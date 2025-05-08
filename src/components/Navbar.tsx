@@ -36,7 +36,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className="flex items-center">
             <a href="#home" className="text-2xl font-bold text-white">
-              <span className="text-idOrange">iD</span> Digital
+              <span className="text-idOrange">Agência</span> iD
             </a>
           </div>
 

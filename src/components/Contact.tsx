@@ -9,7 +9,6 @@ const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    company: '',
     phone: '',
     message: ''
   });
@@ -54,7 +53,6 @@ const Contact = () => {
       setFormData({
         name: '',
         email: '',
-        company: '',
         phone: '',
         message: ''
       });
@@ -166,20 +164,6 @@ const Contact = () => {
                       onChange={handleChange}
                       required
                       placeholder={language === 'PT' ? 'seu@email.com' : 'your@email.com'}
-                      className="bg-black/40 border-gray-700 focus:border-idOrange text-white"
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="company" className="block text-sm font-medium text-gray-300 mb-1">
-                      {language === 'PT' ? 'Empresa' : 'Company'}
-                    </label>
-                    <Input 
-                      id="company"
-                      name="company"
-                      value={formData.company}
-                      onChange={handleChange}
-                      placeholder={language === 'PT' ? 'Nome da sua empresa' : 'Your company name'}
                       className="bg-black/40 border-gray-700 focus:border-idOrange text-white"
                     />
                   </div>
