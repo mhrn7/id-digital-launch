@@ -78,56 +78,16 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* Hero Rocket 3D Image */}
+          {/* Hero Rocket Image */}
           <div className="flex justify-center animate-on-scroll">
-            <div className="relative">
-              {/* Enhanced 3D Rocket */}
-              <svg 
-                className="max-w-full h-auto w-80 md:w-96 animate-float" 
-                viewBox="0 0 200 300" 
-                fill="none" 
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                {/* Rocket Body */}
-                <g transform="translate(50, 20)">
-                  {/* Rocket Main Body */}
-                  <path d="M50 0C40 0 30 10 30 30C30 80 50 170 50 170C50 170 70 80 70 30C70 10 60 0 50 0Z" fill="#F97316" />
-                  
-                  {/* Rocket Window */}
-                  <circle cx="50" cy="50" r="10" fill="#F1F1F1" />
-                  <circle cx="50" cy="50" r="7" fill="#E4E4E7" />
-                  
-                  {/* Rocket Fins */}
-                  <path d="M30 120L0 150L0 100L30 120Z" fill="#403E43" />
-                  <path d="M70 120L100 150L100 100L70 120Z" fill="#403E43" />
-                  
-                  {/* Rocket Bottom */}
-                  <path d="M30 170L40 200L50 170L60 200L70 170C70 170 65 175 50 175C35 175 30 170 30 170Z" fill="#F97316" />
-                  
-                  {/* Rocket Flames */}
-                  <g className="animate-pulse">
-                    <path d="M35 175L25 220C25 220 30 210 35 205C40 200 45 200 50 200C55 200 60 200 65 205C70 210 75 220 75 220L65 175" fill="#FDBA74" />
-                    <path d="M40 175L35 210C35 210 40 205 45 200C47 198 49 198 50 198C51 198 53 198 55 200C60 205 65 210 65 210L60 175" fill="#F97316" />
-                  </g>
-                  
-                  {/* Rocket Details */}
-                  <path d="M40 80L60 80" stroke="#F97316" strokeWidth="2" />
-                  <path d="M35 90L65 90" stroke="#F97316" strokeWidth="2" />
-                  <path d="M35 100L65 100" stroke="#F97316" strokeWidth="2" />
-                  
-                  {/* 3D Shadow Effect */}
-                  <path d="M50 0C45 0 40 5 35 15C35 15 55 10 65 15C60 5 55 0 50 0Z" fill="#FB923C" />
-                  <path d="M70 30C70 10 60 0 50 0C60 0 65 10 65 30C65 80 50 170 50 170C50 170 70 80 70 30Z" fill="#EA580C" opacity="0.5" />
-                </g>
-                
-                {/* Stars Background */}
-                <circle cx="20" cy="40" r="2" fill="white" opacity="0.8" />
-                <circle cx="180" cy="60" r="1.5" fill="white" opacity="0.6" />
-                <circle cx="160" cy="160" r="2" fill="white" opacity="0.7" />
-                <circle cx="30" cy="180" r="1" fill="white" opacity="0.5" />
-                <circle cx="150" cy="30" r="1.5" fill="white" opacity="0.6" />
-                <circle cx="40" cy="120" r="1" fill="white" opacity="0.5" />
-              </svg>
+            <div className="relative w-full max-w-md">
+              <img 
+                src="/lovable-uploads/de67c327-2a6e-4fb3-b59a-d1627b5a65b0.png" 
+                alt="Foguete Agência iD" 
+                className="w-full h-auto animate-float"
+              />
+              {/* Subtle glow effect */}
+              <div className="absolute -inset-4 bg-idOrange/10 rounded-full blur-xl -z-10"></div>
               <div className="absolute -bottom-4 left-0 right-0 h-20 bg-gradient-to-t from-idBlack to-transparent"></div>
             </div>
           </div>
