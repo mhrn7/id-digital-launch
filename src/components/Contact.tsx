@@ -1,4 +1,3 @@
-
 import { useState, useEffect, FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -265,11 +264,6 @@ const Contact = () => {
                       ) : language === 'PT' ? 'Enviar Mensagem' : 'Send Message'}
                     </Button>
                   </div>
-                  <p className="text-xs text-gray-400 text-center pt-2">
-                    {language === 'PT' 
-                      ? 'Os dados do formulário serão enviados para nossa planilha Google.'
-                      : 'Form data will be sent to our Google Sheet.'}
-                  </p>
                 </form>
               )}
             </div>
