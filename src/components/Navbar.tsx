@@ -29,6 +29,12 @@ const Navbar = () => {
     { name: language === 'PT' ? 'Contato' : 'Contact', href: '#contact' },
   ];
 
+  const whatsappMessage = language === 'PT' 
+    ? 'Olá! Vim pelo site da Agência iD e gostaria de saber mais sobre os serviços.'
+    : 'Hello! I came from the iD Agency website and would like to know more about the services.';
+
+  const whatsappLink = `https://wa.me/5561999601534?text=${encodeURIComponent(whatsappMessage)}`;
+
   return (
     <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-black/95 shadow-md' : 'bg-transparent'}`}>
       <div className="container-custom">
@@ -75,9 +81,11 @@ const Navbar = () => {
               <Languages size={20} className="mr-1" />
               <span>{language}</span>
             </button>
-            <Button className="btn-primary">
-              {language === 'PT' ? 'Fale com um Especialista' : 'Talk to a Specialist'}
-            </Button>
+            <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+              <Button className="btn-primary">
+                {language === 'PT' ? 'Fale com um Especialista' : 'Talk to a Specialist'}
+              </Button>
+            </a>
           </div>
         </nav>
 
@@ -98,9 +106,11 @@ const Navbar = () => {
               <Languages size={20} className="mr-1" />
               <span>{language}</span>
             </button>
-            <Button className="btn-primary">
-              {language === 'PT' ? 'Fale Conosco' : 'Contact Us'}
-            </Button>
+            <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+              <Button className="btn-primary">
+                {language === 'PT' ? 'Fale Conosco' : 'Contact Us'}
+              </Button>
+            </a>
           </div>
         </div>
       </div>

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -93,6 +92,12 @@ const Testimonials = () => {
     },
   ];
 
+  const whatsappMessage = language === 'PT' 
+    ? 'Olá! Vim pelo site da Agência iD e gostaria de saber mais sobre uma consultoria.'
+    : 'Hello! I came from the iD Agency website and would like to know more about a consultation.';
+
+  const whatsappLink = `https://wa.me/5561999601534?text=${encodeURIComponent(whatsappMessage)}`;
+
   return (
     <section id="testimonials" className="section-padding bg-gradient-to-b from-idDarkBlack to-black">
       <div className="container-custom">
@@ -131,9 +136,11 @@ const Testimonials = () => {
                 ? 'Junte-se aos nossos clientes satisfeitos e veja o poder do marketing digital estratégico.'
                 : 'Join our satisfied clients and see the power of strategic digital marketing.'}
             </p>
-            <Button className="btn-primary">
-              {language === 'PT' ? 'Solicite uma Consultoria' : 'Request a Consultation'}
-            </Button>
+            <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+              <Button className="btn-primary">
+                {language === 'PT' ? 'Solicite uma Consultoria' : 'Request a Consultation'}
+              </Button>
+            </a>
           </div>
         </div>
       </div>

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
@@ -195,6 +194,12 @@ const Services = () => {
     }
   ];
 
+  const whatsappMessage = language === 'PT' 
+    ? 'Olá! Vim pelo site da Agência iD e gostaria de saber mais sobre os serviços.'
+    : 'Hello! I came from the iD Agency website and would like to know more about the services.';
+
+  const whatsappLink = `https://wa.me/5561999601534?text=${encodeURIComponent(whatsappMessage)}`;
+
   return (
     <section id="services" className="section-padding bg-black">
       <div className="container-custom">
@@ -224,11 +229,7 @@ const Services = () => {
 
         <div className="mt-16 text-center animate-on-scroll">
           <a 
-            href={`https://wa.me/5561999601534?text=${encodeURIComponent(
-              language === 'PT' 
-                ? 'Olá! Vim pelo site da Agência iD e gostaria de saber mais sobre os serviços.'
-                : 'Hello! I came from the iD Agency website and would like to know more about the services.'
-            )}`}
+            href={whatsappLink}
             target="_blank" 
             rel="noopener noreferrer"
           >

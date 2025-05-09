@@ -42,6 +42,12 @@ const Footer = () => {
     { name: language === 'PT' ? 'Contato' : 'Contact', href: '#contact' },
   ];
 
+  const whatsappMessage = language === 'PT' 
+    ? 'Olá! Vim pelo site da Agência iD e gostaria de saber mais sobre os serviços.'
+    : 'Hello! I came from the iD Agency website and would like to know more about the services.';
+
+  const whatsappLink = `https://wa.me/5561999601534?text=${encodeURIComponent(whatsappMessage)}`;
+
   return (
     <footer className="bg-black pt-16 relative">
       {/* Background Effects */}
@@ -137,9 +143,11 @@ const Footer = () => {
               </li>
             </ul>
             <div className="mt-6">
-              <Button className="btn-primary">
-                {language === 'PT' ? 'Fale com um Especialista' : 'Talk to a Specialist'}
-              </Button>
+              <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+                <Button className="btn-primary">
+                  {language === 'PT' ? 'Fale com um Especialista' : 'Talk to a Specialist'}
+                </Button>
+              </a>
             </div>
           </div>
         </div>
@@ -150,10 +158,10 @@ const Footer = () => {
             © 2025 Agência iD. {language === 'PT' ? 'Todos os direitos reservados.' : 'All rights reserved.'}
           </p>
           <div className="mt-3 md:mt-0 flex justify-center md:justify-end space-x-6">
-            <a href="#" className="text-gray-400 hover:text-idOrange transition-colors duration-300">
+            <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-idOrange transition-colors duration-300">
               {language === 'PT' ? 'Termos de Uso' : 'Terms of Use'}
             </a>
-            <a href="#" className="text-gray-400 hover:text-idOrange transition-colors duration-300">
+            <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-idOrange transition-colors duration-300">
               {language === 'PT' ? 'Política de Privacidade' : 'Privacy Policy'}
             </a>
           </div>
