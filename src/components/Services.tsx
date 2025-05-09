@@ -1,20 +1,16 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 
 interface ServiceDetailsProps {
   title: string;
   details: string[];
-  isActive: boolean;
 }
 
-const ServiceDetails = ({ title, details, isActive }: ServiceDetailsProps) => {
+const ServiceDetails = ({ title, details }: ServiceDetailsProps) => {
   return (
-    <div 
-      className={`mt-4 overflow-hidden transition-all duration-300 ease-in-out ${
-        isActive ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
-      }`}
-    >
+    <div className="mt-4">
       <h4 className="text-lg font-semibold mb-2 text-idOrange">{title}</h4>
       <ul className="space-y-2">
         {details.map((detail, idx) => (
@@ -35,28 +31,19 @@ interface ServiceCardProps {
   description: string;
   icon: React.ReactNode;
   details: string[];
-  isExpanded: boolean;
-  onClick: () => void;
 }
 
-const ServiceCard = ({ title, description, icon, details, isExpanded, onClick }: ServiceCardProps) => {
+const ServiceCard = ({ title, description, icon, details }: ServiceCardProps) => {
   return (
     <div 
-      className={`bg-gradient-to-br from-idDarkBlack to-black p-6 rounded-lg border transition-all duration-300 cursor-pointer animate-on-scroll ${
-        isExpanded 
-          ? 'border-idOrange shadow-lg shadow-idOrange/20' 
-          : 'border-gray-800 hover:border-idOrange/50 hover:shadow-lg hover:shadow-idOrange/10'
-      }`}
-      onClick={onClick}
+      className="bg-gradient-to-br from-idDarkBlack to-black p-6 rounded-lg border border-gray-800 
+                 transition-all duration-300 animate-on-scroll hover:border-idOrange/50 
+                 hover:shadow-lg hover:shadow-idOrange/10"
     >
-      <div className={`w-14 h-14 bg-idOrange/10 rounded-lg flex items-center justify-center mb-6 transition-all duration-300 ${
-        isExpanded ? 'bg-idOrange/30' : 'bg-idOrange/10 hover:bg-idOrange/20'
-      }`}>
+      <div className="w-14 h-14 bg-idOrange/10 rounded-lg flex items-center justify-center mb-6 transition-all duration-300 hover:bg-idOrange/20">
         {icon}
       </div>
-      <h3 className={`text-xl font-bold mb-3 transition-colors duration-300 ${
-        isExpanded ? 'text-idOrange' : 'text-white hover:text-idOrange'
-      }`}>
+      <h3 className="text-xl font-bold mb-3 transition-colors duration-300 text-white hover:text-idOrange">
         {title}
       </h3>
       <p className="text-gray-400">{description}</p>
@@ -64,7 +51,6 @@ const ServiceCard = ({ title, description, icon, details, isExpanded, onClick }:
       <ServiceDetails 
         title={`Detalhes sobre ${title}`}
         details={details}
-        isActive={isExpanded}
       />
     </div>
   );
@@ -72,7 +58,6 @@ const ServiceCard = ({ title, description, icon, details, isExpanded, onClick }:
 
 const Services = () => {
   const [language, setLanguage] = useState('PT');
-  const [activeService, setActiveService] = useState<number | null>(null);
 
   useEffect(() => {
     // Check for URL params or localStorage for language setting
@@ -94,14 +79,6 @@ const Services = () => {
 
     return () => observer.disconnect();
   }, []);
-  
-  const handleServiceClick = (index: number) => {
-    if (activeService === index) {
-      setActiveService(null);
-    } else {
-      setActiveService(index);
-    }
-  };
 
   const services = [
     {
@@ -231,11 +208,6 @@ const Services = () => {
               ? 'Oferecemos soluções completas de marketing digital para impulsionar o crescimento do seu negócio.'
               : 'We offer complete digital marketing solutions to drive your business growth.'}
           </p>
-          <p className="text-sm text-gray-400 mt-4 animate-on-scroll">
-            {language === 'PT' 
-              ? 'Clique nos cards para saber mais sobre cada serviço'
-              : 'Click on the cards to learn more about each service'}
-          </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -246,8 +218,6 @@ const Services = () => {
               description={service.description}
               icon={service.icon}
               details={service.details}
-              isExpanded={activeService === index}
-              onClick={() => handleServiceClick(index)}
             />
           ))}
         </div>
