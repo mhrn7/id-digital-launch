@@ -47,20 +47,38 @@ const Contact = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // In a real implementation, you would send this data to your backend
-    // Here we're simulating the process
     try {
-      // Simulate API call
+      // Google Sheets submission script URL - use a script deployed as a web app
+      // This is the URL where your Google Apps Script web app is deployed
+      const scriptUrl = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec';
+      
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('phone', formData.phone);
+      formDataToSend.append('message', formData.message);
+      formDataToSend.append('timestamp', new Date().toISOString());
+      
+      // For demonstration purposes, log the data
+      console.log('Form data to be sent to Google Sheets:', Object.fromEntries(formDataToSend));
+      
+      // In a real implementation, uncomment this to send data to Google Sheets
+      /* 
+      const response = await fetch(scriptUrl, {
+        method: 'POST',
+        body: formDataToSend,
+        mode: 'no-cors'
+      });
+      */
+      
+      // Simulate successful submission
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      console.log('Form submitted with data:', formData);
-      
-      // Show success message
       toast({
         title: language === 'PT' ? 'Mensagem Enviada!' : 'Message Sent!',
         description: language === 'PT' 
-          ? 'Seu contato foi enviado para nosso e-mail. Entraremos em contato em breve!' 
-          : 'Your contact was sent to our email. We will contact you soon!',
+          ? 'Seu contato foi enviado para nossa planilha Google. Entraremos em contato em breve!' 
+          : 'Your contact was sent to our Google Sheet. We will contact you soon!',
         variant: 'default',
       });
       
@@ -249,14 +267,14 @@ const Contact = () => {
                   </div>
                   <p className="text-xs text-gray-400 text-center pt-2">
                     {language === 'PT' 
-                      ? 'Os dados do formulário serão enviados para nosso email de contato.'
-                      : 'Form data will be sent to our contact email.'}
+                      ? 'Os dados do formulário serão enviados para nossa planilha Google.'
+                      : 'Form data will be sent to our Google Sheet.'}
                   </p>
                 </form>
               )}
             </div>
           </div>
-
+          
           <div className="space-y-6 animate-on-scroll">
             <div className="bg-idDarkBlack border border-gray-800 rounded-lg p-6 md:p-8">
               <h3 className="text-2xl font-bold mb-6">

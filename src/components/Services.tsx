@@ -50,12 +50,12 @@ const ServiceCard = ({ title, description, icon, details, isExpanded, onClick }:
       onClick={onClick}
     >
       <div className={`w-14 h-14 bg-idOrange/10 rounded-lg flex items-center justify-center mb-6 transition-all duration-300 ${
-        isExpanded ? 'bg-idOrange/30' : 'group-hover:bg-idOrange/20'
+        isExpanded ? 'bg-idOrange/30' : 'bg-idOrange/10 hover:bg-idOrange/20'
       }`}>
         {icon}
       </div>
       <h3 className={`text-xl font-bold mb-3 transition-colors duration-300 ${
-        isExpanded ? 'text-idOrange' : 'text-white group-hover:text-idOrange'
+        isExpanded ? 'text-idOrange' : 'text-white hover:text-idOrange'
       }`}>
         {title}
       </h3>
