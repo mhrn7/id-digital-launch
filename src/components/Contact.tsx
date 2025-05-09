@@ -3,6 +3,7 @@ import { useState, useEffect, FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
 
 const Contact = () => {
   const [language, setLanguage] = useState('PT');
@@ -14,6 +15,7 @@ const Contact = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     // Check for URL params or localStorage for language setting
@@ -41,14 +43,27 @@ const Contact = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
-    setTimeout(() => {
+    // In a real implementation, you would send this data to your backend
+    // Here we're simulating the process
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       console.log('Form submitted with data:', formData);
-      setIsSubmitting(false);
+      
+      // Show success message
+      toast({
+        title: language === 'PT' ? 'Mensagem Enviada!' : 'Message Sent!',
+        description: language === 'PT' 
+          ? 'Seu contato foi enviado para nosso e-mail. Entraremos em contato em breve!' 
+          : 'Your contact was sent to our email. We will contact you soon!',
+        variant: 'default',
+      });
+      
       setFormSubmitted(true);
       setFormData({
         name: '',
@@ -61,7 +76,18 @@ const Contact = () => {
       setTimeout(() => {
         setFormSubmitted(false);
       }, 3000);
-    }, 1000);
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast({
+        title: language === 'PT' ? 'Erro ao Enviar' : 'Sending Error',
+        description: language === 'PT' 
+          ? 'Ocorreu um erro ao enviar sua mensagem. Por favor, tente novamente.' 
+          : 'An error occurred while sending your message. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfo = [
@@ -93,6 +119,12 @@ const Contact = () => {
       info: '@agenciaiddigital'
     }
   ];
+
+  const whatsappMessage = language === 'PT' 
+    ? 'Olá! Vim pelo site da Agência iD e gostaria de saber mais sobre os serviços.'
+    : 'Hello! I came from the iD Agency website and would like to know more about the services.';
+
+  const whatsappLink = `https://wa.me/5561999601534?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
     <section id="contact" className="section-padding bg-black relative">
@@ -215,6 +247,11 @@ const Contact = () => {
                       ) : language === 'PT' ? 'Enviar Mensagem' : 'Send Message'}
                     </Button>
                   </div>
+                  <p className="text-xs text-gray-400 text-center pt-2">
+                    {language === 'PT' 
+                      ? 'Os dados do formulário serão enviados para nosso email de contato.'
+                      : 'Form data will be sent to our contact email.'}
+                  </p>
                 </form>
               )}
             </div>
@@ -253,11 +290,7 @@ const Contact = () => {
               </p>
               
               <a 
-                href={`https://wa.me/5561999601534?text=${encodeURIComponent(
-                  language === 'PT' 
-                    ? 'Olá! Vim pelo site da Agência iD e gostaria de saber mais sobre os serviços.'
-                    : 'Hello! I came from the iD Agency website and would like to know more about the services.'
-                )}`}
+                href={whatsappLink}
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="flex items-center justify-center bg-green-600 hover:bg-green-700 text-white py-3 px-6 rounded-md transition-colors duration-300 w-full"

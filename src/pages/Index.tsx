@@ -9,6 +9,7 @@ import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import { LanguageProvider } from '@/components/LanguageProvider';
 import StructuredData from '@/components/StructuredData';
+import { Toaster } from '@/components/ui/toaster';
 
 const Index = () => {
   useEffect(() => {
@@ -39,6 +40,7 @@ const Index = () => {
   return (
     <LanguageProvider>
       <div className="min-h-screen bg-black text-white overflow-x-hidden">
+        <Toaster />
         <StructuredData />
         <Navbar />
         <Hero />

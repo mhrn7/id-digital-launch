@@ -26,6 +26,12 @@ const Hero = () => {
     return () => observer.disconnect();
   }, []);
 
+  const whatsappMessage = language === 'PT' 
+    ? 'Olá! Vim pelo site da Agência iD e gostaria de saber mais sobre os serviços.'
+    : 'Hello! I came from the iD Agency website and would like to know more about the services.';
+
+  const whatsappLink = `https://wa.me/5561999601534?text=${encodeURIComponent(whatsappMessage)}`;
+
   return (
     <section id="home" className="relative min-h-screen flex items-center pt-20 bg-idBlack overflow-hidden">
       {/* Background Effects */}
@@ -53,12 +59,20 @@ const Hero = () => {
               )}
             </p>
             <div className="flex flex-wrap gap-4">
-              <Button className="btn-primary">
-                {language === 'PT' ? 'Solicite uma Proposta' : 'Request a Proposal'}
-              </Button>
-              <Button variant="outline" className="btn-outline">
-                {language === 'PT' ? 'Conheça Nossos Serviços' : 'Our Services'}
-              </Button>
+              <a 
+                href={whatsappLink} 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                <Button className="btn-primary">
+                  {language === 'PT' ? 'Solicite uma Proposta' : 'Request a Proposal'}
+                </Button>
+              </a>
+              <a href="#services">
+                <Button variant="outline" className="btn-outline">
+                  {language === 'PT' ? 'Conheça Nossos Serviços' : 'Our Services'}
+                </Button>
+              </a>
             </div>
 
             {/* Stats */}
