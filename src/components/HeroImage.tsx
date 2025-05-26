@@ -74,22 +74,26 @@ const HeroImage = () => {
 
   return (
     <div className="flex justify-center animate-on-scroll">
-      <div className="relative w-full max-w-md">
+      <div className="relative w-full max-w-lg">
         <img 
           src={processedImageUrl || '/lovable-uploads/2bbf8ed2-f3d6-4042-b62b-2fb10b56313f.png'}
           alt="Profissional da Agência iD"
-          className="w-full h-auto object-contain animate-float rounded-lg"
+          className="w-full h-auto object-contain animate-float rounded-2xl shadow-2xl"
           style={{
-            filter: 'drop-shadow(0 10px 30px rgba(242, 113, 18, 0.3))',
-            maxHeight: '500px'
+            filter: 'drop-shadow(0 20px 40px rgba(242, 113, 18, 0.4)) contrast(1.1) brightness(1.05)',
+            maxHeight: '600px',
+            imageRendering: 'crisp-edges'
           }}
           loading="eager"
           fetchPriority="high"
         />
         
-        {/* Subtle glow effect */}
-        <div className="absolute -inset-4 bg-idOrange/10 rounded-full blur-xl -z-10"></div>
-        <div className="absolute -bottom-4 left-0 right-0 h-20 bg-gradient-to-t from-idBlack to-transparent"></div>
+        {/* Enhanced glow effect */}
+        <div className="absolute -inset-6 bg-gradient-to-br from-idOrange/20 via-idOrange/10 to-transparent rounded-full blur-2xl -z-10"></div>
+        <div className="absolute -bottom-6 left-0 right-0 h-24 bg-gradient-to-t from-idBlack via-idBlack/80 to-transparent"></div>
+        
+        {/* Professional frame effect */}
+        <div className="absolute inset-0 rounded-2xl border border-white/10 pointer-events-none"></div>
       </div>
     </div>
   );

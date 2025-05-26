@@ -4,7 +4,7 @@ import { pipeline, env } from '@huggingface/transformers';
 env.allowLocalModels = false;
 env.useBrowserCache = false;
 
-const MAX_IMAGE_DIMENSION = 1024;
+const MAX_IMAGE_DIMENSION = 1536; // Increased for better quality
 
 function resizeImageIfNeeded(canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, image: HTMLImageElement) {
   let width = image.naturalWidth;
@@ -21,12 +21,17 @@ function resizeImageIfNeeded(canvas: HTMLCanvasElement, ctx: CanvasRenderingCont
 
     canvas.width = width;
     canvas.height = height;
+    // Use better image smoothing
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(image, 0, 0, width, height);
     return true;
   }
 
   canvas.width = width;
   canvas.height = height;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = 'high';
   ctx.drawImage(image, 0, 0);
   return false;
 }
@@ -48,8 +53,8 @@ export const removeBackground = async (imageElement: HTMLImageElement): Promise<
     const wasResized = resizeImageIfNeeded(canvas, ctx, imageElement);
     console.log(`Image ${wasResized ? 'was' : 'was not'} resized. Final dimensions: ${canvas.width}x${canvas.height}`);
     
-    // Get image data as base64
-    const imageData = canvas.toDataURL('image/jpeg', 0.8);
+    // Get image data as PNG for better quality
+    const imageData = canvas.toDataURL('image/png', 1.0);
     console.log('Image converted to base64');
     
     // Process the image with the segmentation model
@@ -58,9 +63,21 @@ export const removeBackground = async (imageElement: HTMLImageElement): Promise<
     
     console.log('Segmentation result:', result);
     
-    if (!result || !Array.isArray(result) || result.length === 0 || !result[0].mask) {
+    if (!result || !Array.isArray(result) || result.length === 0) {
       throw new Error('Invalid segmentation result');
     }
+    
+    // Find the person mask
+    const personMask = result.find(r => r.label === 'person');
+    if (!personMask || !personMask.mask) {
+      // If no person detected, use the first mask (usually background)
+      console.log('No person mask found, using first available mask');
+      if (!result[0].mask) {
+        throw new Error('No valid mask found');
+      }
+    }
+    
+    const maskToUse = personMask || result[0];
     
     // Create a new canvas for the masked image
     const outputCanvas = document.createElement('canvas');
@@ -69,6 +86,10 @@ export const removeBackground = async (imageElement: HTMLImageElement): Promise<
     const outputCtx = outputCanvas.getContext('2d');
     
     if (!outputCtx) throw new Error('Could not get output canvas context');
+    
+    // Enable high quality rendering
+    outputCtx.imageSmoothingEnabled = true;
+    outputCtx.imageSmoothingQuality = 'high';
     
     // Draw original image
     outputCtx.drawImage(canvas, 0, 0);
@@ -81,17 +102,29 @@ export const removeBackground = async (imageElement: HTMLImageElement): Promise<
     );
     const data = outputImageData.data;
     
-    // Apply inverted mask to alpha channel
-    for (let i = 0; i < result[0].mask.data.length; i++) {
-      // Invert the mask value (1 - result[0].mask.data[i]) to keep the subject instead of the background
-      const alpha = Math.round((1 - result[0].mask.data[i]) * 255);
+    // Apply mask to alpha channel with better edge detection
+    for (let i = 0; i < maskToUse.mask.data.length; i++) {
+      let alpha;
+      if (personMask) {
+        // Keep the person, remove background
+        alpha = Math.round(maskToUse.mask.data[i] * 255);
+      } else {
+        // Invert the mask (keep subject, remove background)
+        alpha = Math.round((1 - maskToUse.mask.data[i]) * 255);
+      }
+      
+      // Apply some edge smoothing
+      if (alpha > 0 && alpha < 255) {
+        alpha = Math.min(255, alpha * 1.2); // Slightly strengthen semi-transparent edges
+      }
+      
       data[i * 4 + 3] = alpha;
     }
     
     outputCtx.putImageData(outputImageData, 0, 0);
     console.log('Mask applied successfully');
     
-    // Convert canvas to blob
+    // Convert canvas to blob with high quality
     return new Promise((resolve, reject) => {
       outputCanvas.toBlob(
         (blob) => {
@@ -117,6 +150,7 @@ export const loadImage = (file: Blob): Promise<HTMLImageElement> => {
     const img = new Image();
     img.onload = () => resolve(img);
     img.onerror = reject;
+    img.crossOrigin = 'anonymous'; // Enable CORS for better processing
     img.src = URL.createObjectURL(file);
   });
 };
