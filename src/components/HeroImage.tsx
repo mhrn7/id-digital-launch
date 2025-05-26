@@ -13,8 +13,8 @@ const HeroImage = () => {
         setIsProcessing(true);
         console.log('Starting image processing...');
         
-        // Fetch the uploaded image
-        const response = await fetch('/lovable-uploads/de67c327-2a6e-4fb3-b59a-d1627b5a65b0.png');
+        // Fetch the new uploaded image
+        const response = await fetch('/lovable-uploads/2bbf8ed2-f3d6-4042-b62b-2fb10b56313f.png');
         const blob = await response.blob();
         
         // Load the image
@@ -33,7 +33,7 @@ const HeroImage = () => {
         console.error('Error processing image:', err);
         setError('Failed to process image');
         // Fallback to original image
-        setProcessedImageUrl('/lovable-uploads/de67c327-2a6e-4fb3-b59a-d1627b5a65b0.png');
+        setProcessedImageUrl('/lovable-uploads/2bbf8ed2-f3d6-4042-b62b-2fb10b56313f.png');
       } finally {
         setIsProcessing(false);
       }
@@ -76,7 +76,7 @@ const HeroImage = () => {
     <div className="flex justify-center animate-on-scroll">
       <div className="relative w-full max-w-md">
         <img 
-          src={processedImageUrl || '/lovable-uploads/de67c327-2a6e-4fb3-b59a-d1627b5a65b0.png'}
+          src={processedImageUrl || '/lovable-uploads/2bbf8ed2-f3d6-4042-b62b-2fb10b56313f.png'}
           alt="Profissional da Agência iD"
           className="w-full h-auto object-contain animate-float rounded-lg"
           style={{
