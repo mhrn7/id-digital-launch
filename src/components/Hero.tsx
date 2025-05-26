@@ -1,6 +1,7 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import HeroImage from '@/components/HeroImage';
 
 const Hero = () => {
   const [language, setLanguage] = useState('PT');
@@ -92,107 +93,8 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* Hero Rocket 3D Image */}
-          <div className="flex justify-center animate-on-scroll">
-            <div className="relative w-full max-w-md">
-              <svg 
-                className="w-full h-auto animate-float" 
-                viewBox="0 0 400 500" 
-                fill="none" 
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                {/* Rocket Glow Effect */}
-                <ellipse cx="200" cy="350" rx="120" ry="40" fill="url(#rocketGlow)" opacity="0.6" />
-                
-                {/* Rocket Body Group */}
-                <g>
-                  {/* Rocket Base */}
-                  <path d="M180 320H220V380C220 391.046 211.046 400 200 400C188.954 400 180 391.046 180 380V320Z" fill="#E27112" />
-                  
-                  {/* Rocket Main Body */}
-                  <path d="M160 120V320H240V120C240 80 220 40 200 30C180 40 160 80 160 120Z" fill="#F97316" />
-                  <path d="M240 120V320C240 320 270 300 270 220C270 160 250 110 240 120Z" fill="#EA580C" />
-                  <path d="M160 120V320C160 320 130 300 130 220C130 160 150 110 160 120Z" fill="#FB923C" />
-                  
-                  {/* Rocket Nose Cone */}
-                  <path d="M200 30C220 40 240 80 240 120H160C160 80 180 40 200 30Z" fill="#F97316" />
-                  <path d="M240 120C240 120 230 90 200 80C200 80 220 90 240 120Z" fill="#EA580C" />
-                  
-                  {/* Windows */}
-                  <circle cx="200" cy="160" r="25" fill="#F1F1F1" />
-                  <circle cx="200" cy="160" r="20" fill="#FAFAFA" stroke="#E4E4E7" strokeWidth="2" />
-                  <circle cx="200" cy="160" r="12" fill="#E4E4E7" />
-                  
-                  {/* Detailed Lines */}
-                  <path d="M170 220H230" stroke="#EA580C" strokeWidth="3" />
-                  <path d="M170 240H230" stroke="#EA580C" strokeWidth="3" />
-                  <path d="M170 260H230" stroke="#EA580C" strokeWidth="3" />
-                  
-                  {/* Side Thrusters */}
-                  <rect x="140" y="300" width="20" height="40" fill="#D4D4D8" />
-                  <rect x="240" y="300" width="20" height="40" fill="#D4D4D8" />
-                  
-                  {/* Fins */}
-                  <path d="M150 320L110 370V320H150Z" fill="#F97316" />
-                  <path d="M250 320L290 370V320H250Z" fill="#F97316" />
-                  <path d="M150 320L110 370V320Z" fill="#EA580C" stroke="#EA580C" strokeWidth="2" />
-                  <path d="M250 320L290 370V320Z" fill="#EA580C" stroke="#EA580C" strokeWidth="2" />
-                  
-                  {/* Bottom Details */}
-                  <path d="M180 380V400H220V380H180Z" fill="#D4D4D8" />
-                  
-                  {/* Engine Flames - Main */}
-                  <g className="animate-pulse">
-                    <path d="M190 400H210C210 400 220 430 200 450C180 430 190 400 190 400Z" fill="url(#flameGradient)" />
-                    <path d="M192 400H208C208 400 215 420 200 435C185 420 192 400 192 400Z" fill="url(#flameGradientInner)" />
-                  </g>
-                  
-                  {/* Engine Flames - Side Thrusters */}
-                  <g className="animate-pulse">
-                    <path d="M145 340H155C155 340 160 360 150 370C140 360 145 340 145 340Z" fill="url(#flameGradient)" />
-                    <path d="M245 340H255C255 340 260 360 250 370C240 360 245 340 245 340Z" fill="url(#flameGradient)" />
-                  </g>
-                  
-                  {/* 3D Highlights */}
-                  <path d="M160 120C160 120 180 135 200 135C220 135 240 120 240 120C240 120 220 140 200 140C180 140 160 120 160 120Z" fill="white" fillOpacity="0.3" />
-                </g>
-                
-                {/* Stars */}
-                <g className="animate-pulse-slow">
-                  <circle cx="100" cy="100" r="2" fill="white" />
-                  <circle cx="150" cy="80" r="1" fill="white" />
-                  <circle cx="250" cy="100" r="1.5" fill="white" />
-                  <circle cx="300" cy="150" r="1" fill="white" />
-                  <circle cx="120" cy="200" r="2" fill="white" />
-                  <circle cx="280" cy="220" r="1.5" fill="white" />
-                  <circle cx="330" cy="280" r="1" fill="white" />
-                  <circle cx="100" cy="300" r="1.5" fill="white" />
-                </g>
-                
-                {/* Gradients definitions */}
-                <defs>
-                  <radialGradient id="rocketGlow" cx="0.5" cy="0.5" r="0.5" fx="0.5" fy="0.5">
-                    <stop offset="0%" stopColor="#F97316" stopOpacity="0.8" />
-                    <stop offset="100%" stopColor="#F97316" stopOpacity="0" />
-                  </radialGradient>
-                  <linearGradient id="flameGradient" x1="200" y1="400" x2="200" y2="450" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="#FDBA74" />
-                    <stop offset="50%" stopColor="#F97316" />
-                    <stop offset="100%" stopColor="#EA580C" />
-                  </linearGradient>
-                  <linearGradient id="flameGradientInner" x1="200" y1="400" x2="200" y2="435" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="white" />
-                    <stop offset="40%" stopColor="#FDBA74" />
-                    <stop offset="100%" stopColor="#F97316" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              
-              {/* Subtle glow effect */}
-              <div className="absolute -inset-4 bg-idOrange/10 rounded-full blur-xl -z-10"></div>
-              <div className="absolute -bottom-4 left-0 right-0 h-20 bg-gradient-to-t from-idBlack to-transparent"></div>
-            </div>
-          </div>
+          {/* Hero Image - Professional Photo */}
+          <HeroImage />
         </div>
       </div>
       
