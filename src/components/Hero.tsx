@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import HeroImage from '@/components/HeroImage';
+import CounterAnimation from '@/components/CounterAnimation';
 
 const Hero = () => {
   const [language, setLanguage] = useState('PT');
@@ -76,34 +77,20 @@ const Hero = () => {
               </a>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mt-12">
-              <div className="border border-gray-800 rounded-lg p-4 bg-idDarkBlack/50">
-                <h3 className="text-idOrange text-3xl font-bold">2M</h3>
-                <p className="text-gray-400">{language === 'PT' ? 'Gerenciados em anúncios' : 'Managed in ads'}</p>
-              </div>
-              <div className="border border-gray-800 rounded-lg p-4 bg-idDarkBlack/50">
-                <h3 className="text-idOrange text-3xl font-bold">{language === 'PT' ? 'Local' : 'Local'}</h3>
-                <p className="text-gray-400">{language === 'PT' ? 'Especialista em negócios locais' : 'Local business specialist'}</p>
-              </div>
-              <div className="border border-gray-800 rounded-lg p-4 bg-idDarkBlack/50">
-                <h3 className="text-idOrange text-3xl font-bold">24/7</h3>
-                <p className="text-gray-400">{language === 'PT' ? 'Suporte ao cliente' : 'Customer support'}</p>
-              </div>
+            {/* Animated Counter */}
+            <div className="flex justify-center md:justify-start mt-12">
+              <CounterAnimation 
+                targetValue={800000}
+                duration={5000}
+                suffix=""
+                label={language === 'PT' ? 'Gerenciados em Anúncios Online' : 'Managed in Online Ads'}
+              />
             </div>
           </div>
 
           {/* Hero Image - Professional Photo */}
           <HeroImage />
         </div>
-      </div>
-      
-      {/* Scroll Down Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-pulse-slow">
-        <span className="text-gray-400 mb-2">{language === 'PT' ? 'Role para baixo' : 'Scroll down'}</span>
-        <svg className="w-6 h-6 text-idOrange" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-        </svg>
       </div>
     </section>
   );

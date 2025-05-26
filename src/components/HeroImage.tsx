@@ -14,7 +14,7 @@ const HeroImage = () => {
         console.log('Starting image processing...');
         
         // Fetch the uploaded image
-        const response = await fetch('/lovable-uploads/3091e9a7-c7f2-48cf-a751-7b410ed6c321.png');
+        const response = await fetch('/lovable-uploads/de67c327-2a6e-4fb3-b59a-d1627b5a65b0.png');
         const blob = await response.blob();
         
         // Load the image
@@ -33,7 +33,7 @@ const HeroImage = () => {
         console.error('Error processing image:', err);
         setError('Failed to process image');
         // Fallback to original image
-        setProcessedImageUrl('/lovable-uploads/3091e9a7-c7f2-48cf-a751-7b410ed6c321.png');
+        setProcessedImageUrl('/lovable-uploads/de67c327-2a6e-4fb3-b59a-d1627b5a65b0.png');
       } finally {
         setIsProcessing(false);
       }
@@ -76,13 +76,15 @@ const HeroImage = () => {
     <div className="flex justify-center animate-on-scroll">
       <div className="relative w-full max-w-md">
         <img 
-          src={processedImageUrl || '/lovable-uploads/3091e9a7-c7f2-48cf-a751-7b410ed6c321.png'}
+          src={processedImageUrl || '/lovable-uploads/de67c327-2a6e-4fb3-b59a-d1627b5a65b0.png'}
           alt="Profissional da Agência iD"
           className="w-full h-auto object-contain animate-float rounded-lg"
           style={{
             filter: 'drop-shadow(0 10px 30px rgba(242, 113, 18, 0.3))',
             maxHeight: '500px'
           }}
+          loading="eager"
+          fetchPriority="high"
         />
         
         {/* Subtle glow effect */}
