@@ -35,8 +35,8 @@ const About = () => {
           </h2>
           <p className="text-lg text-gray-300 animate-on-scroll">
             {language === 'PT' 
-              ? 'Agência iD é especializada em gestão de anúncios online com foco em aquisição de clientes e vendas para negócios locais. Oferecendo soluções inovadoras para impulsionar seu negócio no ambiente digital, estamos presentes no Brasil e Estados Unidos.'
-              : 'iD Agency specializes in online advertising management focused on customer acquisition and sales for local businesses. Offering innovative solutions to boost your business in the digital environment, we are present in Brazil and the United States.'}
+              ? 'A Agência iD é especializada em tráfego pago e automação com inteligência artificial, oferecendo soluções inovadoras para impulsionar seu negócio no ambiente digital.'
+              : 'iD Agency specializes in paid traffic and automation with artificial intelligence, offering innovative solutions to boost your business in the digital environment.'}
           </p>
         </div>
 
@@ -91,8 +91,8 @@ const About = () => {
                 </svg>
                 <span className="text-gray-300">
                   {language === 'PT'
-                    ? 'Relatórios transparentes e métricas claras'
-                    : 'Transparent reports and clear metrics'}
+                    ? 'Relatórios transparentes e métricas claras de ROI'
+                    : 'Transparent reports and clear ROI metrics'}
                 </span>
               </li>
               <li className="flex items-start">
