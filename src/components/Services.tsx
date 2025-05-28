@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
@@ -83,8 +84,8 @@ const Services = () => {
     {
       title: language === 'PT' ? 'Gestão de Tráfego Pago Estratégico' : 'Strategic Paid Traffic Management',
       description: language === 'PT' 
-        ? 'Estratégias otimizadas para plataformas digitais com foco em conversão e ROI.' 
-        : 'Optimized strategies for digital platforms focused on conversion and ROI.',
+        ? 'Estratégias otimizadas para plataformas digitais com foco em conversão e resultados.' 
+        : 'Optimized strategies for digital platforms focused on conversion and results.',
       icon: (
         <svg className="w-8 h-8 text-idOrange" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
@@ -92,20 +93,28 @@ const Services = () => {
       ),
       details: language === 'PT' 
         ? [
-            'Campanhas otimizadas para busca, display e remarketing com foco em conversão',
-            'Anúncios no Google Ads com estratégias avançadas de segmentação',
-            'Campanhas para Facebook Ads com maximização de orçamento e resultados',
-            'Instagram Ads visualmente impactantes para engajar seu público-alvo',
-            'TikTok Ads focados em conteúdos virais e alto engajamento',
-            'LinkedIn Ads direcionados para profissionais qualificados e decisores'
+            'Campanhas no Google Ads que geram cliques qualificados e mais vendas',
+            'Segmentação inteligente para busca, display e remarketing com foco total em conversão',
+            'Facebook Ads com estratégias que aproveitam cada centavo do seu orçamento',
+            'Anúncios criados para alcançar as pessoas certas e gerar resultados reais',
+            'Instagram Ads que chamam atenção e conectam com seu público',
+            'Criações visuais impactantes para aumentar engajamento e atrair novos clientes',
+            'TikTok Ads com conteúdo envolvente que viraliza',
+            'Campanhas criativas e de alto impacto para alcançar milhares de pessoas com baixo custo',
+            'LinkedIn Ads para quem decide',
+            'Anúncios estratégicos focados em profissionais qualificados e tomadores de decisão'
           ]
         : [
-            'Optimized campaigns for search, display and remarketing focused on conversion',
-            'Google Ads with advanced targeting strategies',
-            'Facebook Ads campaigns with budget and results maximization',
-            'Visually impactful Instagram Ads to engage your target audience',
-            'TikTok Ads focused on viral content and high engagement',
-            'LinkedIn Ads targeted at qualified professionals and decision makers'
+            'Google Ads campaigns that generate qualified clicks and more sales',
+            'Smart targeting for search, display and remarketing with total focus on conversion',
+            'Facebook Ads with strategies that make the most of every cent of your budget',
+            'Ads created to reach the right people and generate real results',
+            'Instagram Ads that grab attention and connect with your audience',
+            'Impactful visual creations to increase engagement and attract new customers',
+            'TikTok Ads with engaging content that goes viral',
+            'Creative and high-impact campaigns to reach thousands of people at low cost',
+            'LinkedIn Ads for decision makers',
+            'Strategic ads focused on qualified professionals and decision makers'
           ]
     },
     {

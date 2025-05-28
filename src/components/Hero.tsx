@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 
 const Hero = () => {
   const [language, setLanguage] = useState('PT');
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
     // Check for URL params or localStorage for language setting
@@ -23,7 +24,25 @@ const Hero = () => {
       observer.observe(el);
     });
 
-    return () => observer.disconnect();
+    // Animate counter
+    const duration = 5000; // 5 seconds
+    const targetValue = 700000;
+    const increment = targetValue / (duration / 50);
+    let currentValue = 0;
+
+    const timer = setInterval(() => {
+      currentValue += increment;
+      if (currentValue >= targetValue) {
+        currentValue = targetValue;
+        clearInterval(timer);
+      }
+      setCount(Math.floor(currentValue));
+    }, 50);
+
+    return () => {
+      observer.disconnect();
+      clearInterval(timer);
+    };
   }, []);
 
   const whatsappMessage = language === 'PT' 
@@ -31,6 +50,15 @@ const Hero = () => {
     : 'Hello! I came from the iD Agency website and would like to know more about the services.';
 
   const whatsappLink = `https://wa.me/5561999601534?text=${encodeURIComponent(whatsappMessage)}`;
+
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) {
+      return (num / 1000000).toFixed(1) + 'M';
+    } else if (num >= 1000) {
+      return (num / 1000).toFixed(0) + 'K';
+    }
+    return num.toString();
+  };
 
   return (
     <section id="home" className="relative min-h-screen flex items-center pt-20 bg-idBlack overflow-hidden">
@@ -75,24 +103,20 @@ const Hero = () => {
               </a>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mt-12">
-              <div className="border border-gray-800 rounded-lg p-4 bg-idDarkBlack/50">
-                <h3 className="text-idOrange text-3xl font-bold">2M</h3>
-                <p className="text-gray-400">{language === 'PT' ? 'Gerenciados em anúncios' : 'Managed in ads'}</p>
-              </div>
-              <div className="border border-gray-800 rounded-lg p-4 bg-idDarkBlack/50">
-                <h3 className="text-idOrange text-3xl font-bold">{language === 'PT' ? 'Local' : 'Local'}</h3>
-                <p className="text-gray-400">{language === 'PT' ? 'Especialista em negócios locais' : 'Local business specialist'}</p>
-              </div>
-              <div className="border border-gray-800 rounded-lg p-4 bg-idDarkBlack/50">
-                <h3 className="text-idOrange text-3xl font-bold">24/7</h3>
-                <p className="text-gray-400">{language === 'PT' ? 'Suporte ao cliente' : 'Customer support'}</p>
+            {/* Stats - Single Counter */}
+            <div className="flex justify-center lg:justify-start mt-12">
+              <div className="border border-gray-800 rounded-lg p-6 bg-idDarkBlack/50 text-center max-w-xs">
+                <h3 className="text-idOrange text-4xl font-bold mb-2">
+                  {formatNumber(count)}
+                </h3>
+                <p className="text-gray-400">
+                  {language === 'PT' ? 'Gerenciados em Anúncios' : 'Managed in Ads'}
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Hero Rocket 3D Image */}
+          {/* Enhanced 3D Rocket */}
           <div className="flex justify-center animate-on-scroll">
             <div className="relative w-full max-w-md">
               <svg 
@@ -101,107 +125,207 @@ const Hero = () => {
                 fill="none" 
                 xmlns="http://www.w3.org/2000/svg"
               >
-                {/* Rocket Glow Effect */}
-                <ellipse cx="200" cy="350" rx="120" ry="40" fill="url(#rocketGlow)" opacity="0.6" />
+                {/* Enhanced Rocket Glow Effect */}
+                <ellipse cx="200" cy="360" rx="140" ry="50" fill="url(#enhancedRocketGlow)" opacity="0.8" />
                 
-                {/* Rocket Body Group */}
+                {/* Rocket Body Group with 3D Effects */}
                 <g>
-                  {/* Rocket Base */}
-                  <path d="M180 320H220V380C220 391.046 211.046 400 200 400C188.954 400 180 391.046 180 380V320Z" fill="#E27112" />
+                  {/* Rocket Base with 3D depth */}
+                  <path d="M175 320H225V385C225 397.15 215.15 407 203 407H197C184.85 407 175 397.15 175 385V320Z" fill="url(#baseGradient)" />
+                  <path d="M175 320H225V330H175Z" fill="url(#baseTopGradient)" />
                   
-                  {/* Rocket Main Body */}
-                  <path d="M160 120V320H240V120C240 80 220 40 200 30C180 40 160 80 160 120Z" fill="#F97316" />
-                  <path d="M240 120V320C240 320 270 300 270 220C270 160 250 110 240 120Z" fill="#EA580C" />
-                  <path d="M160 120V320C160 320 130 300 130 220C130 160 150 110 160 120Z" fill="#FB923C" />
+                  {/* Main Rocket Body with enhanced 3D */}
+                  <path d="M155 115V320H245V115C245 70 225 25 200 15C175 25 155 70 155 115Z" fill="url(#bodyGradient)" />
                   
-                  {/* Rocket Nose Cone */}
-                  <path d="M200 30C220 40 240 80 240 120H160C160 80 180 40 200 30Z" fill="#F97316" />
-                  <path d="M240 120C240 120 230 90 200 80C200 80 220 90 240 120Z" fill="#EA580C" />
+                  {/* Side panels for 3D effect */}
+                  <path d="M245 115V320C245 320 275 300 275 210C275 150 255 105 245 115Z" fill="url(#sideGradientRight)" />
+                  <path d="M155 115V320C155 320 125 300 125 210C125 150 175 105 155 115Z" fill="url(#sideGradientLeft)" />
                   
-                  {/* Windows */}
-                  <circle cx="200" cy="160" r="25" fill="#F1F1F1" />
-                  <circle cx="200" cy="160" r="20" fill="#FAFAFA" stroke="#E4E4E7" strokeWidth="2" />
-                  <circle cx="200" cy="160" r="12" fill="#E4E4E7" />
+                  {/* Enhanced Nose Cone */}
+                  <path d="M200 15C225 25 245 70 245 115H155C155 70 175 25 200 15Z" fill="url(#noseGradient)" />
+                  <path d="M245 115C245 115 235 85 200 75C200 75 225 85 245 115Z" fill="url(#noseHighlight)" />
                   
-                  {/* Detailed Lines */}
-                  <path d="M170 220H230" stroke="#EA580C" strokeWidth="3" />
-                  <path d="M170 240H230" stroke="#EA580C" strokeWidth="3" />
-                  <path d="M170 260H230" stroke="#EA580C" strokeWidth="3" />
+                  {/* Enhanced Windows with depth */}
+                  <circle cx="200" cy="160" r="30" fill="url(#windowOuter)" />
+                  <circle cx="200" cy="160" r="25" fill="url(#windowInner)" stroke="#B0B0B0" strokeWidth="2" />
+                  <circle cx="200" cy="160" r="15" fill="url(#windowGlass)" />
+                  <circle cx="195" cy="155" r="8" fill="rgba(255,255,255,0.6)" />
                   
-                  {/* Side Thrusters */}
-                  <rect x="140" y="300" width="20" height="40" fill="#D4D4D8" />
-                  <rect x="240" y="300" width="20" height="40" fill="#D4D4D8" />
+                  {/* Detailed Panel Lines */}
+                  <rect x="165" y="220" width="70" height="4" fill="url(#panelGradient)" rx="2" />
+                  <rect x="165" y="240" width="70" height="4" fill="url(#panelGradient)" rx="2" />
+                  <rect x="165" y="260" width="70" height="4" fill="url(#panelGradient)" rx="2" />
+                  <rect x="165" y="280" width="70" height="4" fill="url(#panelGradient)" rx="2" />
                   
-                  {/* Fins */}
-                  <path d="M150 320L110 370V320H150Z" fill="#F97316" />
-                  <path d="M250 320L290 370V320H250Z" fill="#F97316" />
-                  <path d="M150 320L110 370V320Z" fill="#EA580C" stroke="#EA580C" strokeWidth="2" />
-                  <path d="M250 320L290 370V320Z" fill="#EA580C" stroke="#EA580C" strokeWidth="2" />
+                  {/* Enhanced Side Thrusters */}
+                  <rect x="130" y="300" width="25" height="45" fill="url(#thrusterGradient)" rx="5" />
+                  <rect x="245" y="300" width="25" height="45" fill="url(#thrusterGradient)" rx="5" />
                   
-                  {/* Bottom Details */}
-                  <path d="M180 380V400H220V380H180Z" fill="#D4D4D8" />
+                  {/* Enhanced Fins with 3D depth */}
+                  <path d="M145 320L100 380V320H145Z" fill="url(#finGradient)" />
+                  <path d="M255 320L300 380V320H255Z" fill="url(#finGradient)" />
+                  <path d="M145 320L100 380L105 375L145 325Z" fill="url(#finHighlight)" />
+                  <path d="M255 320L300 380L295 375L255 325Z" fill="url(#finHighlight)" />
                   
-                  {/* Engine Flames - Main */}
+                  {/* Enhanced Engine Details */}
+                  <rect x="175" y="385" width="50" height="22" fill="url(#engineGradient)" rx="3" />
+                  <circle cx="185" cy="396" r="4" fill="#FF6B35" />
+                  <circle cx="200" cy="396" r="4" fill="#FF6B35" />
+                  <circle cx="215" cy="396" r="4" fill="#FF6B35" />
+                  
+                  {/* Enhanced Engine Flames */}
                   <g className="animate-pulse">
-                    <path d="M190 400H210C210 400 220 430 200 450C180 430 190 400 190 400Z" fill="url(#flameGradient)" />
-                    <path d="M192 400H208C208 400 215 420 200 435C185 420 192 400 192 400Z" fill="url(#flameGradientInner)" />
+                    <path d="M185 407H215C215 407 230 445 200 465C170 445 185 407 185 407Z" fill="url(#flameGradientEnhanced)" />
+                    <path d="M188 407H212C212 407 223 430 200 450C177 430 188 407 188 407Z" fill="url(#flameGradientInnerEnhanced)" />
+                    <path d="M192 407H208C208 407 215 420 200 435C185 420 192 407 192 407Z" fill="url(#flameCoreGradient)" />
                   </g>
                   
-                  {/* Engine Flames - Side Thrusters */}
+                  {/* Side Thruster Flames */}
                   <g className="animate-pulse">
-                    <path d="M145 340H155C155 340 160 360 150 370C140 360 145 340 145 340Z" fill="url(#flameGradient)" />
-                    <path d="M245 340H255C255 340 260 360 250 370C240 360 245 340 245 340Z" fill="url(#flameGradient)" />
+                    <path d="M140 345H150C150 345 158 370 145 385C132 370 140 345 140 345Z" fill="url(#sideThrusterFlame)" />
+                    <path d="M250 345H260C260 345 268 370 255 385C242 370 250 345 250 345Z" fill="url(#sideThrusterFlame)" />
                   </g>
                   
-                  {/* 3D Highlights */}
-                  <path d="M160 120C160 120 180 135 200 135C220 135 240 120 240 120C240 120 220 140 200 140C180 140 160 120 160 120Z" fill="white" fillOpacity="0.3" />
+                  {/* Enhanced 3D Highlights */}
+                  <path d="M155 115C155 115 175 130 200 130C225 130 245 115 245 115C245 115 225 135 200 135C175 135 155 115 155 115Z" fill="rgba(255,255,255,0.4)" />
+                  <rect x="180" y="180" width="40" height="2" fill="rgba(255,255,255,0.3)" rx="1" />
+                  <rect x="180" y="200" width="40" height="2" fill="rgba(255,255,255,0.3)" rx="1" />
                 </g>
                 
-                {/* Stars */}
+                {/* Enhanced Stars with twinkling effect */}
                 <g className="animate-pulse-slow">
-                  <circle cx="100" cy="100" r="2" fill="white" />
-                  <circle cx="150" cy="80" r="1" fill="white" />
-                  <circle cx="250" cy="100" r="1.5" fill="white" />
-                  <circle cx="300" cy="150" r="1" fill="white" />
-                  <circle cx="120" cy="200" r="2" fill="white" />
-                  <circle cx="280" cy="220" r="1.5" fill="white" />
-                  <circle cx="330" cy="280" r="1" fill="white" />
-                  <circle cx="100" cy="300" r="1.5" fill="white" />
+                  <circle cx="90" cy="90" r="2.5" fill="white" opacity="0.9" />
+                  <circle cx="140" cy="70" r="1.5" fill="white" opacity="0.7" />
+                  <circle cx="260" cy="95" r="2" fill="white" opacity="0.8" />
+                  <circle cx="310" cy="140" r="1.5" fill="white" opacity="0.6" />
+                  <circle cx="110" cy="190" r="2.5" fill="white" opacity="0.9" />
+                  <circle cx="290" cy="210" r="2" fill="white" opacity="0.8" />
+                  <circle cx="340" cy="270" r="1.5" fill="white" opacity="0.7" />
+                  <circle cx="80" cy="290" r="2" fill="white" opacity="0.8" />
+                  <circle cx="320" cy="320" r="1.5" fill="white" opacity="0.6" />
                 </g>
                 
-                {/* Gradients definitions */}
+                {/* Enhanced Gradients definitions */}
                 <defs>
-                  <radialGradient id="rocketGlow" cx="0.5" cy="0.5" r="0.5" fx="0.5" fy="0.5">
-                    <stop offset="0%" stopColor="#F97316" stopOpacity="0.8" />
+                  <radialGradient id="enhancedRocketGlow" cx="0.5" cy="0.5" r="0.7" fx="0.3" fy="0.3">
+                    <stop offset="0%" stopColor="#F97316" stopOpacity="0.9" />
+                    <stop offset="70%" stopColor="#F97316" stopOpacity="0.3" />
                     <stop offset="100%" stopColor="#F97316" stopOpacity="0" />
                   </radialGradient>
-                  <linearGradient id="flameGradient" x1="200" y1="400" x2="200" y2="450" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="#FDBA74" />
+                  
+                  <linearGradient id="bodyGradient" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#FB923C" />
                     <stop offset="50%" stopColor="#F97316" />
                     <stop offset="100%" stopColor="#EA580C" />
                   </linearGradient>
-                  <linearGradient id="flameGradientInner" x1="200" y1="400" x2="200" y2="435" gradientUnits="userSpaceOnUse">
-                    <stop offset="0%" stopColor="white" />
-                    <stop offset="40%" stopColor="#FDBA74" />
+                  
+                  <linearGradient id="sideGradientRight" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#EA580C" />
+                    <stop offset="100%" stopColor="#DC2626" />
+                  </linearGradient>
+                  
+                  <linearGradient id="sideGradientLeft" x1="1" y1="0" x2="0" y2="0">
+                    <stop offset="0%" stopColor="#FB923C" />
                     <stop offset="100%" stopColor="#F97316" />
+                  </linearGradient>
+                  
+                  <linearGradient id="noseGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#FDBA74" />
+                    <stop offset="100%" stopColor="#F97316" />
+                  </linearGradient>
+                  
+                  <linearGradient id="baseGradient" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#DC2626" />
+                    <stop offset="50%" stopColor="#EA580C" />
+                    <stop offset="100%" stopColor="#DC2626" />
+                  </linearGradient>
+                  
+                  <radialGradient id="windowOuter" cx="0.5" cy="0.5" r="0.5">
+                    <stop offset="0%" stopColor="#E5E7EB" />
+                    <stop offset="100%" stopColor="#9CA3AF" />
+                  </radialGradient>
+                  
+                  <radialGradient id="windowInner" cx="0.5" cy="0.5" r="0.5">
+                    <stop offset="0%" stopColor="#F9FAFB" />
+                    <stop offset="100%" stopColor="#D1D5DB" />
+                  </radialGradient>
+                  
+                  <radialGradient id="windowGlass" cx="0.3" cy="0.3" r="0.7">
+                    <stop offset="0%" stopColor="rgba(255,255,255,0.9)" />
+                    <stop offset="100%" stopColor="rgba(156,163,175,0.8)" />
+                  </radialGradient>
+                  
+                  <linearGradient id="flameGradientEnhanced" x1="200" y1="407" x2="200" y2="465">
+                    <stop offset="0%" stopColor="#FBBF24" />
+                    <stop offset="30%" stopColor="#F59E0B" />
+                    <stop offset="70%" stopColor="#F97316" />
+                    <stop offset="100%" stopColor="#DC2626" />
+                  </linearGradient>
+                  
+                  <linearGradient id="flameGradientInnerEnhanced" x1="200" y1="407" x2="200" y2="450">
+                    <stop offset="0%" stopColor="white" />
+                    <stop offset="40%" stopColor="#FEF3C7" />
+                    <stop offset="80%" stopColor="#FBBF24" />
+                    <stop offset="100%" stopColor="#F97316" />
+                  </linearGradient>
+                  
+                  <linearGradient id="flameCoreGradient" x1="200" y1="407" x2="200" y2="435">
+                    <stop offset="0%" stopColor="white" />
+                    <stop offset="60%" stopColor="#FEF3C7" />
+                    <stop offset="100%" stopColor="#FBBF24" />
+                  </linearGradient>
+                  
+                  <linearGradient id="thrusterGradient" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#6B7280" />
+                    <stop offset="50%" stopColor="#9CA3AF" />
+                    <stop offset="100%" stopColor="#6B7280" />
+                  </linearGradient>
+                  
+                  <linearGradient id="finGradient" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="#F97316" />
+                    <stop offset="100%" stopColor="#EA580C" />
+                  </linearGradient>
+                  
+                  <linearGradient id="sideThrusterFlame" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#FBBF24" />
+                    <stop offset="100%" stopColor="#F97316" />
+                  </linearGradient>
+                  
+                  <linearGradient id="engineGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#4B5563" />
+                    <stop offset="100%" stopColor="#374151" />
+                  </linearGradient>
+                  
+                  <linearGradient id="panelGradient" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#DC2626" />
+                    <stop offset="50%" stopColor="#EA580C" />
+                    <stop offset="100%" stopColor="#DC2626" />
+                  </linearGradient>
+                  
+                  <linearGradient id="noseHighlight" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="rgba(255,255,255,0.4)" />
+                    <stop offset="100%" stopColor="rgba(255,255,255,0.1)" />
+                  </linearGradient>
+                  
+                  <linearGradient id="baseTopGradient" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#F97316" />
+                    <stop offset="50%" stopColor="#FB923C" />
+                    <stop offset="100%" stopColor="#F97316" />
+                  </linearGradient>
+                  
+                  <linearGradient id="finHighlight" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="rgba(255,255,255,0.3)" />
+                    <stop offset="100%" stopColor="rgba(255,255,255,0.1)" />
                   </linearGradient>
                 </defs>
               </svg>
               
-              {/* Subtle glow effect */}
-              <div className="absolute -inset-4 bg-idOrange/10 rounded-full blur-xl -z-10"></div>
-              <div className="absolute -bottom-4 left-0 right-0 h-20 bg-gradient-to-t from-idBlack to-transparent"></div>
+              {/* Enhanced glow effects */}
+              <div className="absolute -inset-6 bg-idOrange/15 rounded-full blur-2xl -z-10 animate-pulse-slow"></div>
+              <div className="absolute -bottom-8 left-0 right-0 h-24 bg-gradient-to-t from-idBlack via-idBlack/50 to-transparent"></div>
             </div>
           </div>
         </div>
-      </div>
-      
-      {/* Scroll Down Indicator */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-pulse-slow">
-        <span className="text-gray-400 mb-2">{language === 'PT' ? 'Role para baixo' : 'Scroll down'}</span>
-        <svg className="w-6 h-6 text-idOrange" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-        </svg>
       </div>
     </section>
   );
