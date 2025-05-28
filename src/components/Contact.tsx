@@ -1,3 +1,4 @@
+
 import { useState, useEffect, FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,9 +8,9 @@ import { useToast } from '@/hooks/use-toast';
 const Contact = () => {
   const [language, setLanguage] = useState('PT');
   const [formData, setFormData] = useState({
-    name: '',
+    nome: '',
     email: '',
-    phone: '',
+    telefone: '',
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -67,9 +68,9 @@ const Contact = () => {
         
         setFormSubmitted(true);
         setFormData({
-          name: '',
+          nome: '',
           email: '',
-          phone: '',
+          telefone: '',
           message: ''
         });
         
@@ -180,7 +181,7 @@ const Contact = () => {
                     <Input 
                       id="nome"
                       name="nome"
-                      value={formData.name}
+                      value={formData.nome}
                       onChange={handleChange}
                       required
                       placeholder={language === 'PT' ? 'Seu nome completo' : 'Your full name'}
@@ -211,7 +212,7 @@ const Contact = () => {
                     <Input 
                       id="telefone"
                       name="telefone"
-                      value={formData.phone}
+                      value={formData.telefone}
                       onChange={handleChange}
                       required
                       placeholder={language === 'PT' ? 'Seu número de telefone' : 'Your phone number'}
