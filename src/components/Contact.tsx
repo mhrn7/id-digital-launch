@@ -47,24 +47,16 @@ const Contact = () => {
     setIsSubmitting(true);
     
     try {
-      // Create FormData for FormSubmit.co
-      const formDataToSend = new FormData();
-      formDataToSend.append('nome', formData.name);
-      formDataToSend.append('email', formData.email);
-      formDataToSend.append('telefone', formData.phone);
-      formDataToSend.append('message', formData.message);
-      
-      // FormSubmit.co protection fields
-      formDataToSend.append('_honey', ''); // Bot protection
-      formDataToSend.append('_captcha', 'false'); // Disable captcha
-      formDataToSend.append('_next', window.location.origin + '/#contact'); // Redirect back to contact section
+      // Create a form element to submit to FormSubmit.co
+      const form = e.target as HTMLFormElement;
+      const formDataToSend = new FormData(form);
       
       const response = await fetch('https://formsubmit.co/idanunciosonline@gmail.com', {
         method: 'POST',
         body: formDataToSend
       });
       
-      if (response.ok) {
+      if (response.ok || response.status === 0) {
         toast({
           title: language === 'PT' ? 'Mensagem Enviada!' : 'Message Sent!',
           description: language === 'PT' 
@@ -182,12 +174,12 @@ const Contact = () => {
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
+                    <label htmlFor="nome" className="block text-sm font-medium text-gray-300 mb-1">
                       {language === 'PT' ? 'Nome*' : 'Name*'}
                     </label>
                     <Input 
-                      id="name"
-                      name="name"
+                      id="nome"
+                      name="nome"
                       value={formData.name}
                       onChange={handleChange}
                       required
@@ -213,12 +205,12 @@ const Contact = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-1">
+                    <label htmlFor="telefone" className="block text-sm font-medium text-gray-300 mb-1">
                       {language === 'PT' ? 'Telefone*' : 'Phone*'}
                     </label>
                     <Input 
-                      id="phone"
-                      name="phone"
+                      id="telefone"
+                      name="telefone"
                       value={formData.phone}
                       onChange={handleChange}
                       required
@@ -244,6 +236,8 @@ const Contact = () => {
 
                   {/* Hidden fields for FormSubmit.co protection */}
                   <input type="text" name="_honey" style={{display: 'none'}} />
+                  <input type="hidden" name="_captcha" value="false" />
+                  <input type="hidden" name="_next" value={window.location.origin + '/#contact'} />
 
                   <div>
                     <Button 
