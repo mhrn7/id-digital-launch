@@ -47,52 +47,47 @@ const Contact = () => {
     setIsSubmitting(true);
     
     try {
-      // Google Sheets submission script URL - use a script deployed as a web app
-      // This is the URL where your Google Apps Script web app is deployed
-      const scriptUrl = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID_HERE/exec';
-      
+      // Create FormData for FormSubmit.co
       const formDataToSend = new FormData();
-      formDataToSend.append('name', formData.name);
+      formDataToSend.append('nome', formData.name);
       formDataToSend.append('email', formData.email);
-      formDataToSend.append('phone', formData.phone);
+      formDataToSend.append('telefone', formData.phone);
       formDataToSend.append('message', formData.message);
-      formDataToSend.append('timestamp', new Date().toISOString());
       
-      // For demonstration purposes, log the data
-      console.log('Form data to be sent to Google Sheets:', Object.fromEntries(formDataToSend));
+      // FormSubmit.co protection fields
+      formDataToSend.append('_honey', ''); // Bot protection
+      formDataToSend.append('_captcha', 'false'); // Disable captcha
+      formDataToSend.append('_next', window.location.origin + '/#contact'); // Redirect back to contact section
       
-      // In a real implementation, uncomment this to send data to Google Sheets
-      /* 
-      const response = await fetch(scriptUrl, {
+      const response = await fetch('https://formsubmit.co/idanunciosonline@gmail.com', {
         method: 'POST',
-        body: formDataToSend,
-        mode: 'no-cors'
-      });
-      */
-      
-      // Simulate successful submission
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast({
-        title: language === 'PT' ? 'Mensagem Enviada!' : 'Message Sent!',
-        description: language === 'PT' 
-          ? 'Seu contato foi enviado para nossa planilha Google. Entraremos em contato em breve!' 
-          : 'Your contact was sent to our Google Sheet. We will contact you soon!',
-        variant: 'default',
+        body: formDataToSend
       });
       
-      setFormSubmitted(true);
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        message: ''
-      });
-      
-      // Reset form submission state after 3 seconds
-      setTimeout(() => {
-        setFormSubmitted(false);
-      }, 3000);
+      if (response.ok) {
+        toast({
+          title: language === 'PT' ? 'Mensagem Enviada!' : 'Message Sent!',
+          description: language === 'PT' 
+            ? 'Seu contato foi enviado com sucesso. Entraremos em contato em breve!' 
+            : 'Your contact was sent successfully. We will contact you soon!',
+          variant: 'default',
+        });
+        
+        setFormSubmitted(true);
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          message: ''
+        });
+        
+        // Reset form submission state after 3 seconds
+        setTimeout(() => {
+          setFormSubmitted(false);
+        }, 3000);
+      } else {
+        throw new Error('Failed to send message');
+      }
     } catch (error) {
       console.error('Error submitting form:', error);
       toast({
@@ -246,6 +241,9 @@ const Contact = () => {
                       className="bg-black/40 border-gray-700 focus:border-idOrange text-white min-h-[120px]"
                     />
                   </div>
+
+                  {/* Hidden fields for FormSubmit.co protection */}
+                  <input type="text" name="_honey" style={{display: 'none'}} />
 
                   <div>
                     <Button 
