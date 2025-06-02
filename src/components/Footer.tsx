@@ -1,17 +1,14 @@
 
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Languages } from 'lucide-react';
+import { useLanguage } from './LanguageProvider';
+import LanguageSelector from './LanguageSelector';
 
 const Footer = () => {
-  const [language, setLanguage] = useState('PT');
+  const { language } = useLanguage();
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
-    // Check for URL params or localStorage for language setting
-    const storedLanguage = localStorage.getItem('language') || 'PT';
-    setLanguage(storedLanguage);
-    
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 500);
     };
@@ -20,13 +17,6 @@ const Footer = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const toggleLanguage = () => {
-    const newLanguage = language === 'PT' ? 'EN' : 'PT';
-    localStorage.setItem('language', newLanguage);
-    setLanguage(newLanguage);
-    window.dispatchEvent(new Event('languageChanged'));
-  };
-
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
@@ -34,18 +24,97 @@ const Footer = () => {
     });
   };
 
-  const navLinks = [
-    { name: language === 'PT' ? 'Home' : 'Home', href: '#home' },
-    { name: language === 'PT' ? 'Sobre nós' : 'About us', href: '#about' },
-    { name: language === 'PT' ? 'Serviços' : 'Services', href: '#services' },
-    { name: language === 'PT' ? 'Depoimentos' : 'Testimonials', href: '#testimonials' },
-    { name: language === 'PT' ? 'Contato' : 'Contact', href: '#contact' },
-  ];
+  const getContent = () => {
+    switch (language) {
+      case 'EN':
+        return {
+          companyDescription: 'Specialists in paid traffic and AI automation for business growth.',
+          navigation: 'Navigation',
+          services: 'Services',
+          contact: 'Contact',
+          talkToSpecialist: 'Talk to a Specialist',
+          allRightsReserved: 'All rights reserved.',
+          termsOfUse: 'Terms of Use',
+          privacyPolicy: 'Privacy Policy',
+          navLinks: [
+            { name: 'Home', href: '#home' },
+            { name: 'About us', href: '#about' },
+            { name: 'Services', href: '#services' },
+            { name: 'Testimonials', href: '#testimonials' },
+            { name: 'Contact', href: '#contact' },
+          ],
+          serviceLinks: [
+            { name: 'Google Ads', href: '#services' },
+            { name: 'Meta Ads', href: '#services' },
+            { name: 'LinkedIn Ads', href: '#services' },
+            { name: 'Landing Pages', href: '#services' },
+          ]
+        };
+      case 'ES':
+        return {
+          companyDescription: 'Especialistas en tráfico pago y automatización con IA para el crecimiento de negocios.',
+          navigation: 'Navegación',
+          services: 'Servicios',
+          contact: 'Contacto',
+          talkToSpecialist: 'Hablar con un Especialista',
+          allRightsReserved: 'Todos los derechos reservados.',
+          termsOfUse: 'Términos de Uso',
+          privacyPolicy: 'Política de Privacidad',
+          navLinks: [
+            { name: 'Inicio', href: '#home' },
+            { name: 'Nosotros', href: '#about' },
+            { name: 'Servicios', href: '#services' },
+            { name: 'Testimonios', href: '#testimonials' },
+            { name: 'Contacto', href: '#contact' },
+          ],
+          serviceLinks: [
+            { name: 'Google Ads', href: '#services' },
+            { name: 'Meta Ads', href: '#services' },
+            { name: 'LinkedIn Ads', href: '#services' },
+            { name: 'Landing Pages', href: '#services' },
+          ]
+        };
+      default: // PT
+        return {
+          companyDescription: 'Especialistas em tráfego pago e automação com IA para crescimento de negócios.',
+          navigation: 'Navegação',
+          services: 'Serviços',
+          contact: 'Contato',
+          talkToSpecialist: 'Fale com um Especialista',
+          allRightsReserved: 'Todos os direitos reservados.',
+          termsOfUse: 'Termos de Uso',
+          privacyPolicy: 'Política de Privacidade',
+          navLinks: [
+            { name: 'Home', href: '#home' },
+            { name: 'Sobre nós', href: '#about' },
+            { name: 'Serviços', href: '#services' },
+            { name: 'Depoimentos', href: '#testimonials' },
+            { name: 'Contato', href: '#contact' },
+          ],
+          serviceLinks: [
+            { name: 'Google Ads', href: '#services' },
+            { name: 'Meta Ads', href: '#services' },
+            { name: 'LinkedIn Ads', href: '#services' },
+            { name: 'Landing Pages', href: '#services' },
+          ]
+        };
+    }
+  };
 
-  const whatsappMessage = language === 'PT' 
-    ? 'Olá! Vim pelo site da Agência iD e gostaria de saber mais sobre os serviços.'
-    : 'Hello! I came from the iD Agency website and would like to know more about the services.';
+  const content = getContent();
 
+  const getWhatsappMessage = () => {
+    switch (language) {
+      case 'EN':
+        return 'Hello! I came from the iD Agency website and would like to know more about the services.';
+      case 'ES':
+        return 'Hola! Vengo del sitio web de la Agencia iD y me gustaría saber más sobre los servicios.';
+      default: // PT
+        return 'Olá! Vim pelo site da Agência iD e gostaria de saber mais sobre os serviços.';
+    }
+  };
+
+  const whatsappMessage = getWhatsappMessage();
   const whatsappLink = `https://wa.me/5561999601534?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
@@ -63,25 +132,20 @@ const Footer = () => {
               <span className="text-idOrange">iD</span> Digital
             </a>
             <p className="text-gray-400 mb-6">
-              {language === 'PT' 
-                ? 'Especialistas em tráfego pago e automação com IA para crescimento de negócios.'
-                : 'Specialists in paid traffic and AI automation for business growth.'}
+              {content.companyDescription}
             </p>
             <div className="flex items-center space-x-4">
-              <button onClick={toggleLanguage} className="flex items-center text-white hover:text-idOrange transition-colors duration-300">
-                <Languages size={20} className="mr-1" />
-                <span>{language}</span>
-              </button>
+              <LanguageSelector />
             </div>
           </div>
 
           {/* Navigation */}
           <div>
             <h3 className="text-lg font-bold text-white mb-4">
-              {language === 'PT' ? 'Navegação' : 'Navigation'}
+              {content.navigation}
             </h3>
             <ul className="space-y-2">
-              {navLinks.map((link, index) => (
+              {content.navLinks.map((link, index) => (
                 <li key={index}>
                   <a 
                     href={link.href}
@@ -97,36 +161,23 @@ const Footer = () => {
           {/* Services */}
           <div>
             <h3 className="text-lg font-bold text-white mb-4">
-              {language === 'PT' ? 'Serviços' : 'Services'}
+              {content.services}
             </h3>
             <ul className="space-y-2">
-              <li>
-                <a href="#services" className="text-gray-400 hover:text-idOrange transition-colors duration-300">
-                  {language === 'PT' ? 'Google Ads' : 'Google Ads'}
-                </a>
-              </li>
-              <li>
-                <a href="#services" className="text-gray-400 hover:text-idOrange transition-colors duration-300">
-                  {language === 'PT' ? 'Meta Ads' : 'Meta Ads'}
-                </a>
-              </li>
-              <li>
-                <a href="#services" className="text-gray-400 hover:text-idOrange transition-colors duration-300">
-                  {language === 'PT' ? 'LinkedIn Ads' : 'LinkedIn Ads'}
-                </a>
-              </li>
-              <li>
-                <a href="#services" className="text-gray-400 hover:text-idOrange transition-colors duration-300">
-                  {language === 'PT' ? 'Landing Pages' : 'Landing Pages'}
-                </a>
-              </li>
+              {content.serviceLinks.map((service, index) => (
+                <li key={index}>
+                  <a href={service.href} className="text-gray-400 hover:text-idOrange transition-colors duration-300">
+                    {service.name}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Contact */}
           <div>
             <h3 className="text-lg font-bold text-white mb-4">
-              {language === 'PT' ? 'Contato' : 'Contact'}
+              {content.contact}
             </h3>
             <ul className="space-y-2">
               <li className="flex items-center text-gray-400">
@@ -145,7 +196,7 @@ const Footer = () => {
             <div className="mt-6">
               <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
                 <Button className="btn-primary">
-                  {language === 'PT' ? 'Fale com um Especialista' : 'Talk to a Specialist'}
+                  {content.talkToSpecialist}
                 </Button>
               </a>
             </div>
@@ -155,14 +206,14 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 py-6 text-center md:flex md:justify-between md:text-left">
           <p className="text-gray-400">
-            © 2025 Agência iD. {language === 'PT' ? 'Todos os direitos reservados.' : 'All rights reserved.'}
+            © 2025 Agência iD. {content.allRightsReserved}
           </p>
           <div className="mt-3 md:mt-0 flex justify-center md:justify-end space-x-6">
             <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-idOrange transition-colors duration-300">
-              {language === 'PT' ? 'Termos de Uso' : 'Terms of Use'}
+              {content.termsOfUse}
             </a>
             <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-idOrange transition-colors duration-300">
-              {language === 'PT' ? 'Política de Privacidade' : 'Privacy Policy'}
+              {content.privacyPolicy}
             </a>
           </div>
         </div>

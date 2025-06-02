@@ -1,16 +1,12 @@
-
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from './LanguageProvider';
 
 const Hero = () => {
-  const [language, setLanguage] = useState('PT');
+  const { language } = useLanguage();
   const [count, setCount] = useState(0);
 
   useEffect(() => {
-    // Check for URL params or localStorage for language setting
-    const storedLanguage = localStorage.getItem('language') || 'PT';
-    setLanguage(storedLanguage);
-
     // Apply animation to elements
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -45,10 +41,55 @@ const Hero = () => {
     };
   }, []);
 
-  const whatsappMessage = language === 'PT' 
-    ? 'Olá! Vim pelo site da Agência iD e gostaria de saber mais sobre os serviços.'
-    : 'Hello! I came from the iD Agency website and would like to know more about the services.';
+  const getContent = () => {
+    switch (language) {
+      case 'EN':
+        return {
+          heroTitle: (
+            <>Boost your <span className="text-idOrange">business</span> with paid traffic</>
+          ),
+          heroDescription: 'Digital marketing strategies focused on results and cutting-edge AI technology to accelerate your company\'s growth.',
+          requestProposal: 'Request a Proposal',
+          ourServices: 'Our Services',
+          managedInAds: 'Managed in Ads'
+        };
+      case 'ES':
+        return {
+          heroTitle: (
+            <>Impulsa tu <span className="text-idOrange">negocio</span> con tráfico pago</>
+          ),
+          heroDescription: 'Estrategias de marketing digital enfocadas en resultados y tecnología de punta con IA para acelerar el crecimiento de tu empresa.',
+          requestProposal: 'Solicitar una Propuesta',
+          ourServices: 'Nuestros Servicios',
+          managedInAds: 'Gestionados en Anuncios'
+        };
+      default: // PT
+        return {
+          heroTitle: (
+            <>Impulsione seu <span className="text-idOrange">negócio</span> com tráfego pago</>
+          ),
+          heroDescription: 'Estratégias de marketing digital com foco em resultados e tecnologia de ponta com IA para acelerar o crescimento da sua empresa.',
+          requestProposal: 'Solicite uma Proposta',
+          ourServices: 'Conheça Nossos Serviços',
+          managedInAds: 'Gerenciados em Anúncios'
+        };
+    }
+  };
 
+  const content = getContent();
+
+  const getWhatsappMessage = () => {
+    switch (language) {
+      case 'EN':
+        return 'Hello! I came from the iD Agency website and would like to know more about the services.';
+      case 'ES':
+        return 'Hola! Vengo del sitio web de la Agencia iD y me gustaría saber más sobre los servicios.';
+      default: // PT
+        return 'Olá! Vim pelo site da Agência iD e gostaria de saber mais sobre os serviços.';
+    }
+  };
+
+  const whatsappMessage = getWhatsappMessage();
   const whatsappLink = `https://wa.me/5561999601534?text=${encodeURIComponent(whatsappMessage)}`;
 
   const formatNumber = (num: number) => {
@@ -73,18 +114,10 @@ const Hero = () => {
           {/* Hero Content */}
           <div className="animate-on-scroll">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6">
-              {language === 'PT' ? (
-                <>Impulsione seu <span className="text-idOrange">negócio</span> com tráfego pago</>
-              ) : (
-                <>Boost your <span className="text-idOrange">business</span> with paid traffic</>
-              )}
+              {content.heroTitle}
             </h1>
             <p className="text-lg md:text-xl mb-8 text-gray-300 max-w-xl">
-              {language === 'PT' ? (
-                <>Estratégias de marketing digital com foco em resultados e tecnologia de ponta com IA para acelerar o crescimento da sua empresa.</>
-              ) : (
-                <>Digital marketing strategies focused on results and cutting-edge AI technology to accelerate your company's growth.</>
-              )}
+              {content.heroDescription}
             </p>
             <div className="flex flex-wrap gap-4">
               <a 
@@ -93,12 +126,12 @@ const Hero = () => {
                 rel="noopener noreferrer"
               >
                 <Button className="btn-primary">
-                  {language === 'PT' ? 'Solicite uma Proposta' : 'Request a Proposal'}
+                  {content.requestProposal}
                 </Button>
               </a>
               <a href="#services">
                 <Button variant="outline" className="btn-outline">
-                  {language === 'PT' ? 'Conheça Nossos Serviços' : 'Our Services'}
+                  {content.ourServices}
                 </Button>
               </a>
             </div>
@@ -110,7 +143,7 @@ const Hero = () => {
                   {formatNumber(count)}
                 </h3>
                 <p className="text-gray-400">
-                  {language === 'PT' ? 'Gerenciados em Anúncios' : 'Managed in Ads'}
+                  {content.managedInAds}
                 </p>
               </div>
             </div>
