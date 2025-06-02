@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from './LanguageProvider';
@@ -22,7 +23,7 @@ const Hero = () => {
 
     // Animate counter
     const duration = 5000; // 5 seconds
-    const targetValue = 700000;
+    const targetValue = 830000;
     const increment = targetValue / (duration / 50);
     let currentValue = 0;
 
@@ -46,32 +47,38 @@ const Hero = () => {
       case 'EN':
         return {
           heroTitle: (
-            <>Boost your <span className="text-idOrange">business</span> with paid traffic</>
+            <>Ready to scale your <span className="text-idOrange">sales</span> with paid traffic?</>
           ),
-          heroDescription: 'Digital marketing strategies focused on results and cutting-edge AI technology to accelerate your company\'s growth.',
-          requestProposal: 'Request a Proposal',
+          heroDescription: 'Get a personalized analysis at no cost. Digital marketing strategies focused on results and cutting-edge AI technology to accelerate your company\'s growth.',
+          requestProposal: '🎯 Get Free Analysis Now',
           ourServices: 'Our Services',
-          managedInAds: 'Managed in Ads'
+          managedInAds: 'Managed in Ads',
+          satisfiedPartners: 'Satisfied Partners',
+          approvalRate: 'Approval Rate'
         };
       case 'ES':
         return {
           heroTitle: (
-            <>Impulsa tu <span className="text-idOrange">negocio</span> con tráfico pago</>
+            <>¿Listo para escalar tus <span className="text-idOrange">ventas</span> con tráfico pago?</>
           ),
-          heroDescription: 'Estrategias de marketing digital enfocadas en resultados y tecnología de punta con IA para acelerar el crecimiento de tu empresa.',
-          requestProposal: 'Solicitar una Propuesta',
+          heroDescription: 'Recibe un análisis personalizado sin costo. Estrategias de marketing digital enfocadas en resultados y tecnología de punta con IA para acelerar el crecimiento de tu empresa.',
+          requestProposal: '🎯 Obtener Análisis Gratis Ahora',
           ourServices: 'Nuestros Servicios',
-          managedInAds: 'Gestionados en Anuncios'
+          managedInAds: 'Gestionados en Anuncios',
+          satisfiedPartners: 'Socios Satisfechos',
+          approvalRate: 'Índice de Aprobación'
         };
       default: // PT
         return {
           heroTitle: (
-            <>Impulsione seu <span className="text-idOrange">negócio</span> com tráfego pago</>
+            <>Pronto para escalar suas <span className="text-idOrange">vendas</span> com tráfego pago?</>
           ),
-          heroDescription: 'Estratégias de marketing digital com foco em resultados e tecnologia de ponta com IA para acelerar o crescimento da sua empresa.',
-          requestProposal: 'Solicite uma Proposta',
+          heroDescription: 'Receba uma análise personalizada sem custo. Estratégias de marketing digital com foco em resultados e tecnologia de ponta com IA para acelerar o crescimento da sua empresa.',
+          requestProposal: '🎯 Receber Diagnóstico Agora',
           ourServices: 'Conheça Nossos Serviços',
-          managedInAds: 'Gerenciados em Anúncios'
+          managedInAds: 'Gerenciados em Anúncios',
+          satisfiedPartners: 'Parceiros Satisfeitos',
+          approvalRate: 'Taxa de Aprovação'
         };
     }
   };
@@ -81,11 +88,11 @@ const Hero = () => {
   const getWhatsappMessage = () => {
     switch (language) {
       case 'EN':
-        return 'Hello! I came from the iD Agency website and would like to know more about the services.';
+        return 'Hello! I came from the iD Agency website and would like to receive a free analysis of my business.';
       case 'ES':
-        return 'Hola! Vengo del sitio web de la Agencia iD y me gustaría saber más sobre los servicios.';
+        return 'Hola! Vengo del sitio web de la Agencia iD y me gustaría recibir un análisis gratuito de mi negocio.';
       default: // PT
-        return 'Olá! Vim pelo site da Agência iD e gostaria de saber mais sobre os serviços.';
+        return 'Olá! Vim pelo site da Agência iD e gostaria de receber uma análise gratuita do meu negócio.';
     }
   };
 
@@ -113,7 +120,7 @@ const Hero = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           {/* Hero Content */}
           <div className="animate-on-scroll">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold mb-6 leading-tight">
               {content.heroTitle}
             </h1>
             <p className="text-lg md:text-xl mb-8 text-gray-300 max-w-xl">
@@ -125,237 +132,59 @@ const Hero = () => {
                 target="_blank" 
                 rel="noopener noreferrer"
               >
-                <Button className="btn-primary">
+                <Button className="btn-primary text-base md:text-lg px-6 md:px-8 py-4 md:py-6">
                   {content.requestProposal}
                 </Button>
               </a>
               <a href="#services">
-                <Button variant="outline" className="btn-outline">
+                <Button variant="outline" className="btn-outline text-base md:text-lg px-6 md:px-8 py-4 md:py-6">
                   {content.ourServices}
                 </Button>
               </a>
             </div>
 
-            {/* Stats - Single Counter */}
-            <div className="flex justify-center lg:justify-start mt-12">
-              <div className="border border-gray-800 rounded-lg p-6 bg-idDarkBlack/50 text-center max-w-xs">
-                <h3 className="text-idOrange text-4xl font-bold mb-2">
+            {/* Stats - Multiple Counters */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-12">
+              <div className="border border-gray-800 rounded-lg p-4 md:p-6 bg-idDarkBlack/50 text-center">
+                <h3 className="text-idOrange text-2xl md:text-3xl font-bold mb-2">
                   {formatNumber(count)}
                 </h3>
-                <p className="text-gray-400">
+                <p className="text-gray-400 text-sm md:text-base">
                   {content.managedInAds}
+                </p>
+              </div>
+              
+              <div className="border border-gray-800 rounded-lg p-4 md:p-6 bg-idDarkBlack/50 text-center">
+                <h3 className="text-idOrange text-2xl md:text-3xl font-bold mb-2">
+                  67+
+                </h3>
+                <p className="text-gray-400 text-sm md:text-base">
+                  {content.satisfiedPartners}
+                </p>
+              </div>
+              
+              <div className="border border-gray-800 rounded-lg p-4 md:p-6 bg-idDarkBlack/50 text-center">
+                <h3 className="text-idOrange text-2xl md:text-3xl font-bold mb-2">
+                  98%
+                </h3>
+                <p className="text-gray-400 text-sm md:text-base">
+                  {content.approvalRate}
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Enhanced 3D Rocket */}
+          {/* 3D Rocket Image */}
           <div className="flex justify-center animate-on-scroll">
             <div className="relative w-full max-w-md">
-              <svg 
-                className="w-full h-auto animate-float" 
-                viewBox="0 0 400 500" 
-                fill="none" 
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                {/* Enhanced Rocket Glow Effect */}
-                <ellipse cx="200" cy="360" rx="140" ry="50" fill="url(#enhancedRocketGlow)" opacity="0.8" />
-                
-                {/* Rocket Body Group with 3D Effects */}
-                <g>
-                  {/* Rocket Base with 3D depth */}
-                  <path d="M175 320H225V385C225 397.15 215.15 407 203 407H197C184.85 407 175 397.15 175 385V320Z" fill="url(#baseGradient)" />
-                  <path d="M175 320H225V330H175Z" fill="url(#baseTopGradient)" />
-                  
-                  {/* Main Rocket Body with enhanced 3D */}
-                  <path d="M155 115V320H245V115C245 70 225 25 200 15C175 25 155 70 155 115Z" fill="url(#bodyGradient)" />
-                  
-                  {/* Side panels for 3D effect */}
-                  <path d="M245 115V320C245 320 275 300 275 210C275 150 255 105 245 115Z" fill="url(#sideGradientRight)" />
-                  <path d="M155 115V320C155 320 125 300 125 210C125 150 175 105 155 115Z" fill="url(#sideGradientLeft)" />
-                  
-                  {/* Enhanced Nose Cone */}
-                  <path d="M200 15C225 25 245 70 245 115H155C155 70 175 25 200 15Z" fill="url(#noseGradient)" />
-                  <path d="M245 115C245 115 235 85 200 75C200 75 225 85 245 115Z" fill="url(#noseHighlight)" />
-                  
-                  {/* Enhanced Windows with depth */}
-                  <circle cx="200" cy="160" r="30" fill="url(#windowOuter)" />
-                  <circle cx="200" cy="160" r="25" fill="url(#windowInner)" stroke="#B0B0B0" strokeWidth="2" />
-                  <circle cx="200" cy="160" r="15" fill="url(#windowGlass)" />
-                  <circle cx="195" cy="155" r="8" fill="rgba(255,255,255,0.6)" />
-                  
-                  {/* Detailed Panel Lines */}
-                  <rect x="165" y="220" width="70" height="4" fill="url(#panelGradient)" rx="2" />
-                  <rect x="165" y="240" width="70" height="4" fill="url(#panelGradient)" rx="2" />
-                  <rect x="165" y="260" width="70" height="4" fill="url(#panelGradient)" rx="2" />
-                  <rect x="165" y="280" width="70" height="4" fill="url(#panelGradient)" rx="2" />
-                  
-                  {/* Enhanced Side Thrusters */}
-                  <rect x="130" y="300" width="25" height="45" fill="url(#thrusterGradient)" rx="5" />
-                  <rect x="245" y="300" width="25" height="45" fill="url(#thrusterGradient)" rx="5" />
-                  
-                  {/* Enhanced Fins with 3D depth */}
-                  <path d="M145 320L100 380V320H145Z" fill="url(#finGradient)" />
-                  <path d="M255 320L300 380V320H255Z" fill="url(#finGradient)" />
-                  <path d="M145 320L100 380L105 375L145 325Z" fill="url(#finHighlight)" />
-                  <path d="M255 320L300 380L295 375L255 325Z" fill="url(#finHighlight)" />
-                  
-                  {/* Enhanced Engine Details */}
-                  <rect x="175" y="385" width="50" height="22" fill="url(#engineGradient)" rx="3" />
-                  <circle cx="185" cy="396" r="4" fill="#FF6B35" />
-                  <circle cx="200" cy="396" r="4" fill="#FF6B35" />
-                  <circle cx="215" cy="396" r="4" fill="#FF6B35" />
-                  
-                  {/* Enhanced Engine Flames */}
-                  <g className="animate-pulse">
-                    <path d="M185 407H215C215 407 230 445 200 465C170 445 185 407 185 407Z" fill="url(#flameGradientEnhanced)" />
-                    <path d="M188 407H212C212 407 223 430 200 450C177 430 188 407 188 407Z" fill="url(#flameGradientInnerEnhanced)" />
-                    <path d="M192 407H208C208 407 215 420 200 435C185 420 192 407 192 407Z" fill="url(#flameCoreGradient)" />
-                  </g>
-                  
-                  {/* Side Thruster Flames */}
-                  <g className="animate-pulse">
-                    <path d="M140 345H150C150 345 158 370 145 385C132 370 140 345 140 345Z" fill="url(#sideThrusterFlame)" />
-                    <path d="M250 345H260C260 345 268 370 255 385C242 370 250 345 250 345Z" fill="url(#sideThrusterFlame)" />
-                  </g>
-                  
-                  {/* Enhanced 3D Highlights */}
-                  <path d="M155 115C155 115 175 130 200 130C225 130 245 115 245 115C245 115 225 135 200 135C175 135 155 115 155 115Z" fill="rgba(255,255,255,0.4)" />
-                  <rect x="180" y="180" width="40" height="2" fill="rgba(255,255,255,0.3)" rx="1" />
-                  <rect x="180" y="200" width="40" height="2" fill="rgba(255,255,255,0.3)" rx="1" />
-                </g>
-                
-                {/* Enhanced Stars with twinkling effect */}
-                <g className="animate-pulse-slow">
-                  <circle cx="90" cy="90" r="2.5" fill="white" opacity="0.9" />
-                  <circle cx="140" cy="70" r="1.5" fill="white" opacity="0.7" />
-                  <circle cx="260" cy="95" r="2" fill="white" opacity="0.8" />
-                  <circle cx="310" cy="140" r="1.5" fill="white" opacity="0.6" />
-                  <circle cx="110" cy="190" r="2.5" fill="white" opacity="0.9" />
-                  <circle cx="290" cy="210" r="2" fill="white" opacity="0.8" />
-                  <circle cx="340" cy="270" r="1.5" fill="white" opacity="0.7" />
-                  <circle cx="80" cy="290" r="2" fill="white" opacity="0.8" />
-                  <circle cx="320" cy="320" r="1.5" fill="white" opacity="0.6" />
-                </g>
-                
-                {/* Enhanced Gradients definitions */}
-                <defs>
-                  <radialGradient id="enhancedRocketGlow" cx="0.5" cy="0.5" r="0.7" fx="0.3" fy="0.3">
-                    <stop offset="0%" stopColor="#F97316" stopOpacity="0.9" />
-                    <stop offset="70%" stopColor="#F97316" stopOpacity="0.3" />
-                    <stop offset="100%" stopColor="#F97316" stopOpacity="0" />
-                  </radialGradient>
-                  
-                  <linearGradient id="bodyGradient" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#FB923C" />
-                    <stop offset="50%" stopColor="#F97316" />
-                    <stop offset="100%" stopColor="#EA580C" />
-                  </linearGradient>
-                  
-                  <linearGradient id="sideGradientRight" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#EA580C" />
-                    <stop offset="100%" stopColor="#DC2626" />
-                  </linearGradient>
-                  
-                  <linearGradient id="sideGradientLeft" x1="1" y1="0" x2="0" y2="0">
-                    <stop offset="0%" stopColor="#FB923C" />
-                    <stop offset="100%" stopColor="#F97316" />
-                  </linearGradient>
-                  
-                  <linearGradient id="noseGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#FDBA74" />
-                    <stop offset="100%" stopColor="#F97316" />
-                  </linearGradient>
-                  
-                  <linearGradient id="baseGradient" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#DC2626" />
-                    <stop offset="50%" stopColor="#EA580C" />
-                    <stop offset="100%" stopColor="#DC2626" />
-                  </linearGradient>
-                  
-                  <radialGradient id="windowOuter" cx="0.5" cy="0.5" r="0.5">
-                    <stop offset="0%" stopColor="#E5E7EB" />
-                    <stop offset="100%" stopColor="#9CA3AF" />
-                  </radialGradient>
-                  
-                  <radialGradient id="windowInner" cx="0.5" cy="0.5" r="0.5">
-                    <stop offset="0%" stopColor="#F9FAFB" />
-                    <stop offset="100%" stopColor="#D1D5DB" />
-                  </radialGradient>
-                  
-                  <radialGradient id="windowGlass" cx="0.3" cy="0.3" r="0.7">
-                    <stop offset="0%" stopColor="rgba(255,255,255,0.9)" />
-                    <stop offset="100%" stopColor="rgba(156,163,175,0.8)" />
-                  </radialGradient>
-                  
-                  <linearGradient id="flameGradientEnhanced" x1="200" y1="407" x2="200" y2="465">
-                    <stop offset="0%" stopColor="#FBBF24" />
-                    <stop offset="30%" stopColor="#F59E0B" />
-                    <stop offset="70%" stopColor="#F97316" />
-                    <stop offset="100%" stopColor="#DC2626" />
-                  </linearGradient>
-                  
-                  <linearGradient id="flameGradientInnerEnhanced" x1="200" y1="407" x2="200" y2="450">
-                    <stop offset="0%" stopColor="white" />
-                    <stop offset="40%" stopColor="#FEF3C7" />
-                    <stop offset="80%" stopColor="#FBBF24" />
-                    <stop offset="100%" stopColor="#F97316" />
-                  </linearGradient>
-                  
-                  <linearGradient id="flameCoreGradient" x1="200" y1="407" x2="200" y2="435">
-                    <stop offset="0%" stopColor="white" />
-                    <stop offset="60%" stopColor="#FEF3C7" />
-                    <stop offset="100%" stopColor="#FBBF24" />
-                  </linearGradient>
-                  
-                  <linearGradient id="thrusterGradient" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#6B7280" />
-                    <stop offset="50%" stopColor="#9CA3AF" />
-                    <stop offset="100%" stopColor="#6B7280" />
-                  </linearGradient>
-                  
-                  <linearGradient id="finGradient" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#F97316" />
-                    <stop offset="100%" stopColor="#EA580C" />
-                  </linearGradient>
-                  
-                  <linearGradient id="sideThrusterFlame" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#FBBF24" />
-                    <stop offset="100%" stopColor="#F97316" />
-                  </linearGradient>
-                  
-                  <linearGradient id="engineGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#4B5563" />
-                    <stop offset="100%" stopColor="#374151" />
-                  </linearGradient>
-                  
-                  <linearGradient id="panelGradient" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#DC2626" />
-                    <stop offset="50%" stopColor="#EA580C" />
-                    <stop offset="100%" stopColor="#DC2626" />
-                  </linearGradient>
-                  
-                  <linearGradient id="noseHighlight" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="rgba(255,255,255,0.4)" />
-                    <stop offset="100%" stopColor="rgba(255,255,255,0.1)" />
-                  </linearGradient>
-                  
-                  <linearGradient id="baseTopGradient" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#F97316" />
-                    <stop offset="50%" stopColor="#FB923C" />
-                    <stop offset="100%" stopColor="#F97316" />
-                  </linearGradient>
-                  
-                  <linearGradient id="finHighlight" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="rgba(255,255,255,0.3)" />
-                    <stop offset="100%" stopColor="rgba(255,255,255,0.1)" />
-                  </linearGradient>
-                </defs>
-              </svg>
-              
-              {/* Enhanced glow effects */}
-              <div className="absolute -inset-6 bg-idOrange/15 rounded-full blur-2xl -z-10 animate-pulse-slow"></div>
-              <div className="absolute -bottom-8 left-0 right-0 h-24 bg-gradient-to-t from-idBlack via-idBlack/50 to-transparent"></div>
+              <div className="relative">
+                <img 
+                  src="https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
+                  alt="3D Rocket Launch" 
+                  className="w-full h-auto max-h-[500px] object-contain filter brightness-110 contrast-110"
+                />
+                <div className="absolute -inset-6 bg-idOrange/15 rounded-full blur-2xl -z-10 animate-pulse-slow"></div>
+              </div>
             </div>
           </div>
         </div>

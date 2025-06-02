@@ -31,9 +31,25 @@ interface ServiceItemProps {
   icon: React.ReactNode;
   details: string[];
   value: string;
+  ctaText: string;
 }
 
-const ServiceItem = ({ title, description, icon, details, value }: ServiceItemProps) => {
+const ServiceItem = ({ title, description, icon, details, value, ctaText }: ServiceItemProps) => {
+  const getWhatsappMessage = (serviceTitle: string) => {
+    const { language } = useLanguage();
+    switch (language) {
+      case 'EN':
+        return `Hello! I came from the iD Agency website and I'm interested in the service: ${serviceTitle}`;
+      case 'ES':
+        return `Hola! Vengo del sitio web de la Agencia iD y estoy interesado en el servicio: ${serviceTitle}`;
+      default: // PT
+        return `Olá! Vim pelo site da Agência iD e tenho interesse no serviço: ${serviceTitle}`;
+    }
+  };
+
+  const whatsappMessage = getWhatsappMessage(title);
+  const whatsappLink = `https://wa.me/5561999601534?text=${encodeURIComponent(whatsappMessage)}`;
+
   return (
     <AccordionItem value={value} className="border border-gray-800 rounded-lg mb-4 overflow-hidden">
       <AccordionTrigger className="bg-gradient-to-br from-idDarkBlack to-black p-6 hover:no-underline hover:bg-gradient-to-br hover:from-idDarkBlack/80 hover:to-black/80 transition-all duration-300 [&[data-state=open]]:border-b [&[data-state=open]]:border-gray-800">
@@ -51,6 +67,13 @@ const ServiceItem = ({ title, description, icon, details, value }: ServiceItemPr
       </AccordionTrigger>
       <AccordionContent className="bg-gradient-to-br from-idDarkBlack to-black px-6 pb-6">
         <ServiceDetails details={details} />
+        <div className="mt-6 pt-4 border-t border-gray-800">
+          <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+            <Button className="btn-primary w-full">
+              {ctaText}
+            </Button>
+          </a>
+        </div>
       </AccordionContent>
     </AccordionItem>
   );
@@ -81,12 +104,13 @@ const Services = () => {
       case 'EN':
         return {
           title: 'Our Services',
-          description: 'We offer complete digital marketing solutions to drive your business growth.',
-          requestAnalysis: 'Request a Free Analysis',
+          description: 'Complete digital marketing solutions that generate real results for your business.',
+          requestAnalysis: '🎯 Get Free Analysis Now',
+          wantService: 'I Want This Service',
           services: [
             {
-              title: 'Strategic Paid Traffic Management',
-              description: 'Optimized strategies for digital platforms focused on conversion and results.',
+              title: 'Ads That Generate Sales and Qualified Leads',
+              description: 'Strategic paid traffic management focused on conversion and measurable results.',
               details: [
                 'Google Ads campaigns that generate qualified clicks and more sales',
                 'Smart targeting for search, display and remarketing with total focus on conversion',
@@ -101,7 +125,7 @@ const Services = () => {
               ]
             },
             {
-              title: 'AI Automation',
+              title: 'AI Automation That Works 24/7',
               description: 'Intelligent solutions to automate processes and improve customer experience.',
               details: [
                 'Intelligent chatbots for 24/7 customer service',
@@ -113,8 +137,8 @@ const Services = () => {
               ]
             },
             {
-              title: 'Website and Landing Page Creation',
-              description: 'Development of pages optimized for conversion and user experience.',
+              title: 'Landing Pages That Convert Into Customers',
+              description: 'Pages optimized for conversion and user experience that generate results.',
               details: [
                 'Responsive design for all devices',
                 'SEO optimization and fast loading',
@@ -125,8 +149,8 @@ const Services = () => {
               ]
             },
             {
-              title: 'Content Marketing',
-              description: 'Content strategies to engage, educate and convert your audience.',
+              title: 'Content That Engages and Converts',
+              description: 'Content strategies to engage, educate and convert your audience into customers.',
               details: [
                 'Creation of viral content for TikTok',
                 'Content strategies for Instagram and Facebook',
@@ -141,12 +165,13 @@ const Services = () => {
       case 'ES':
         return {
           title: 'Nuestros Servicios',
-          description: 'Ofrecemos soluciones completas de marketing digital para impulsar el crecimiento de tu negocio.',
-          requestAnalysis: 'Solicitar un Análisis Gratuito',
+          description: 'Soluciones completas de marketing digital que generan resultados reales para tu negocio.',
+          requestAnalysis: '🎯 Obtener Análisis Gratis Ahora',
+          wantService: 'Quiero Este Servicio',
           services: [
             {
-              title: 'Gestión Estratégica de Tráfico Pago',
-              description: 'Estrategias optimizadas para plataformas digitales enfocadas en conversión y resultados.',
+              title: 'Anuncios Que Generan Ventas y Leads Calificados',
+              description: 'Gestión estratégica de tráfico pago enfocada en conversión y resultados medibles.',
               details: [
                 'Campañas de Google Ads que generan clics calificados y más ventas',
                 'Segmentación inteligente para búsqueda, display y remarketing con enfoque total en conversión',
@@ -161,7 +186,7 @@ const Services = () => {
               ]
             },
             {
-              title: 'Automatización con IA',
+              title: 'Automatización con IA Que Funciona 24/7',
               description: 'Soluciones inteligentes para automatizar procesos y mejorar la experiencia del cliente.',
               details: [
                 'Chatbots inteligentes para atención al cliente 24/7',
@@ -173,8 +198,8 @@ const Services = () => {
               ]
             },
             {
-              title: 'Creación de Sitios Web y Landing Pages',
-              description: 'Desarrollo de páginas optimizadas para conversión y experiencia del usuario.',
+              title: 'Landing Pages Que Convierten en Clientes',
+              description: 'Páginas optimizadas para conversión y experiencia del usuario que generan resultados.',
               details: [
                 'Diseño responsivo para todos los dispositivos',
                 'Optimización SEO y carga rápida',
@@ -185,8 +210,8 @@ const Services = () => {
               ]
             },
             {
-              title: 'Marketing de Contenido',
-              description: 'Estrategias de contenido para involucrar, educar y convertir a tu audiencia.',
+              title: 'Contenido Que Involucra y Convierte',
+              description: 'Estrategias de contenido para involucrar, educar y convertir a tu audiencia en clientes.',
               details: [
                 'Creación de contenido viral para TikTok',
                 'Estrategias de contenido para Instagram y Facebook',
@@ -201,12 +226,13 @@ const Services = () => {
       default: // PT
         return {
           title: 'Nossos Serviços',
-          description: 'Oferecemos soluções completas de marketing digital para impulsionar o crescimento do seu negócio.',
-          requestAnalysis: 'Solicite uma Análise Gratuita',
+          description: 'Soluções completas de marketing digital que geram resultados reais para seu negócio.',
+          requestAnalysis: '🎯 Receber Diagnóstico Agora',
+          wantService: 'Quero Esse Serviço',
           services: [
             {
-              title: 'Gestão de Tráfego Pago Estratégico',
-              description: 'Estratégias otimizadas para plataformas digitais com foco em conversão e resultados.',
+              title: 'Anúncios Que Geram Vendas e Leads Qualificados',
+              description: 'Gestão estratégica de tráfego pago com foco em conversão e resultados mensuráveis.',
               details: [
                 'Campanhas no Google Ads que geram cliques qualificados e mais vendas',
                 'Segmentação inteligente para busca, display e remarketing com foco total em conversão',
@@ -221,7 +247,7 @@ const Services = () => {
               ]
             },
             {
-              title: 'Automação com IA',
+              title: 'Automação com IA Que Funciona 24/7',
               description: 'Soluções inteligentes para automatizar processos e melhorar a experiência do cliente.',
               details: [
                 'Chatbots inteligentes para atendimento 24/7 ao cliente',
@@ -233,8 +259,8 @@ const Services = () => {
               ]
             },
             {
-              title: 'Criação de Sites e Landing Pages',
-              description: 'Desenvolvimento de páginas otimizadas para conversão e experiência do usuário.',
+              title: 'Landing Pages Que Convertem em Clientes',
+              description: 'Páginas otimizadas para conversão e experiência do usuário que geram resultados.',
               details: [
                 'Design responsivo para todos os dispositivos',
                 'Otimização para SEO e carregamento rápido',
@@ -245,8 +271,8 @@ const Services = () => {
               ]
             },
             {
-              title: 'Marketing de Conteúdo',
-              description: 'Estratégias de conteúdo para engajar, educar e converter sua audiência.',
+              title: 'Conteúdo Que Engaja e Converte',
+              description: 'Estratégias de conteúdo para engajar, educar e converter sua audiência em clientes.',
               details: [
                 'Criação de conteúdos virais para TikTok',
                 'Estratégias de conteúdo para Instagram e Facebook',
@@ -331,6 +357,7 @@ const Services = () => {
                 description={service.description}
                 icon={getServiceIcon(index)}
                 details={service.details}
+                ctaText={content.wantService}
               />
             ))}
           </Accordion>

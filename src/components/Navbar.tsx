@@ -80,28 +80,37 @@ const Navbar = () => {
   const getCtaText = () => {
     switch (language) {
       case 'EN':
-        return { desktop: 'Talk to a Specialist', mobile: 'Contact Us' };
+        return { desktop: '🎯 Get Free Analysis Now', mobile: '🎯 Get Analysis' };
       case 'ES':
-        return { desktop: 'Hablar con un Especialista', mobile: 'Contáctanos' };
+        return { desktop: '🎯 Obtener Análisis Gratis Ahora', mobile: '🎯 Obtener Análisis' };
       default: // PT
-        return { desktop: 'Fale com um Especialista', mobile: 'Fale Conosco' };
+        return { desktop: '🎯 Receber Diagnóstico Agora', mobile: '🎯 Receber Diagnóstico' };
     }
+  };
+
+  const getBrandName = () => {
+    return language === 'EN' ? 'iD Agency' : 'Agência iD';
   };
 
   const navLinks = getNavLinks();
   const whatsappMessage = getWhatsappMessage();
   const ctaText = getCtaText();
+  const brandName = getBrandName();
   const whatsappLink = `https://wa.me/5561999601534?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
     <header className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-black/95 backdrop-blur-sm shadow-lg' : 'bg-transparent'}`}>
       <div className="container-custom">
         <nav className="flex items-center justify-between h-16 md:h-20">
-          {/* Logo */}
-          <div className="flex items-center z-50">
+          {/* Logo + Language Selector (Mobile) */}
+          <div className="flex items-center space-x-4 z-50">
             <a href="#home" className="text-xl md:text-2xl font-bold text-white">
-              <span className="text-idOrange">Agência</span> iD
+              <span className="text-idOrange">{language === 'EN' ? 'iD' : 'Agência'}</span> {language === 'EN' ? 'Agency' : 'iD'}
             </a>
+            {/* Language Selector visible on mobile */}
+            <div className="lg:hidden">
+              <LanguageSelector />
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -175,7 +184,6 @@ const Navbar = () => {
             
             <div className="border-t border-gray-800 pt-6 pb-6">
               <div className="flex flex-col space-y-4">
-                <LanguageSelector />
                 <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
                   <Button className="btn-primary w-full">
                     {ctaText.mobile}
