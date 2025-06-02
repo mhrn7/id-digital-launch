@@ -1,14 +1,11 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
+import { useLanguage } from './LanguageProvider';
 
 const About = () => {
-  const [language, setLanguage] = useState('PT');
+  const { language } = useLanguage();
 
   useEffect(() => {
-    // Check for URL params or localStorage for language setting
-    const storedLanguage = localStorage.getItem('language') || 'PT';
-    setLanguage(storedLanguage);
-    
     // Apply animation to elements
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -25,18 +22,68 @@ const About = () => {
     return () => observer.disconnect();
   }, []);
 
+  const getContent = () => {
+    switch (language) {
+      case 'EN':
+        return {
+          title: 'About us',
+          description: 'iD Agency specializes in online advertising management, sales and AI automation, offering innovative solutions to boost businesses in the digital environment.',
+          mission: 'Our Mission',
+          missionText: 'Transform digital marketing through intelligent paid traffic strategies that generate real, measurable growth for our clients.',
+          quote: 'We combine data analysis, automation and the latest AI technology to create campaigns that not only attract traffic, but convert visitors into loyal customers.',
+          whyChoose: 'Why Choose Us?',
+          benefits: [
+            'Customized strategies for each business and objective',
+            'Transparent reports and metrics',
+            'Cutting-edge technology in automation and artificial intelligence',
+            'Dedicated team with proven market experience'
+          ]
+        };
+      case 'ES':
+        return {
+          title: 'Nosotros',
+          description: 'La Agencia iD se especializa en gestión de publicidad online, ventas y automatización con IA, ofreciendo soluciones innovadoras para impulsar negocios en el entorno digital.',
+          mission: 'Nuestra Misión',
+          missionText: 'Transformar el marketing digital a través de estrategias inteligentes de tráfico pago que generen crecimiento real y medible para nuestros clientes.',
+          quote: 'Combinamos análisis de datos, automatización y la más reciente tecnología de IA para crear campañas que no solo atraen tráfico, sino que convierten visitantes en clientes fieles.',
+          whyChoose: '¿Por Qué Elegirnos?',
+          benefits: [
+            'Estrategias personalizadas para cada negocio y objetivo',
+            'Reportes transparentes y métricas',
+            'Tecnología de punta en automatización e inteligencia artificial',
+            'Equipo dedicado con experiencia comprobada en el mercado'
+          ]
+        };
+      default: // PT
+        return {
+          title: 'Sobre nós',
+          description: 'A Agência iD é especializada em gestão de anúncios online, vendas e automações com IA, oferecendo soluções inovadoras para impulsionar negócios no ambiente digital.',
+          mission: 'Nossa Missão',
+          missionText: 'Transformar o marketing digital através de estratégias inteligentes de tráfego pago que geram crescimento real e mensurável para nossos clientes.',
+          quote: 'Combinamos análise de dados, automação e a mais recente tecnologia de IA para criar campanhas que não apenas atraem tráfego, mas convertem visitantes em clientes fiéis.',
+          whyChoose: 'Por Que Nos Escolher?',
+          benefits: [
+            'Estratégias personalizadas para cada negócio e objetivo',
+            'Relatórios transparentes e métricas',
+            'Tecnologia de ponta em automação e inteligência artificial',
+            'Equipe dedicada com experiência comprovada no mercado'
+          ]
+        };
+    }
+  };
+
+  const content = getContent();
+
   return (
     <section id="about" className="section-padding bg-gradient-to-b from-black to-idDarkBlack">
       <div className="container-custom">
         <div className="max-w-3xl mx-auto text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold mb-6 animate-on-scroll">
-            {language === 'PT' ? 'Sobre nós' : 'About us'}
+            {content.title}
             <span className="block w-20 h-1 bg-idOrange mx-auto mt-4"></span>
           </h2>
           <p className="text-lg text-gray-300 animate-on-scroll">
-            {language === 'PT' 
-              ? 'A Agência iD é especializada em gestão de anúncios online, vendas e automações com IA, oferecendo soluções inovadoras para impulsionar negócios no ambiente digital.'
-              : 'iD Agency specializes in online advertising management, sales and AI automation, offering innovative solutions to boost businesses in the digital environment.'}
+            {content.description}
           </p>
         </div>
 
@@ -54,67 +101,33 @@ const About = () => {
 
           <div className="space-y-6 animate-on-scroll">
             <h3 className="text-2xl md:text-3xl font-bold text-white">
-              {language === 'PT' ? 'Nossa Missão' : 'Our Mission'}
+              {content.mission}
             </h3>
             <p className="text-gray-300">
-              {language === 'PT' 
-                ? 'Transformar o marketing digital através de estratégias inteligentes de tráfego pago que geram crescimento real e mensurável para nossos clientes.'
-                : 'Transform digital marketing through intelligent paid traffic strategies that generate real, measurable growth for our clients.'}
+              {content.missionText}
             </p>
             
             <div className="border-l-4 border-idOrange pl-4 py-2">
               <p className="text-gray-300 italic">
-                {language === 'PT'
-                  ? 'Combinamos análise de dados, automação e a mais recente tecnologia de IA para criar campanhas que não apenas atraem tráfego, mas convertem visitantes em clientes fiéis.'
-                  : 'We combine data analysis, automation and the latest AI technology to create campaigns that not only attract traffic, but convert visitors into loyal customers.'}
+                {content.quote}
               </p>
             </div>
             
             <h3 className="text-2xl md:text-3xl font-bold text-white pt-4">
-              {language === 'PT' ? 'Por Que Nos Escolher?' : 'Why Choose Us?'}
+              {content.whyChoose}
             </h3>
             
             <ul className="space-y-3">
-              <li className="flex items-start">
-                <svg className="w-6 h-6 text-idOrange mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-gray-300">
-                  {language === 'PT'
-                    ? 'Estratégias personalizadas para cada negócio e objetivo'
-                    : 'Customized strategies for each business and objective'}
-                </span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-6 h-6 text-idOrange mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-gray-300">
-                  {language === 'PT'
-                    ? 'Relatórios transparentes e métricas'
-                    : 'Transparent reports and metrics'}
-                </span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-6 h-6 text-idOrange mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-gray-300">
-                  {language === 'PT'
-                    ? 'Tecnologia de ponta em automação e inteligência artificial'
-                    : 'Cutting-edge technology in automation and artificial intelligence'}
-                </span>
-              </li>
-              <li className="flex items-start">
-                <svg className="w-6 h-6 text-idOrange mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-                <span className="text-gray-300">
-                  {language === 'PT'
-                    ? 'Equipe dedicada com experiência comprovada no mercado'
-                    : 'Dedicated team with proven market experience'}
-                </span>
-              </li>
+              {content.benefits.map((benefit, index) => (
+                <li key={index} className="flex items-start">
+                  <svg className="w-6 h-6 text-idOrange mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-gray-300">
+                    {benefit}
+                  </span>
+                </li>
+              ))}
             </ul>
           </div>
         </div>

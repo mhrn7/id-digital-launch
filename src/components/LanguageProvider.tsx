@@ -1,9 +1,11 @@
 
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 
+type Language = 'PT' | 'EN' | 'ES';
+
 type LanguageContextType = {
-  language: string;
-  setLanguage: (lang: string) => void;
+  language: Language;
+  setLanguage: (lang: Language) => void;
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -21,14 +23,14 @@ interface LanguageProviderProps {
 }
 
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
-  const [language, setLanguageState] = useState('PT');
+  const [language, setLanguageState] = useState<Language>('PT');
 
   useEffect(() => {
-    const storedLanguage = localStorage.getItem('language') || 'PT';
+    const storedLanguage = (localStorage.getItem('language') as Language) || 'PT';
     setLanguageState(storedLanguage);
     
     const handleLanguageChange = () => {
-      const updatedLanguage = localStorage.getItem('language') || 'PT';
+      const updatedLanguage = (localStorage.getItem('language') as Language) || 'PT';
       setLanguageState(updatedLanguage);
     };
     
@@ -36,7 +38,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
     return () => window.removeEventListener('languageChanged', handleLanguageChange);
   }, []);
 
-  const setLanguage = (lang: string) => {
+  const setLanguage = (lang: Language) => {
     localStorage.setItem('language', lang);
     setLanguageState(lang);
     window.dispatchEvent(new Event('languageChanged'));

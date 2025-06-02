@@ -1,12 +1,13 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Languages } from 'lucide-react';
+import { useLanguage } from './LanguageProvider';
+import LanguageSelector from './LanguageSelector';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [language, setLanguage] = useState('PT');
+  const { language } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -17,22 +18,60 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const toggleLanguage = () => {
-    setLanguage(prev => prev === 'PT' ? 'EN' : 'PT');
+  const getNavLinks = () => {
+    switch (language) {
+      case 'EN':
+        return [
+          { name: 'Home', href: '#home' },
+          { name: 'About us', href: '#about' },
+          { name: 'Services', href: '#services' },
+          { name: 'Testimonials', href: '#testimonials' },
+          { name: 'Contact', href: '#contact' },
+        ];
+      case 'ES':
+        return [
+          { name: 'Inicio', href: '#home' },
+          { name: 'Nosotros', href: '#about' },
+          { name: 'Servicios', href: '#services' },
+          { name: 'Testimonios', href: '#testimonials' },
+          { name: 'Contacto', href: '#contact' },
+        ];
+      default: // PT
+        return [
+          { name: 'Home', href: '#home' },
+          { name: 'Sobre nós', href: '#about' },
+          { name: 'Serviços', href: '#services' },
+          { name: 'Depoimentos', href: '#testimonials' },
+          { name: 'Contato', href: '#contact' },
+        ];
+    }
   };
 
-  const navLinks = [
-    { name: language === 'PT' ? 'Home' : 'Home', href: '#home' },
-    { name: language === 'PT' ? 'Sobre nós' : 'About us', href: '#about' },
-    { name: language === 'PT' ? 'Serviços' : 'Services', href: '#services' },
-    { name: language === 'PT' ? 'Depoimentos' : 'Testimonials', href: '#testimonials' },
-    { name: language === 'PT' ? 'Contato' : 'Contact', href: '#contact' },
-  ];
+  const getWhatsappMessage = () => {
+    switch (language) {
+      case 'EN':
+        return 'Hello! I came from the iD Agency website and would like to know more about the services.';
+      case 'ES':
+        return 'Hola! Vengo del sitio web de la Agencia iD y me gustaría saber más sobre los servicios.';
+      default: // PT
+        return 'Olá! Vim pelo site da Agência iD e gostaria de saber mais sobre os serviços.';
+    }
+  };
 
-  const whatsappMessage = language === 'PT' 
-    ? 'Olá! Vim pelo site da Agência iD e gostaria de saber mais sobre os serviços.'
-    : 'Hello! I came from the iD Agency website and would like to know more about the services.';
+  const getCtaText = () => {
+    switch (language) {
+      case 'EN':
+        return { desktop: 'Talk to a Specialist', mobile: 'Contact Us' };
+      case 'ES':
+        return { desktop: 'Hablar con un Especialista', mobile: 'Contáctanos' };
+      default: // PT
+        return { desktop: 'Fale com um Especialista', mobile: 'Fale Conosco' };
+    }
+  };
 
+  const navLinks = getNavLinks();
+  const whatsappMessage = getWhatsappMessage();
+  const ctaText = getCtaText();
   const whatsappLink = `https://wa.me/5561999601534?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
@@ -77,13 +116,10 @@ const Navbar = () => {
 
           {/* Language Toggle & CTA - Desktop */}
           <div className="hidden lg:flex items-center space-x-4">
-            <button onClick={toggleLanguage} className="flex items-center text-white hover:text-idOrange">
-              <Languages size={20} className="mr-1" />
-              <span>{language}</span>
-            </button>
+            <LanguageSelector />
             <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
               <Button className="btn-primary">
-                {language === 'PT' ? 'Fale com um Especialista' : 'Talk to a Specialist'}
+                {ctaText.desktop}
               </Button>
             </a>
           </div>
@@ -102,13 +138,10 @@ const Navbar = () => {
             </a>
           ))}
           <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-800">
-            <button onClick={toggleLanguage} className="flex items-center text-white hover:text-idOrange">
-              <Languages size={20} className="mr-1" />
-              <span>{language}</span>
-            </button>
+            <LanguageSelector />
             <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
               <Button className="btn-primary">
-                {language === 'PT' ? 'Fale Conosco' : 'Contact Us'}
+                {ctaText.mobile}
               </Button>
             </a>
           </div>
