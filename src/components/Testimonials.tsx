@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from './LanguageProvider';
@@ -67,7 +66,7 @@ const Testimonials = () => {
           description: 'See how our services have positively impacted our clients\' businesses.',
           readyTitle: 'Ready to transform your digital marketing?',
           readyDescription: 'Join our satisfied clients and see the power of strategic digital marketing.',
-          requestConsultation: 'Request a Consultation',
+          requestConsultation: 'I Want to Boost My Business',
           testimonials: [
             {
               quote: "After we started with iD Agency, our schedule was filled with new clients via Google and Instagram. The team is extremely professional and agile.",
@@ -97,7 +96,7 @@ const Testimonials = () => {
           description: 'Ve cómo nuestros servicios han impactado positivamente los negocios de nuestros clientes.',
           readyTitle: '¿Listo para transformar tu marketing digital?',
           readyDescription: 'Únete a nuestros clientes satisfechos y ve el poder del marketing digital estratégico.',
-          requestConsultation: 'Solicitar una Consultoría',
+          requestConsultation: 'Quiero Impulsar Mi Negocio',
           testimonials: [
             {
               quote: "Después de que comenzamos con la Agencia iD, nuestra agenda se llenó de nuevos clientes vía Google e Instagram. El equipo es extremadamente profesional y ágil.",
@@ -127,7 +126,7 @@ const Testimonials = () => {
           description: 'Veja como nossos serviços têm impactado positivamente os negócios dos nossos clientes.',
           readyTitle: 'Pronto para transformar seu marketing digital?',
           readyDescription: 'Junte-se aos nossos clientes satisfeitos e veja o poder do marketing digital estratégico.',
-          requestConsultation: 'Solicite uma Consultoria',
+          requestConsultation: 'Quero Impulsionar Meu Negócio',
           testimonials: [
             {
               quote: "Depois que começamos com a Agência iD, nossa agenda lotou de novos clientes via Google e Instagram. A equipe é extremamente profissional e ágil.",
@@ -155,20 +154,6 @@ const Testimonials = () => {
   };
 
   const content = getContent();
-
-  const getWhatsappMessage = () => {
-    switch (language) {
-      case 'EN':
-        return 'Hello! I came from the iD Agency website and would like to know more about a consultation.';
-      case 'ES':
-        return 'Hola! Vengo del sitio web de la Agencia iD y me gustaría saber más sobre una consultoría.';
-      default: // PT
-        return 'Olá! Vim pelo site da Agência iD e gostaria de saber mais sobre uma consultoria.';
-    }
-  };
-
-  const whatsappMessage = getWhatsappMessage();
-  const whatsappLink = `https://wa.me/5561999601534?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
     <section id="testimonials" className="section-padding bg-gradient-to-b from-idDarkBlack to-black">
@@ -202,7 +187,7 @@ const Testimonials = () => {
             <p className="text-gray-300 mb-6">
               {content.readyDescription}
             </p>
-            <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+            <a href="#contact">
               <Button className="btn-primary">
                 {content.requestConsultation}
               </Button>

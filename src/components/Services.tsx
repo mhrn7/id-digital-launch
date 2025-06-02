@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -35,21 +34,6 @@ interface ServiceItemProps {
 }
 
 const ServiceItem = ({ title, description, icon, details, value, ctaText }: ServiceItemProps) => {
-  const getWhatsappMessage = (serviceTitle: string) => {
-    const { language } = useLanguage();
-    switch (language) {
-      case 'EN':
-        return `Hello! I came from the iD Agency website and I'm interested in the service: ${serviceTitle}`;
-      case 'ES':
-        return `Hola! Vengo del sitio web de la Agencia iD y estoy interesado en el servicio: ${serviceTitle}`;
-      default: // PT
-        return `Olá! Vim pelo site da Agência iD e tenho interesse no serviço: ${serviceTitle}`;
-    }
-  };
-
-  const whatsappMessage = getWhatsappMessage(title);
-  const whatsappLink = `https://wa.me/5561999601534?text=${encodeURIComponent(whatsappMessage)}`;
-
   return (
     <AccordionItem value={value} className="border border-gray-800 rounded-lg mb-4 overflow-hidden">
       <AccordionTrigger className="bg-gradient-to-br from-idDarkBlack to-black p-6 hover:no-underline hover:bg-gradient-to-br hover:from-idDarkBlack/80 hover:to-black/80 transition-all duration-300 [&[data-state=open]]:border-b [&[data-state=open]]:border-gray-800">
@@ -68,7 +52,7 @@ const ServiceItem = ({ title, description, icon, details, value, ctaText }: Serv
       <AccordionContent className="bg-gradient-to-br from-idDarkBlack to-black px-6 pb-6">
         <ServiceDetails details={details} />
         <div className="mt-6 pt-4 border-t border-gray-800">
-          <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+          <a href="#contact">
             <Button className="btn-primary w-full">
               {ctaText}
             </Button>
@@ -105,8 +89,8 @@ const Services = () => {
         return {
           title: 'Our Services',
           description: 'Complete digital marketing solutions that generate real results for your business.',
-          requestAnalysis: '🎯 Get Free Analysis Now',
-          wantService: 'I Want This Service',
+          requestAnalysis: 'I Want to Receive a Proposal',
+          wantService: 'I Want to Receive a Proposal',
           services: [
             {
               title: 'Ads That Generate Sales and Qualified Leads',
@@ -166,8 +150,8 @@ const Services = () => {
         return {
           title: 'Nuestros Servicios',
           description: 'Soluciones completas de marketing digital que generan resultados reales para tu negocio.',
-          requestAnalysis: '🎯 Obtener Análisis Gratis Ahora',
-          wantService: 'Quiero Este Servicio',
+          requestAnalysis: 'Quiero Recibir una Propuesta',
+          wantService: 'Quiero Recibir una Propuesta',
           services: [
             {
               title: 'Anuncios Que Generan Ventas y Leads Calificados',
@@ -175,7 +159,7 @@ const Services = () => {
               details: [
                 'Campañas de Google Ads que generan clics calificados y más ventas',
                 'Segmentación inteligente para búsqueda, display y remarketing con enfoque total en conversión',
-                'Facebook Ads con estrategias que aprovechan cada centavo de tu presupuesto',
+                'Facebook Ads con estrategias que aproveitan cada centavo de tu presupuesto',
                 'Anuncios creados para alcanzar a las personas correctas y generar resultados reales',
                 'Instagram Ads que llaman la atención y conectan con tu audiencia',
                 'Creaciones visuales impactantes para aumentar el engagement y atraer nuevos clientes',
@@ -227,8 +211,8 @@ const Services = () => {
         return {
           title: 'Nossos Serviços',
           description: 'Soluções completas de marketing digital que geram resultados reais para seu negócio.',
-          requestAnalysis: '🎯 Receber Diagnóstico Agora',
-          wantService: 'Quero Esse Serviço',
+          requestAnalysis: 'Quero Receber uma Proposta',
+          wantService: 'Quero Receber uma Proposta',
           services: [
             {
               title: 'Anúncios Que Geram Vendas e Leads Qualificados',
@@ -364,11 +348,7 @@ const Services = () => {
         </div>
 
         <div className="mt-12 md:mt-16 text-center animate-on-scroll">
-          <a 
-            href={whatsappLink}
-            target="_blank" 
-            rel="noopener noreferrer"
-          >
+          <a href="#contact">
             <Button className="btn-primary text-base md:text-lg px-6 md:px-8 py-4 md:py-6">
               {content.requestAnalysis}
             </Button>

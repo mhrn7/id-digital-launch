@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from './LanguageProvider';
@@ -69,22 +68,22 @@ const Navbar = () => {
   const getWhatsappMessage = () => {
     switch (language) {
       case 'EN':
-        return 'Hello! I came from the iD Agency website and would like to know more about the services.';
+        return 'Hello! I came from the iD Agency website and would like to get in touch.';
       case 'ES':
-        return 'Hola! Vengo del sitio web de la Agencia iD y me gustaría saber más sobre los servicios.';
+        return 'Hola! Vengo del sitio web de la Agencia iD y me gustaría ponerme en contacto.';
       default: // PT
-        return 'Olá! Vim pelo site da Agência iD e gostaria de saber mais sobre os serviços.';
+        return 'Olá! Vim pelo site da Agência iD e gostaria de entrar em contato.';
     }
   };
 
   const getCtaText = () => {
     switch (language) {
       case 'EN':
-        return { desktop: '🎯 Get Free Analysis Now', mobile: '🎯 Get Analysis' };
+        return { desktop: 'Get in Touch', mobile: 'Contact' };
       case 'ES':
-        return { desktop: '🎯 Obtener Análisis Gratis Ahora', mobile: '🎯 Obtener Análisis' };
+        return { desktop: 'Ponerse en Contacto', mobile: 'Contacto' };
       default: // PT
-        return { desktop: '🎯 Receber Diagnóstico Agora', mobile: '🎯 Receber Diagnóstico' };
+        return { desktop: 'Entre em Contato', mobile: 'Contato' };
     }
   };
 
@@ -148,7 +147,7 @@ const Navbar = () => {
           {/* Language Toggle & CTA - Desktop */}
           <div className="hidden lg:flex items-center space-x-4">
             <LanguageSelector />
-            <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+            <a href="#contact">
               <Button className="btn-primary">
                 {ctaText.desktop}
               </Button>
@@ -184,7 +183,7 @@ const Navbar = () => {
             
             <div className="border-t border-gray-800 pt-6 pb-6">
               <div className="flex flex-col space-y-4">
-                <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
+                <a href="#contact">
                   <Button className="btn-primary w-full">
                     {ctaText.mobile}
                   </Button>

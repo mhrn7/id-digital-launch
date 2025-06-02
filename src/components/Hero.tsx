@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from './LanguageProvider';
+import RocketAnimation from './RocketAnimation';
 
 const Hero = () => {
   const { language } = useLanguage();
@@ -50,7 +51,7 @@ const Hero = () => {
             <>Ready to scale your <span className="text-idOrange">sales</span> with paid traffic?</>
           ),
           heroDescription: 'Get a personalized analysis at no cost. Digital marketing strategies focused on results and cutting-edge AI technology to accelerate your company\'s growth.',
-          requestProposal: '🎯 Get Free Analysis Now',
+          requestProposal: 'I Want to Start Scaling My Business',
           ourServices: 'Our Services',
           managedInAds: 'Managed in Ads',
           satisfiedPartners: 'Satisfied Partners',
@@ -62,7 +63,7 @@ const Hero = () => {
             <>¿Listo para escalar tus <span className="text-idOrange">ventas</span> con tráfico pago?</>
           ),
           heroDescription: 'Recibe un análisis personalizado sin costo. Estrategias de marketing digital enfocadas en resultados y tecnología de punta con IA para acelerar el crecimiento de tu empresa.',
-          requestProposal: '🎯 Obtener Análisis Gratis Ahora',
+          requestProposal: 'Quiero Comenzar a Escalar Mi Negocio',
           ourServices: 'Nuestros Servicios',
           managedInAds: 'Gestionados en Anuncios',
           satisfiedPartners: 'Socios Satisfechos',
@@ -74,7 +75,7 @@ const Hero = () => {
             <>Pronto para escalar suas <span className="text-idOrange">vendas</span> com tráfego pago?</>
           ),
           heroDescription: 'Receba uma análise personalizada sem custo. Estratégias de marketing digital com foco em resultados e tecnologia de ponta com IA para acelerar o crescimento da sua empresa.',
-          requestProposal: '🎯 Receber Diagnóstico Agora',
+          requestProposal: 'Quero Começar a Escalar Meu Negócio',
           ourServices: 'Conheça Nossos Serviços',
           managedInAds: 'Gerenciados em Anúncios',
           satisfiedPartners: 'Parceiros Satisfeitos',
@@ -84,20 +85,6 @@ const Hero = () => {
   };
 
   const content = getContent();
-
-  const getWhatsappMessage = () => {
-    switch (language) {
-      case 'EN':
-        return 'Hello! I came from the iD Agency website and would like to receive a free analysis of my business.';
-      case 'ES':
-        return 'Hola! Vengo del sitio web de la Agencia iD y me gustaría recibir un análisis gratuito de mi negocio.';
-      default: // PT
-        return 'Olá! Vim pelo site da Agência iD e gostaria de receber uma análise gratuita do meu negócio.';
-    }
-  };
-
-  const whatsappMessage = getWhatsappMessage();
-  const whatsappLink = `https://wa.me/5561999601534?text=${encodeURIComponent(whatsappMessage)}`;
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) {
@@ -127,11 +114,7 @@ const Hero = () => {
               {content.heroDescription}
             </p>
             <div className="flex flex-wrap gap-4">
-              <a 
-                href={whatsappLink} 
-                target="_blank" 
-                rel="noopener noreferrer"
-              >
+              <a href="#contact">
                 <Button className="btn-primary text-base md:text-lg px-6 md:px-8 py-4 md:py-6">
                   {content.requestProposal}
                 </Button>
@@ -174,18 +157,9 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* 3D Rocket Image */}
+          {/* 3D Rocket Animation */}
           <div className="flex justify-center animate-on-scroll">
-            <div className="relative w-full max-w-md">
-              <div className="relative">
-                <img 
-                  src="https://images.unsplash.com/photo-1516849841032-87cbac4d88f7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=800&q=80" 
-                  alt="3D Rocket Launch" 
-                  className="w-full h-auto max-h-[500px] object-contain filter brightness-110 contrast-110"
-                />
-                <div className="absolute -inset-6 bg-idOrange/15 rounded-full blur-2xl -z-10 animate-pulse-slow"></div>
-              </div>
-            </div>
+            <RocketAnimation />
           </div>
         </div>
       </div>
