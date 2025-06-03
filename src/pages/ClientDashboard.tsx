@@ -6,28 +6,34 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/lib/supabase';
 import { User } from '@supabase/supabase-js';
-import { LogOut, TrendingUp, DollarSign, MousePointer, Eye } from 'lucide-react';
+import { LogOut, FileText, CreditCard, TrendingUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-interface CampaignData {
-  platform: string;
-  investment: number;
-  cpc: number;
-  cpm: number;
-  ctr: number;
-  roas: number;
+interface ClientPlan {
+  name: string;
+  price: number;
+  features: string[];
+  status: 'active' | 'expired' | 'pending';
+}
+
+interface Report {
+  id: string;
+  title: string;
+  date: string;
+  file_url: string;
 }
 
 const ClientDashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [campaignData, setCampaignData] = useState<CampaignData[]>([]);
+  const [clientPlan, setClientPlan] = useState<ClientPlan | null>(null);
+  const [reports, setReports] = useState<Report[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
 
   useEffect(() => {
     checkUser();
-    fetchCampaignData();
+    fetchClientData();
   }, []);
 
   const checkUser = async () => {
@@ -46,27 +52,38 @@ const ClientDashboard = () => {
     }
   };
 
-  const fetchCampaignData = async () => {
-    // Simulando dados de campanha - em produção, isso viria das APIs do Google Ads e Meta
-    const mockData: CampaignData[] = [
+  const fetchClientData = async () => {
+    // Dados simulados - em produção, buscar do Supabase
+    const mockPlan: ClientPlan = {
+      name: 'Plano Profissional',
+      price: 2500,
+      features: [
+        'Gestão Google Ads',
+        'Gestão Meta Ads',
+        'Relatórios mensais',
+        'Otimização de campanhas',
+        'Suporte dedicado'
+      ],
+      status: 'active'
+    };
+
+    const mockReports: Report[] = [
       {
-        platform: 'Google Ads',
-        investment: 15000,
-        cpc: 2.35,
-        cpm: 18.50,
-        ctr: 3.2,
-        roas: 4.8
+        id: '1',
+        title: 'Relatório Janeiro 2024',
+        date: '2024-01-31',
+        file_url: '#'
       },
       {
-        platform: 'Meta Ads',
-        investment: 12000,
-        cpc: 1.85,
-        cpm: 12.30,
-        ctr: 2.8,
-        roas: 5.2
+        id: '2',
+        title: 'Relatório Dezembro 2023',
+        date: '2023-12-31',
+        file_url: '#'
       }
     ];
-    setCampaignData(mockData);
+
+    setClientPlan(mockPlan);
+    setReports(mockReports);
   };
 
   const handleLogout = async () => {
@@ -82,6 +99,13 @@ const ClientDashboard = () => {
     }
   };
 
+  const downloadReport = (report: Report) => {
+    toast({
+      title: "Download iniciado",
+      description: `Baixando ${report.title}...`
+    });
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-idBlack flex items-center justify-center">
@@ -89,9 +113,6 @@ const ClientDashboard = () => {
       </div>
     );
   }
-
-  const totalInvestment = campaignData.reduce((sum, campaign) => sum + campaign.investment, 0);
-  const avgRoas = campaignData.reduce((sum, campaign) => sum + campaign.roas, 0) / campaignData.length;
 
   return (
     <div className="min-h-screen bg-idBlack text-white">
@@ -110,125 +131,132 @@ const ClientDashboard = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-idDarkBlack border-gray-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-400">
-                Investimento Total
-              </CardTitle>
-              <DollarSign className="h-4 w-4 text-idOrange" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">
-                R$ {totalInvestment.toLocaleString()}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-idDarkBlack border-gray-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-400">
-                ROAS Médio
-              </CardTitle>
-              <TrendingUp className="h-4 w-4 text-idOrange" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">
-                {avgRoas.toFixed(1)}x
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-idDarkBlack border-gray-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-400">
-                Plataformas Ativas
-              </CardTitle>
-              <Eye className="h-4 w-4 text-idOrange" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">
-                {campaignData.length}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-idDarkBlack border-gray-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-400">
-                Status
-              </CardTitle>
-              <MousePointer className="h-4 w-4 text-idOrange" />
-            </CardHeader>
-            <CardContent>
-              <Badge className="bg-green-600">Ativo</Badge>
-            </CardContent>
-          </Card>
+        {/* Navigation Tabs */}
+        <div className="flex space-x-1 mb-8 bg-idDarkBlack p-1 rounded-lg">
+          <Button variant="ghost" className="flex-1 bg-idOrange text-white">
+            <FileText className="w-4 h-4 mr-2" />
+            Contrato
+          </Button>
+          <Button variant="ghost" className="flex-1 text-gray-400 hover:text-white">
+            <CreditCard className="w-4 h-4 mr-2" />
+            Plano
+          </Button>
+          <Button variant="ghost" className="flex-1 text-gray-400 hover:text-white">
+            <TrendingUp className="w-4 h-4 mr-2" />
+            Relatórios
+          </Button>
         </div>
 
-        {/* Campaign Details */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {campaignData.map((campaign, index) => (
-            <Card key={index} className="bg-idDarkBlack border-gray-800">
+        <div className="space-y-8">
+          {/* Contrato Section */}
+          <Card className="bg-idDarkBlack border-gray-800">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center">
+                <FileText className="w-5 h-5 mr-2 text-idOrange" />
+                Contrato de Serviços
+              </CardTitle>
+              <CardDescription className="text-gray-400">
+                Seu contrato de prestação de serviços
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between p-4 border border-gray-700 rounded-lg">
+                <div>
+                  <h4 className="text-white font-medium">Contrato de Gestão de Tráfego</h4>
+                  <p className="text-gray-400 text-sm">Assinado em 15/01/2024</p>
+                  <Badge className="mt-2 bg-green-600">Ativo</Badge>
+                </div>
+                <Button variant="outline" className="border-gray-700">
+                  <FileText className="w-4 h-4 mr-2" />
+                  Baixar PDF
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Plano Section */}
+          {clientPlan && (
+            <Card className="bg-idDarkBlack border-gray-800">
               <CardHeader>
-                <CardTitle className="text-white">{campaign.platform}</CardTitle>
+                <CardTitle className="text-white flex items-center">
+                  <CreditCard className="w-5 h-5 mr-2 text-idOrange" />
+                  {clientPlan.name}
+                </CardTitle>
                 <CardDescription className="text-gray-400">
-                  Performance das campanhas
+                  Detalhes do seu plano atual
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Investimento:</span>
-                    <span className="text-white font-semibold">
-                      R$ {campaign.investment.toLocaleString()}
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Valor Mensal:</span>
+                    <span className="text-2xl font-bold text-idOrange">
+                      R$ {clientPlan.price.toLocaleString()}
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">CPC:</span>
-                    <span className="text-white">R$ {campaign.cpc.toFixed(2)}</span>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-400">Status:</span>
+                    <Badge className={clientPlan.status === 'active' ? 'bg-green-600' : 'bg-red-600'}>
+                      {clientPlan.status === 'active' ? 'Ativo' : 'Inativo'}
+                    </Badge>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">CPM:</span>
-                    <span className="text-white">R$ {campaign.cpm.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">CTR:</span>
-                    <span className="text-white">{campaign.ctr}%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">ROAS:</span>
-                    <span className="text-idOrange font-semibold">
-                      {campaign.roas.toFixed(1)}x
-                    </span>
+
+                  <div>
+                    <h4 className="text-white font-medium mb-3">Serviços Inclusos:</h4>
+                    <ul className="space-y-2">
+                      {clientPlan.features.map((feature, index) => (
+                        <li key={index} className="flex items-center text-gray-300">
+                          <div className="w-2 h-2 bg-idOrange rounded-full mr-3"></div>
+                          {feature}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
+          )}
 
-        {/* Contracts Section */}
-        <div className="mt-8">
+          {/* Relatórios Section */}
           <Card className="bg-idDarkBlack border-gray-800">
             <CardHeader>
-              <CardTitle className="text-white">Documentos</CardTitle>
+              <CardTitle className="text-white flex items-center">
+                <TrendingUp className="w-5 h-5 mr-2 text-idOrange" />
+                Relatórios de Performance
+              </CardTitle>
               <CardDescription className="text-gray-400">
-                Seus contratos e documentos
+                Seus relatórios mensais organizados por data
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 border border-gray-700 rounded-lg">
-                  <div>
-                    <h4 className="text-white font-medium">Contrato de Serviços</h4>
-                    <p className="text-gray-400 text-sm">Atualizado em 15/01/2024</p>
+                {reports.length > 0 ? (
+                  reports.map((report) => (
+                    <div key={report.id} className="flex items-center justify-between p-4 border border-gray-700 rounded-lg">
+                      <div>
+                        <h4 className="text-white font-medium">{report.title}</h4>
+                        <p className="text-gray-400 text-sm">
+                          Data: {new Date(report.date).toLocaleDateString('pt-BR')}
+                        </p>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        className="border-gray-700"
+                        onClick={() => downloadReport(report)}
+                      >
+                        <FileText className="w-4 h-4 mr-2" />
+                        Baixar
+                      </Button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <TrendingUp className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                    <p className="text-gray-400">Nenhum relatório disponível ainda.</p>
+                    <p className="text-gray-500 text-sm">Os relatórios aparecerão aqui conforme forem publicados.</p>
                   </div>
-                  <Button variant="outline" className="border-gray-700">
-                    Download PDF
-                  </Button>
-                </div>
+                )}
               </div>
             </CardContent>
           </Card>

@@ -1,248 +1,319 @@
 
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { supabase } from '@/lib/supabase';
-import { User } from '@supabase/supabase-js';
-import { LogOut, Users, Plus, Settings } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Users, FileText, Upload, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+interface Client {
+  id: string;
+  email: string;
+  name: string;
+  plan: string;
+  status: 'active' | 'inactive';
+  created_at: string;
+}
+
+interface Report {
+  id: string;
+  client_id: string;
+  client_name: string;
+  title: string;
+  date: string;
+  file_name: string;
+}
+
 const AdminDashboard = () => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [clients, setClients] = useState<any[]>([]);
-  const [newClientEmail, setNewClientEmail] = useState('');
-  const [newClientPassword, setNewClientPassword] = useState('');
-  const navigate = useNavigate();
+  const [clients, setClients] = useState<Client[]>([
+    {
+      id: '1',
+      email: 'cliente@exemplo.com',
+      name: 'João Silva',
+      plan: 'Plano Profissional',
+      status: 'active',
+      created_at: '2024-01-15'
+    }
+  ]);
+  
+  const [reports, setReports] = useState<Report[]>([
+    {
+      id: '1',
+      client_id: '1',
+      client_name: 'João Silva',
+      title: 'Relatório Janeiro 2024',
+      date: '2024-01-31',
+      file_name: 'relatorio_janeiro_2024.pdf'
+    }
+  ]);
+
+  const [newClientData, setNewClientData] = useState({
+    email: '',
+    name: '',
+    plan: 'Plano Básico'
+  });
+
+  const [reportUpload, setReportUpload] = useState({
+    client_id: '',
+    title: '',
+    file: null as File | null
+  });
+
   const { toast } = useToast();
 
-  useEffect(() => {
-    checkAdminUser();
-    fetchClients();
-  }, []);
-
-  const checkAdminUser = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate('/cliente/login');
-        return;
-      }
-      
-      // Verificar se é admin (você pode implementar uma tabela de admins)
-      // Por enquanto, vamos usar um email específico como admin
-      const adminEmails = ['admin@agenciaid.com', 'seu-email@exemplo.com'];
-      if (!adminEmails.includes(user.email || '')) {
-        navigate('/cliente/dashboard');
-        return;
-      }
-      
-      setUser(user);
-    } catch (error) {
-      console.error('Error checking admin user:', error);
-      navigate('/cliente/login');
-    } finally {
-      setLoading(false);
+  const handleCreateClient = () => {
+    if (!newClientData.email || !newClientData.name) {
+      toast({
+        title: "Erro",
+        description: "Preencha todos os campos obrigatórios.",
+        variant: "destructive"
+      });
+      return;
     }
-  };
 
-  const fetchClients = async () => {
-    try {
-      // Em produção, você buscaria os clientes de uma tabela no Supabase
-      const mockClients = [
-        { id: 1, email: 'cliente1@exemplo.com', name: 'Cliente 1', created_at: '2024-01-15' },
-        { id: 2, email: 'cliente2@exemplo.com', name: 'Cliente 2', created_at: '2024-01-20' },
-      ];
-      setClients(mockClients);
-    } catch (error) {
-      console.error('Error fetching clients:', error);
-    }
-  };
+    const newClient: Client = {
+      id: Date.now().toString(),
+      email: newClientData.email,
+      name: newClientData.name,
+      plan: newClientData.plan,
+      status: 'active',
+      created_at: new Date().toISOString().split('T')[0]
+    };
 
-  const handleCreateClient = async (e: React.FormEvent) => {
-    e.preventDefault();
+    setClients([...clients, newClient]);
+    setNewClientData({ email: '', name: '', plan: 'Plano Básico' });
     
-    try {
-      // Criar usuário no Supabase Auth
-      const { data, error } = await supabase.auth.admin.createUser({
-        email: newClientEmail,
-        password: newClientPassword,
-        email_confirm: true
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Cliente criado com sucesso!",
-        description: `Login criado para ${newClientEmail}`,
-      });
-
-      setNewClientEmail('');
-      setNewClientPassword('');
-      fetchClients();
-    } catch (error: any) {
-      toast({
-        title: "Erro ao criar cliente",
-        description: error.message,
-        variant: "destructive"
-      });
-    }
+    toast({
+      title: "Cliente criado!",
+      description: `Cliente ${newClientData.name} foi adicionado com sucesso.`
+    });
   };
 
-  const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
+  const handleUploadReport = () => {
+    if (!reportUpload.client_id || !reportUpload.title || !reportUpload.file) {
       toast({
-        title: "Erro ao sair",
-        description: error.message,
+        title: "Erro",
+        description: "Preencha todos os campos e selecione um arquivo.",
         variant: "destructive"
       });
-    } else {
-      navigate('/cliente/login');
+      return;
     }
-  };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-idBlack flex items-center justify-center">
-        <div className="text-white">Carregando...</div>
-      </div>
-    );
-  }
+    const client = clients.find(c => c.id === reportUpload.client_id);
+    if (!client) return;
+
+    const newReport: Report = {
+      id: Date.now().toString(),
+      client_id: reportUpload.client_id,
+      client_name: client.name,
+      title: reportUpload.title,
+      date: new Date().toISOString().split('T')[0],
+      file_name: reportUpload.file.name
+    };
+
+    setReports([...reports, newReport]);
+    setReportUpload({ client_id: '', title: '', file: null });
+    
+    toast({
+      title: "Relatório enviado!",
+      description: `Relatório para ${client.name} foi adicionado com sucesso.`
+    });
+  };
 
   return (
     <div className="min-h-screen bg-idBlack text-white">
-      {/* Header */}
       <div className="border-b border-gray-800 bg-idDarkBlack">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-idOrange">Painel Administrativo</h1>
-            <p className="text-gray-400">Gestão de clientes e sistema</p>
-          </div>
-          <Button variant="outline" onClick={handleLogout} className="border-gray-700">
-            <LogOut className="w-4 h-4 mr-2" />
-            Sair
-          </Button>
+        <div className="container mx-auto px-4 py-4">
+          <h1 className="text-2xl font-bold text-idOrange">Painel Administrativo</h1>
+          <p className="text-gray-400">Gestão de clientes e relatórios</p>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-idDarkBlack border-gray-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-400">
-                Total de Clientes
-              </CardTitle>
-              <Users className="h-4 w-4 text-idOrange" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">
-                {clients.length}
-              </div>
-            </CardContent>
-          </Card>
+        <Tabs defaultValue="clients" className="space-y-6">
+          <TabsList className="bg-idDarkBlack border-gray-800">
+            <TabsTrigger value="clients" className="text-white">
+              <Users className="w-4 h-4 mr-2" />
+              Clientes
+            </TabsTrigger>
+            <TabsTrigger value="reports" className="text-white">
+              <FileText className="w-4 h-4 mr-2" />
+              Relatórios
+            </TabsTrigger>
+          </TabsList>
 
-          <Card className="bg-idDarkBlack border-gray-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-400">
-                Clientes Ativos
-              </CardTitle>
-              <Settings className="h-4 w-4 text-idOrange" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">
-                {clients.length}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-idDarkBlack border-gray-800">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-400">
-                Novos este Mês
-              </CardTitle>
-              <Plus className="h-4 w-4 text-idOrange" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">
-                2
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Create New Client */}
-          <Card className="bg-idDarkBlack border-gray-800">
-            <CardHeader>
-              <CardTitle className="text-white">Criar Novo Cliente</CardTitle>
-              <CardDescription className="text-gray-400">
-                Adicione um novo cliente ao sistema
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleCreateClient} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="client-email" className="text-white">Email do Cliente</Label>
-                  <Input
-                    id="client-email"
-                    type="email"
-                    value={newClientEmail}
-                    onChange={(e) => setNewClientEmail(e.target.value)}
-                    className="bg-gray-800 border-gray-700 text-white"
-                    required
-                  />
+          <TabsContent value="clients" className="space-y-6">
+            {/* Criar Novo Cliente */}
+            <Card className="bg-idDarkBlack border-gray-800">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <Plus className="w-5 h-5 mr-2 text-idOrange" />
+                  Novo Cliente
+                </CardTitle>
+                <CardDescription className="text-gray-400">
+                  Adicionar um novo cliente ao sistema
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="email" className="text-white">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={newClientData.email}
+                      onChange={(e) => setNewClientData({...newClientData, email: e.target.value})}
+                      className="bg-gray-800 border-gray-700 text-white"
+                      placeholder="cliente@exemplo.com"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="name" className="text-white">Nome</Label>
+                    <Input
+                      id="name"
+                      value={newClientData.name}
+                      onChange={(e) => setNewClientData({...newClientData, name: e.target.value})}
+                      className="bg-gray-800 border-gray-700 text-white"
+                      placeholder="Nome do cliente"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="plan" className="text-white">Plano</Label>
+                    <select
+                      value={newClientData.plan}
+                      onChange={(e) => setNewClientData({...newClientData, plan: e.target.value})}
+                      className="w-full h-10 bg-gray-800 border border-gray-700 text-white rounded-md px-3"
+                    >
+                      <option value="Plano Básico">Plano Básico</option>
+                      <option value="Plano Profissional">Plano Profissional</option>
+                      <option value="Plano Premium">Plano Premium</option>
+                    </select>
+                  </div>
                 </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="client-password" className="text-white">Senha Temporária</Label>
-                  <Input
-                    id="client-password"
-                    type="password"
-                    value={newClientPassword}
-                    onChange={(e) => setNewClientPassword(e.target.value)}
-                    className="bg-gray-800 border-gray-700 text-white"
-                    required
-                  />
-                </div>
-                
-                <Button type="submit" className="w-full btn-primary">
+                <Button onClick={handleCreateClient} className="mt-4 btn-primary">
                   <Plus className="w-4 h-4 mr-2" />
                   Criar Cliente
                 </Button>
-              </form>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Clients List */}
-          <Card className="bg-idDarkBlack border-gray-800">
-            <CardHeader>
-              <CardTitle className="text-white">Clientes Cadastrados</CardTitle>
-              <CardDescription className="text-gray-400">
-                Lista de todos os clientes
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {clients.map((client) => (
-                  <div key={client.id} className="flex items-center justify-between p-4 border border-gray-700 rounded-lg">
-                    <div>
-                      <h4 className="text-white font-medium">{client.email}</h4>
-                      <p className="text-gray-400 text-sm">Criado em {client.created_at}</p>
+            {/* Lista de Clientes */}
+            <Card className="bg-idDarkBlack border-gray-800">
+              <CardHeader>
+                <CardTitle className="text-white">Clientes Cadastrados</CardTitle>
+                <CardDescription className="text-gray-400">
+                  {clients.length} cliente(s) no sistema
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {clients.map((client) => (
+                    <div key={client.id} className="flex items-center justify-between p-4 border border-gray-700 rounded-lg">
+                      <div>
+                        <h4 className="text-white font-medium">{client.name}</h4>
+                        <p className="text-gray-400 text-sm">{client.email}</p>
+                        <p className="text-gray-500 text-xs">Criado em: {new Date(client.created_at).toLocaleDateString('pt-BR')}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-white text-sm">{client.plan}</p>
+                        <Badge className={client.status === 'active' ? 'bg-green-600' : 'bg-red-600'}>
+                          {client.status === 'active' ? 'Ativo' : 'Inativo'}
+                        </Badge>
+                      </div>
                     </div>
-                    <Button variant="outline" size="sm" className="border-gray-700">
-                      Ver Dashboard
-                    </Button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="reports" className="space-y-6">
+            {/* Upload de Relatório */}
+            <Card className="bg-idDarkBlack border-gray-800">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <Upload className="w-5 h-5 mr-2 text-idOrange" />
+                  Enviar Relatório
+                </CardTitle>
+                <CardDescription className="text-gray-400">
+                  Fazer upload de um relatório para um cliente
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="client-select" className="text-white">Cliente</Label>
+                    <select
+                      id="client-select"
+                      value={reportUpload.client_id}
+                      onChange={(e) => setReportUpload({...reportUpload, client_id: e.target.value})}
+                      className="w-full h-10 bg-gray-800 border border-gray-700 text-white rounded-md px-3"
+                    >
+                      <option value="">Selecione um cliente</option>
+                      {clients.map((client) => (
+                        <option key={client.id} value={client.id}>{client.name}</option>
+                      ))}
+                    </select>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+                  <div>
+                    <Label htmlFor="report-title" className="text-white">Título do Relatório</Label>
+                    <Input
+                      id="report-title"
+                      value={reportUpload.title}
+                      onChange={(e) => setReportUpload({...reportUpload, title: e.target.value})}
+                      className="bg-gray-800 border-gray-700 text-white"
+                      placeholder="Ex: Relatório Janeiro 2024"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="report-file" className="text-white">Arquivo PDF</Label>
+                    <Input
+                      id="report-file"
+                      type="file"
+                      accept=".pdf"
+                      onChange={(e) => setReportUpload({...reportUpload, file: e.target.files?.[0] || null})}
+                      className="bg-gray-800 border-gray-700 text-white"
+                    />
+                  </div>
+                </div>
+                <Button onClick={handleUploadReport} className="mt-4 btn-primary">
+                  <Upload className="w-4 h-4 mr-2" />
+                  Enviar Relatório
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Lista de Relatórios */}
+            <Card className="bg-idDarkBlack border-gray-800">
+              <CardHeader>
+                <CardTitle className="text-white">Relatórios Enviados</CardTitle>
+                <CardDescription className="text-gray-400">
+                  {reports.length} relatório(s) no sistema
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {reports.map((report) => (
+                    <div key={report.id} className="flex items-center justify-between p-4 border border-gray-700 rounded-lg">
+                      <div>
+                        <h4 className="text-white font-medium">{report.title}</h4>
+                        <p className="text-gray-400 text-sm">Cliente: {report.client_name}</p>
+                        <p className="text-gray-500 text-xs">Data: {new Date(report.date).toLocaleDateString('pt-BR')}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-gray-400 text-sm">{report.file_name}</p>
+                        <Badge className="bg-blue-600">Enviado</Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
