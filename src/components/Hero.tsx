@@ -1,22 +1,22 @@
-
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from './LanguageProvider';
-
 const Hero = () => {
-  const { language } = useLanguage();
+  const {
+    language
+  } = useLanguage();
   const [count, setCount] = useState(0);
-
   useEffect(() => {
     // Apply animation to elements
-    const observer = new IntersectionObserver((entries) => {
+    const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('active');
         }
       });
-    }, { threshold: 0.1 });
-
+    }, {
+      threshold: 0.1
+    });
     document.querySelectorAll('.animate-on-scroll').forEach(el => {
       observer.observe(el);
     });
@@ -26,7 +26,6 @@ const Hero = () => {
     const targetValue = 830000;
     const increment = targetValue / (duration / 50);
     let currentValue = 0;
-
     const timer = setInterval(() => {
       currentValue += increment;
       if (currentValue >= targetValue) {
@@ -35,20 +34,16 @@ const Hero = () => {
       }
       setCount(Math.floor(currentValue));
     }, 50);
-
     return () => {
       observer.disconnect();
       clearInterval(timer);
     };
   }, []);
-
   const getContent = () => {
     switch (language) {
       case 'EN':
         return {
-          heroTitle: (
-            <>Ready to scale your <span className="text-idOrange">sales</span> with paid traffic?</>
-          ),
+          heroTitle: <>Ready to scale your <span className="text-idOrange">sales</span> with paid traffic?</>,
           heroDescription: 'Get a personalized analysis at no cost. Digital marketing strategies focused on results and cutting-edge AI technology to accelerate your company\'s growth.',
           requestProposal: 'I Want to Start Scaling My Business',
           ourServices: 'Our Services',
@@ -58,9 +53,7 @@ const Hero = () => {
         };
       case 'ES':
         return {
-          heroTitle: (
-            <>¿Listo para escalar tus <span className="text-idOrange">ventas</span> con tráfico pago?</>
-          ),
+          heroTitle: <>¿Listo para escalar tus <span className="text-idOrange">ventas</span> con tráfico pago?</>,
           heroDescription: 'Recibe un análisis personalizado sin costo. Estrategias de marketing digital enfocadas en resultados y tecnología de punta con IA para acelerar el crecimiento de tu empresa.',
           requestProposal: 'Quiero Comenzar a Escalar Mi Negocio',
           ourServices: 'Nuestros Servicios',
@@ -68,11 +61,10 @@ const Hero = () => {
           satisfiedPartners: 'Socios Satisfechos',
           approvalRate: 'Índice de Aprobación'
         };
-      default: // PT
+      default:
+        // PT
         return {
-          heroTitle: (
-            <>Pronto para escalar suas <span className="text-idOrange">vendas</span> com tráfego pago?</>
-          ),
+          heroTitle: <>Pronto para escalar suas <span className="text-idOrange">vendas</span> com tráfego pago?</>,
           heroDescription: 'Receba uma análise personalizada sem custo. Estratégias de marketing digital com foco em resultados e tecnologia de ponta com IA para acelerar o crescimento da sua empresa.',
           requestProposal: 'Quero Começar a Escalar Meu Negócio',
           ourServices: 'Conheça Nossos Serviços',
@@ -82,9 +74,7 @@ const Hero = () => {
         };
     }
   };
-
   const content = getContent();
-
   const formatNumber = (num: number) => {
     if (num >= 1000000) {
       return (num / 1000000).toFixed(1) + 'M';
@@ -93,9 +83,7 @@ const Hero = () => {
     }
     return num.toString();
   };
-
-  return (
-    <section id="home" className="relative min-h-screen flex items-center pt-20 bg-idBlack overflow-hidden">
+  return <section id="home" className="relative min-h-screen flex items-center pt-20 bg-idBlack overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-1/4 -left-10 w-72 h-72 bg-idOrange/20 rounded-full blur-[100px]"></div>
@@ -162,11 +150,7 @@ const Hero = () => {
               {/* Gradient Circle Background */}
               <div className="w-80 h-80 rounded-full bg-gradient-to-br from-idOrange/30 to-idOrange/10 p-1">
                 <div className="w-full h-full rounded-full bg-gradient-to-br from-idOrange/20 to-transparent p-4">
-                  <img 
-                    src="/lovable-uploads/e8edba01-542f-42bc-851a-f1cbbdf62975.png"
-                    alt="CEO da Agência iD"
-                    className="w-full h-full object-cover rounded-full border-4 border-idOrange/40"
-                  />
+                  <img src="/lovable-uploads/e8edba01-542f-42bc-851a-f1cbbdf62975.png" alt="CEO da Agência iD" className="w-full h-full rounded-full border-4 border-idOrange/40 object-cover" />
                 </div>
               </div>
               
@@ -178,8 +162,6 @@ const Hero = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default Hero;
