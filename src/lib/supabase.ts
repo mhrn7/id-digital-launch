@@ -12,6 +12,7 @@ const createMockClient = () => ({
     resetPasswordForEmail: async () => ({ error: { message: 'Supabase não configurado. Configure as variáveis de ambiente.' } }),
     signOut: async () => ({ error: null }),
     getSession: async () => ({ data: { session: null }, error: null }),
+    getUser: async () => ({ data: { user: null }, error: null }),
     onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } })
   },
   from: () => ({
