@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -31,7 +30,7 @@ const ClientAreaModal = ({ isOpen, onClose }: ClientAreaModalProps) => {
     setError('');
 
     try {
-      // Check for admin credentials
+      // Check for admin credentials first
       if (email === 'admin' && password === 'mhrn#2025') {
         toast({
           title: "Login administrativo realizado!",
@@ -39,6 +38,13 @@ const ClientAreaModal = ({ isOpen, onClose }: ClientAreaModalProps) => {
         });
         navigate('/admin/dashboard');
         onClose();
+        return;
+      }
+
+      // Check if Supabase is configured
+      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+        setError('Sistema de autenticação não configurado. Entre em contato com o administrador.');
+        setLoading(false);
         return;
       }
 
@@ -71,6 +77,13 @@ const ClientAreaModal = ({ isOpen, onClose }: ClientAreaModalProps) => {
     setError('');
 
     try {
+      // Check if Supabase is configured
+      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+        setError('Sistema de recuperação não configurado. Entre em contato com o administrador.');
+        setLoading(false);
+        return;
+      }
+
       const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
         redirectTo: `${window.location.origin}/cliente/login`
       });

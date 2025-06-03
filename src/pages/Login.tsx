@@ -33,6 +33,13 @@ const Login = () => {
         return;
       }
 
+      // Check if Supabase is configured
+      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+        setError('Sistema de autenticação não configurado. Entre em contato com o administrador.');
+        setLoading(false);
+        return;
+      }
+
       // Regular user login
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -57,6 +64,12 @@ const Login = () => {
 
   const handleGoogleLogin = async () => {
     try {
+      // Check if Supabase is configured
+      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+        setError('Sistema de autenticação não configurado. Entre em contato com o administrador.');
+        return;
+      }
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
