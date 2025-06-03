@@ -23,6 +23,17 @@ const Login = () => {
     setError('');
 
     try {
+      // Check for admin credentials
+      if (email === 'admin' && password === 'mhrn#2025') {
+        toast({
+          title: "Login administrativo realizado!",
+          description: "Redirecionando para o painel administrativo.",
+        });
+        navigate('/admin/dashboard');
+        return;
+      }
+
+      // Regular user login
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -76,13 +87,14 @@ const Login = () => {
             )}
             
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-white">Email</Label>
+              <Label htmlFor="email" className="text-white">E-mail ou Login</Label>
               <Input
                 id="email"
-                type="email"
+                type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="bg-gray-800 border-gray-700 text-white"
+                placeholder="seu@email.com ou admin"
                 required
               />
             </div>
