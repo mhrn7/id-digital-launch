@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from './LanguageProvider';
-import RocketAnimation from './RocketAnimation';
 
 const Hero = () => {
   const { language } = useLanguage();
@@ -157,9 +156,25 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* 3D Rocket Animation */}
+          {/* Profile Image with Circle Background */}
           <div className="flex justify-center animate-on-scroll">
-            <RocketAnimation />
+            <div className="relative">
+              {/* Gradient Circle Background */}
+              <div className="w-80 h-80 rounded-full bg-gradient-to-br from-idOrange/30 to-idOrange/10 p-1">
+                <div className="w-full h-full rounded-full bg-gradient-to-br from-idOrange/20 to-transparent p-4">
+                  <img 
+                    src="/lovable-uploads/e8edba01-542f-42bc-851a-f1cbbdf62975.png"
+                    alt="CEO da Agência iD"
+                    className="w-full h-full object-cover rounded-full border-4 border-idOrange/40"
+                  />
+                </div>
+              </div>
+              
+              {/* Floating Animation Effects */}
+              <div className="absolute -top-4 -right-4 w-8 h-8 bg-idOrange/60 rounded-full animate-pulse"></div>
+              <div className="absolute -bottom-6 -left-6 w-12 h-12 bg-idOrange/40 rounded-full animate-pulse"></div>
+              <div className="absolute top-1/2 -right-8 w-6 h-6 bg-idOrange/50 rounded-full animate-bounce"></div>
+            </div>
           </div>
         </div>
       </div>

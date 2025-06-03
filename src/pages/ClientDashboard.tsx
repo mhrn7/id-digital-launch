@@ -55,14 +55,13 @@ const ClientDashboard = () => {
   const fetchClientData = async () => {
     // Dados simulados - em produção, buscar do Supabase
     const mockPlan: ClientPlan = {
-      name: 'Plano Profissional',
-      price: 2500,
+      name: 'Start',
+      price: 1500,
       features: [
         'Gestão Google Ads',
-        'Gestão Meta Ads',
         'Relatórios mensais',
-        'Otimização de campanhas',
-        'Suporte dedicado'
+        'Suporte via WhatsApp',
+        'Otimização básica'
       ],
       status: 'active'
     };
@@ -162,7 +161,7 @@ const ClientDashboard = () => {
             <CardContent>
               <div className="flex items-center justify-between p-4 border border-gray-700 rounded-lg">
                 <div>
-                  <h4 className="text-white font-medium">Contrato de Gestão de Tráfego</h4>
+                  <h4 className="text-white font-medium">Contrato de Gestão de Tráfego - Start</h4>
                   <p className="text-gray-400 text-sm">Assinado em 15/01/2024</p>
                   <Badge className="mt-2 bg-green-600">Ativo</Badge>
                 </div>
@@ -180,7 +179,7 @@ const ClientDashboard = () => {
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
                   <CreditCard className="w-5 h-5 mr-2 text-idOrange" />
-                  {clientPlan.name}
+                  Plano {clientPlan.name}
                 </CardTitle>
                 <CardDescription className="text-gray-400">
                   Detalhes do seu plano atual
