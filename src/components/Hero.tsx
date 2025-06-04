@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from './LanguageProvider';
@@ -47,7 +48,7 @@ const Hero = () => {
       case 'EN':
         return {
           heroTitle: <>Ready to scale your <span className="text-idOrange">sales</span> with paid traffic?</>,
-          heroDescription: 'Get a personalized analysis at no cost. Digital marketing strategies focused on results and cutting-edge AI technology to accelerate your company\'s growth.',
+          heroDescription: 'Digital marketing strategies focused on results and cutting-edge AI technology to accelerate your company\'s growth.',
           requestProposal: 'I Want to Start Scaling My Business',
           ourServices: 'Our Services',
           managedInAds: 'Managed in Ads',
@@ -57,7 +58,7 @@ const Hero = () => {
       case 'ES':
         return {
           heroTitle: <>¿Listo para escalar tus <span className="text-idOrange">ventas</span> con tráfico pago?</>,
-          heroDescription: 'Recibe un análisis personalizado sin costo. Estrategias de marketing digital enfocadas en resultados y tecnología de punta con IA para acelerar el crecimiento de tu empresa.',
+          heroDescription: 'Estrategias de marketing digital enfocadas en resultados y tecnología de punta con IA para acelerar el crecimiento de tu empresa.',
           requestProposal: 'Quiero Comenzar a Escalar Mi Negocio',
           ourServices: 'Nuestros Servicios',
           managedInAds: 'Gestionados en Anuncios',
@@ -68,7 +69,7 @@ const Hero = () => {
         // PT
         return {
           heroTitle: <>Pronto para escalar suas <span className="text-idOrange">vendas</span> com tráfego pago?</>,
-          heroDescription: 'Receba uma análise personalizada sem custo. Estratégias de marketing digital com foco em resultados e tecnologia de ponta com IA para acelerar o crescimento da sua empresa.',
+          heroDescription: 'Estratégias de marketing digital com foco em resultados e tecnologia de ponta com IA para acelerar o crescimento da sua empresa.',
           requestProposal: 'Quero Começar a Escalar Meu Negócio',
           ourServices: 'Conheça Nossos Serviços',
           managedInAds: 'Gerenciados em Anúncios',
@@ -150,11 +151,11 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* Profile Image with Circle Background - Increased size by 1.5x */}
+          {/* Profile Image with Circle Background - Responsive sizing */}
           <div className="flex justify-center animate-on-scroll">
             <div className="relative">
-              {/* Gradient Circle Background - increased from w-80 h-80 to w-[480px] h-[480px] */}
-              <div className="w-[480px] h-[480px] rounded-full bg-gradient-to-br from-idOrange/30 to-idOrange/10 p-1">
+              {/* Gradient Circle Background - responsive sizing: smaller on mobile, larger on desktop */}
+              <div className="w-[280px] h-[280px] md:w-[480px] md:h-[480px] rounded-full bg-gradient-to-br from-idOrange/30 to-idOrange/10 p-1">
                 <div className="w-full h-full rounded-full bg-gradient-to-br from-idOrange/20 to-transparent p-4">
                   <img 
                     src="/lovable-uploads/e8edba01-542f-42bc-851a-f1cbbdf62975.png" 
@@ -164,10 +165,10 @@ const Hero = () => {
                 </div>
               </div>
               
-              {/* Floating Animation Effects - adjusted positions for larger image */}
-              <div className="absolute -top-6 -right-6 w-10 h-10 bg-idOrange/60 rounded-full animate-pulse"></div>
-              <div className="absolute -bottom-8 -left-8 w-16 h-16 bg-idOrange/40 rounded-full animate-pulse"></div>
-              <div className="absolute top-1/2 -right-10 w-8 h-8 bg-idOrange/50 rounded-full animate-bounce"></div>
+              {/* Floating Animation Effects - adjusted positions for responsive sizing */}
+              <div className="absolute -top-3 -right-3 md:-top-6 md:-right-6 w-6 h-6 md:w-10 md:h-10 bg-idOrange/60 rounded-full animate-pulse"></div>
+              <div className="absolute -bottom-4 -left-4 md:-bottom-8 md:-left-8 w-8 h-8 md:w-16 md:h-16 bg-idOrange/40 rounded-full animate-pulse"></div>
+              <div className="absolute top-1/2 -right-5 md:-right-10 w-4 h-4 md:w-8 md:h-8 bg-idOrange/50 rounded-full animate-bounce"></div>
             </div>
           </div>
         </div>

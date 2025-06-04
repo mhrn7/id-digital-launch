@@ -1,95 +1,110 @@
 
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, FileText, Upload, Plus, Key, Download } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Calendar, FileText, Plus, Users, MessageSquare, Eye, Trash2, UserPlus, Key, Upload } from 'lucide-react';
 
-interface Client {
-  id: string;
-  email: string;
-  name: string;
-  plan: string;
-  status: 'active' | 'inactive';
-  created_at: string;
-  password?: string;
-}
+// Mock data for demonstration
+const mockClients = [
+  {
+    id: 1,
+    name: 'João Silva',
+    email: 'joao@empresa.com',
+    plan: 'Start',
+    status: 'Ativo',
+    startDate: '2024-01-15',
+    password: 'temp123'
+  },
+  {
+    id: 2,
+    name: 'Maria Santos',
+    email: 'maria@loja.com',
+    plan: 'Premium',
+    status: 'Ativo',
+    startDate: '2024-02-01',
+    password: 'temp456'
+  }
+];
 
-interface Report {
-  id: string;
-  client_id: string;
-  client_name: string;
-  title: string;
-  date: string;
-  file_name: string;
-}
+const mockReports = [
+  {
+    id: 1,
+    clientName: 'João Silva',
+    month: 'Janeiro 2024',
+    status: 'Enviado',
+    date: '2024-01-31'
+  },
+  {
+    id: 2,
+    clientName: 'Maria Santos',
+    month: 'Janeiro 2024',
+    status: 'Pendente',
+    date: '2024-01-31'
+  }
+];
 
-interface Contract {
-  id: string;
-  client_id: string;
-  client_name: string;
-  title: string;
-  date: string;
-  file_name: string;
-}
+const mockContracts = [
+  {
+    id: 1,
+    clientName: 'João Silva',
+    fileName: 'contrato_joao_silva.pdf',
+    uploadDate: '2024-01-15',
+    status: 'Ativo'
+  },
+  {
+    id: 2,
+    clientName: 'Maria Santos',
+    fileName: 'contrato_maria_santos.pdf',
+    uploadDate: '2024-02-01',
+    status: 'Ativo'
+  }
+];
+
+const mockFormMessages = [
+  {
+    id: 1,
+    name: 'Carlos Oliveira',
+    email: 'carlos@email.com',
+    phone: '+55 (11) 99999-9999',
+    message: 'Gostaria de saber mais sobre os serviços de Google Ads para minha empresa.',
+    date: '2024-01-20 14:30',
+    status: 'Novo'
+  },
+  {
+    id: 2,
+    name: 'Ana Costa',
+    email: 'ana@startup.com',
+    phone: '+55 (21) 88888-8888',
+    message: 'Preciso de ajuda com automação de vendas e landing pages.',
+    date: '2024-01-19 10:15',
+    status: 'Respondido'
+  },
+  {
+    id: 3,
+    name: 'Pedro Lima',
+    email: 'pedro@comercio.com',
+    phone: '+55 (31) 77777-7777',
+    message: 'Quero entender melhor como funcionam as campanhas no Facebook e Instagram.',
+    date: '2024-01-18 16:45',
+    status: 'Novo'
+  }
+];
 
 const AdminDashboard = () => {
-  const [clients, setClients] = useState<Client[]>([
-    {
-      id: '1',
-      email: 'cliente@exemplo.com',
-      name: 'João Silva',
-      plan: 'Start',
-      status: 'active',
-      created_at: '2024-01-15'
-    }
-  ]);
-  
-  const [reports, setReports] = useState<Report[]>([
-    {
-      id: '1',
-      client_id: '1',
-      client_name: 'João Silva',
-      title: 'Relatório Janeiro 2024',
-      date: '2024-01-31',
-      file_name: 'relatorio_janeiro_2024.pdf'
-    }
-  ]);
-
-  const [contracts, setContracts] = useState<Contract[]>([
-    {
-      id: '1',
-      client_id: '1',
-      client_name: 'João Silva',
-      title: 'Contrato de Serviços - Start',
-      date: '2024-01-15',
-      file_name: 'contrato_joao_silva.pdf'
-    }
-  ]);
-
-  const [newClientData, setNewClientData] = useState({
-    email: '',
+  const [clients, setClients] = useState(mockClients);
+  const [reports, setReports] = useState(mockReports);
+  const [contracts, setContracts] = useState(mockContracts);
+  const [formMessages, setFormMessages] = useState(mockFormMessages);
+  const [newClient, setNewClient] = useState({
     name: '',
-    plan: 'Start'
+    email: '',
+    plan: 'Start',
+    password: ''
   });
-
-  const [reportUpload, setReportUpload] = useState({
-    client_id: '',
-    title: '',
-    file: null as File | null
-  });
-
-  const [contractUpload, setContractUpload] = useState({
-    client_id: '',
-    title: '',
-    file: null as File | null
-  });
-
-  const { toast } = useToast();
 
   const generatePassword = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -97,294 +112,388 @@ const AdminDashboard = () => {
     for (let i = 0; i < 8; i++) {
       password += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    return password;
+    setNewClient(prev => ({ ...prev, password }));
   };
 
-  const handleCreateClient = () => {
-    if (!newClientData.email || !newClientData.name) {
-      toast({
-        title: "Erro",
-        description: "Preencha todos os campos obrigatórios.",
-        variant: "destructive"
-      });
-      return;
+  const handleAddClient = () => {
+    if (newClient.name && newClient.email) {
+      const client = {
+        id: clients.length + 1,
+        ...newClient,
+        status: 'Ativo',
+        startDate: new Date().toISOString().split('T')[0]
+      };
+      setClients([...clients, client]);
+      setNewClient({ name: '', email: '', plan: 'Start', password: '' });
     }
-
-    const generatedPassword = generatePassword();
-
-    const newClient: Client = {
-      id: Date.now().toString(),
-      email: newClientData.email,
-      name: newClientData.name,
-      plan: newClientData.plan,
-      status: 'active',
-      created_at: new Date().toISOString().split('T')[0],
-      password: generatedPassword
-    };
-
-    setClients([...clients, newClient]);
-    setNewClientData({ email: '', name: '', plan: 'Start' });
-    
-    toast({
-      title: "Cliente criado!",
-      description: `Cliente ${newClientData.name} foi adicionado. Senha: ${generatedPassword}`
-    });
   };
 
-  const handleUploadReport = () => {
-    if (!reportUpload.client_id || !reportUpload.title || !reportUpload.file) {
-      toast({
-        title: "Erro",
-        description: "Preencha todos os campos e selecione um arquivo.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    const client = clients.find(c => c.id === reportUpload.client_id);
-    if (!client) return;
-
-    const newReport: Report = {
-      id: Date.now().toString(),
-      client_id: reportUpload.client_id,
-      client_name: client.name,
-      title: reportUpload.title,
-      date: new Date().toISOString().split('T')[0],
-      file_name: reportUpload.file.name
+  const handleFileUpload = (type: 'report' | 'contract', clientId: number) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.pdf,.doc,.docx';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const client = clients.find(c => c.id === clientId);
+        if (type === 'report') {
+          const newReport = {
+            id: reports.length + 1,
+            clientName: client?.name || '',
+            month: new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }),
+            status: 'Enviado',
+            date: new Date().toISOString().split('T')[0]
+          };
+          setReports([...reports, newReport]);
+        } else {
+          const newContract = {
+            id: contracts.length + 1,
+            clientName: client?.name || '',
+            fileName: file.name,
+            uploadDate: new Date().toISOString().split('T')[0],
+            status: 'Ativo'
+          };
+          setContracts([...contracts, newContract]);
+        }
+      }
     };
-
-    setReports([...reports, newReport]);
-    setReportUpload({ client_id: '', title: '', file: null });
-    
-    toast({
-      title: "Relatório enviado!",
-      description: `Relatório para ${client.name} foi adicionado com sucesso.`
-    });
+    input.click();
   };
 
-  const handleUploadContract = () => {
-    if (!contractUpload.client_id || !contractUpload.title || !contractUpload.file) {
-      toast({
-        title: "Erro",
-        description: "Preencha todos os campos e selecione um arquivo.",
-        variant: "destructive"
-      });
-      return;
-    }
+  const updateMessageStatus = (messageId: number, status: string) => {
+    setFormMessages(formMessages.map(msg => 
+      msg.id === messageId ? { ...msg, status } : msg
+    ));
+  };
 
-    const client = clients.find(c => c.id === contractUpload.client_id);
-    if (!client) return;
-
-    const newContract: Contract = {
-      id: Date.now().toString(),
-      client_id: contractUpload.client_id,
-      client_name: client.name,
-      title: contractUpload.title,
-      date: new Date().toISOString().split('T')[0],
-      file_name: contractUpload.file.name
-    };
-
-    setContracts([...contracts, newContract]);
-    setContractUpload({ client_id: '', title: '', file: null });
-    
-    toast({
-      title: "Contrato enviado!",
-      description: `Contrato para ${client.name} foi adicionado com sucesso.`
-    });
+  const deleteMessage = (messageId: number) => {
+    setFormMessages(formMessages.filter(msg => msg.id !== messageId));
   };
 
   return (
-    <div className="min-h-screen bg-idBlack text-white">
-      <div className="border-b border-gray-800 bg-idDarkBlack">
-        <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold text-idOrange">Painel Administrativo</h1>
-          <p className="text-gray-400">Gestão de clientes, contratos e relatórios</p>
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            <h1 className="text-3xl font-bold text-gray-900">Painel Administrativo</h1>
+            <Badge variant="secondary" className="text-sm">
+              Admin Dashboard
+            </Badge>
+          </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs defaultValue="clients" className="space-y-6">
-          <TabsList className="bg-idDarkBlack border-gray-800">
-            <TabsTrigger value="clients" className="text-white">
-              <Users className="w-4 h-4 mr-2" />
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="clients" className="flex items-center gap-2">
+              <Users className="w-4 h-4" />
               Clientes
             </TabsTrigger>
-            <TabsTrigger value="contracts" className="text-white">
-              <FileText className="w-4 h-4 mr-2" />
+            <TabsTrigger value="reports" className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Relatórios
+            </TabsTrigger>
+            <TabsTrigger value="contracts" className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
               Contratos
             </TabsTrigger>
-            <TabsTrigger value="reports" className="text-white">
-              <Upload className="w-4 h-4 mr-2" />
-              Relatórios
+            <TabsTrigger value="messages" className="flex items-center gap-2">
+              <MessageSquare className="w-4 h-4" />
+              Mensagens
+            </TabsTrigger>
+            <TabsTrigger value="analytics" className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Analytics
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="clients" className="space-y-6">
-            {/* Criar Novo Cliente */}
-            <Card className="bg-idDarkBlack border-gray-800">
+          <TabsContent value="clients">
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <UserPlus className="w-5 h-5" />
+                    Adicionar Novo Cliente
+                  </CardTitle>
+                  <CardDescription>
+                    Cadastre um novo cliente e gere uma senha de acesso automaticamente.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div>
+                      <Label htmlFor="clientName">Nome</Label>
+                      <Input
+                        id="clientName"
+                        value={newClient.name}
+                        onChange={(e) => setNewClient(prev => ({ ...prev, name: e.target.value }))}
+                        placeholder="Nome do cliente"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="clientEmail">Email</Label>
+                      <Input
+                        id="clientEmail"
+                        type="email"
+                        value={newClient.email}
+                        onChange={(e) => setNewClient(prev => ({ ...prev, email: e.target.value }))}
+                        placeholder="email@cliente.com"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="clientPlan">Plano</Label>
+                      <select
+                        id="clientPlan"
+                        value={newClient.plan}
+                        onChange={(e) => setNewClient(prev => ({ ...prev, plan: e.target.value }))}
+                        className="w-full p-2 border border-gray-300 rounded-md"
+                      >
+                        <option value="Start">Start</option>
+                        <option value="Premium">Premium</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label htmlFor="clientPassword">Senha</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="clientPassword"
+                          value={newClient.password}
+                          onChange={(e) => setNewClient(prev => ({ ...prev, password: e.target.value }))}
+                          placeholder="Senha"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={generatePassword}
+                        >
+                          <Key className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="flex items-end">
+                      <Button onClick={handleAddClient} className="w-full">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Adicionar
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Lista de Clientes</CardTitle>
+                  <CardDescription>
+                    Gerencie todos os clientes cadastrados no sistema.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left p-2">Nome</th>
+                          <th className="text-left p-2">Email</th>
+                          <th className="text-left p-2">Plano</th>
+                          <th className="text-left p-2">Status</th>
+                          <th className="text-left p-2">Data Início</th>
+                          <th className="text-left p-2">Senha</th>
+                          <th className="text-left p-2">Ações</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {clients.map((client) => (
+                          <tr key={client.id} className="border-b">
+                            <td className="p-2">{client.name}</td>
+                            <td className="p-2">{client.email}</td>
+                            <td className="p-2">
+                              <Badge variant={client.plan === 'Premium' ? 'default' : 'secondary'}>
+                                {client.plan}
+                              </Badge>
+                            </td>
+                            <td className="p-2">
+                              <Badge variant={client.status === 'Ativo' ? 'default' : 'destructive'}>
+                                {client.status}
+                              </Badge>
+                            </td>
+                            <td className="p-2">{new Date(client.startDate).toLocaleDateString('pt-BR')}</td>
+                            <td className="p-2">
+                              <code className="bg-gray-100 px-2 py-1 rounded text-sm">
+                                {client.password}
+                              </code>
+                            </td>
+                            <td className="p-2">
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleFileUpload('report', client.id)}
+                                >
+                                  <Upload className="w-4 h-4 mr-1" />
+                                  Relatório
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleFileUpload('contract', client.id)}
+                                >
+                                  <Upload className="w-4 h-4 mr-1" />
+                                  Contrato
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="reports">
+            <Card>
               <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <Plus className="w-5 h-5 mr-2 text-idOrange" />
-                  Novo Cliente
-                </CardTitle>
-                <CardDescription className="text-gray-400">
-                  Adicionar um novo cliente ao sistema com senha gerada automaticamente
+                <CardTitle>Relatórios Mensais</CardTitle>
+                <CardDescription>
+                  Gerencie os relatórios mensais enviados para os clientes.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="email" className="text-white">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={newClientData.email}
-                      onChange={(e) => setNewClientData({...newClientData, email: e.target.value})}
-                      className="bg-gray-800 border-gray-700 text-white"
-                      placeholder="cliente@exemplo.com"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="name" className="text-white">Nome</Label>
-                    <Input
-                      id="name"
-                      value={newClientData.name}
-                      onChange={(e) => setNewClientData({...newClientData, name: e.target.value})}
-                      className="bg-gray-800 border-gray-700 text-white"
-                      placeholder="Nome do cliente"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="plan" className="text-white">Plano</Label>
-                    <select
-                      value={newClientData.plan}
-                      onChange={(e) => setNewClientData({...newClientData, plan: e.target.value})}
-                      className="w-full h-10 bg-gray-800 border border-gray-700 text-white rounded-md px-3"
-                    >
-                      <option value="Start">Start</option>
-                      <option value="Premium">Premium</option>
-                    </select>
-                  </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left p-2">Cliente</th>
+                        <th className="text-left p-2">Período</th>
+                        <th className="text-left p-2">Status</th>
+                        <th className="text-left p-2">Data</th>
+                        <th className="text-left p-2">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {reports.map((report) => (
+                        <tr key={report.id} className="border-b">
+                          <td className="p-2">{report.clientName}</td>
+                          <td className="p-2">{report.month}</td>
+                          <td className="p-2">
+                            <Badge variant={report.status === 'Enviado' ? 'default' : 'secondary'}>
+                              {report.status}
+                            </Badge>
+                          </td>
+                          <td className="p-2">{new Date(report.date).toLocaleDateString('pt-BR')}</td>
+                          <td className="p-2">
+                            <Button size="sm" variant="outline">
+                              <Eye className="w-4 h-4 mr-1" />
+                              Visualizar
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-                <Button onClick={handleCreateClient} className="mt-4 btn-primary">
-                  <Plus className="w-4 h-4 mr-2" />
-                  Criar Cliente e Gerar Senha
-                </Button>
               </CardContent>
             </Card>
+          </TabsContent>
 
-            {/* Lista de Clientes */}
-            <Card className="bg-idDarkBlack border-gray-800">
+          <TabsContent value="contracts">
+            <Card>
               <CardHeader>
-                <CardTitle className="text-white">Clientes Cadastrados</CardTitle>
-                <CardDescription className="text-gray-400">
-                  {clients.length} cliente(s) no sistema
+                <CardTitle>Contratos</CardTitle>
+                <CardDescription>
+                  Gerencie os contratos dos clientes.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left p-2">Cliente</th>
+                        <th className="text-left p-2">Arquivo</th>
+                        <th className="text-left p-2">Data Upload</th>
+                        <th className="text-left p-2">Status</th>
+                        <th className="text-left p-2">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {contracts.map((contract) => (
+                        <tr key={contract.id} className="border-b">
+                          <td className="p-2">{contract.clientName}</td>
+                          <td className="p-2">{contract.fileName}</td>
+                          <td className="p-2">{new Date(contract.uploadDate).toLocaleDateString('pt-BR')}</td>
+                          <td className="p-2">
+                            <Badge variant="default">
+                              {contract.status}
+                            </Badge>
+                          </td>
+                          <td className="p-2">
+                            <Button size="sm" variant="outline">
+                              <Eye className="w-4 h-4 mr-1" />
+                              Visualizar
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="messages">
+            <Card>
+              <CardHeader>
+                <CardTitle>Mensagens do Formulário</CardTitle>
+                <CardDescription>
+                  Mensagens recebidas através do formulário de contato do site.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {clients.map((client) => (
-                    <div key={client.id} className="flex items-center justify-between p-4 border border-gray-700 rounded-lg">
-                      <div>
-                        <h4 className="text-white font-medium">{client.name}</h4>
-                        <p className="text-gray-400 text-sm">{client.email}</p>
-                        <p className="text-gray-500 text-xs">Criado em: {new Date(client.created_at).toLocaleDateString('pt-BR')}</p>
-                        {client.password && (
-                          <div className="flex items-center mt-2">
-                            <Key className="w-4 h-4 text-idOrange mr-2" />
-                            <span className="text-xs text-idOrange font-mono">{client.password}</span>
+                  {formMessages.map((message) => (
+                    <div key={message.id} className="border rounded-lg p-4 bg-white">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center gap-3">
+                          <div>
+                            <h3 className="font-semibold text-lg">{message.name}</h3>
+                            <p className="text-sm text-gray-600">{message.email} • {message.phone}</p>
                           </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant={message.status === 'Novo' ? 'destructive' : 'default'}>
+                            {message.status}
+                          </Badge>
+                          <span className="text-xs text-gray-500">{message.date}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="mb-4">
+                        <p className="text-gray-700 leading-relaxed">{message.message}</p>
+                      </div>
+                      
+                      <div className="flex gap-2">
+                        {message.status === 'Novo' && (
+                          <Button
+                            size="sm"
+                            onClick={() => updateMessageStatus(message.id, 'Respondido')}
+                          >
+                            Marcar como Respondido
+                          </Button>
                         )}
-                      </div>
-                      <div className="text-right">
-                        <p className="text-white text-sm">{client.plan}</p>
-                        <Badge className={client.status === 'active' ? 'bg-green-600' : 'bg-red-600'}>
-                          {client.status === 'active' ? 'Ativo' : 'Inativo'}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="contracts" className="space-y-6">
-            {/* Upload de Contrato */}
-            <Card className="bg-idDarkBlack border-gray-800">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <Upload className="w-5 h-5 mr-2 text-idOrange" />
-                  Enviar Contrato
-                </CardTitle>
-                <CardDescription className="text-gray-400">
-                  Fazer upload de um contrato para um cliente
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="contract-client-select" className="text-white">Cliente</Label>
-                    <select
-                      id="contract-client-select"
-                      value={contractUpload.client_id}
-                      onChange={(e) => setContractUpload({...contractUpload, client_id: e.target.value})}
-                      className="w-full h-10 bg-gray-800 border border-gray-700 text-white rounded-md px-3"
-                    >
-                      <option value="">Selecione um cliente</option>
-                      {clients.map((client) => (
-                        <option key={client.id} value={client.id}>{client.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <Label htmlFor="contract-title" className="text-white">Título do Contrato</Label>
-                    <Input
-                      id="contract-title"
-                      value={contractUpload.title}
-                      onChange={(e) => setContractUpload({...contractUpload, title: e.target.value})}
-                      className="bg-gray-800 border-gray-700 text-white"
-                      placeholder="Ex: Contrato de Serviços - Start"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="contract-file" className="text-white">Arquivo PDF</Label>
-                    <Input
-                      id="contract-file"
-                      type="file"
-                      accept=".pdf"
-                      onChange={(e) => setContractUpload({...contractUpload, file: e.target.files?.[0] || null})}
-                      className="bg-gray-800 border-gray-700 text-white"
-                    />
-                  </div>
-                </div>
-                <Button onClick={handleUploadContract} className="mt-4 btn-primary">
-                  <Upload className="w-4 h-4 mr-2" />
-                  Enviar Contrato
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Lista de Contratos */}
-            <Card className="bg-idDarkBlack border-gray-800">
-              <CardHeader>
-                <CardTitle className="text-white">Contratos Enviados</CardTitle>
-                <CardDescription className="text-gray-400">
-                  {contracts.length} contrato(s) no sistema
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {contracts.map((contract) => (
-                    <div key={contract.id} className="flex items-center justify-between p-4 border border-gray-700 rounded-lg">
-                      <div>
-                        <h4 className="text-white font-medium">{contract.title}</h4>
-                        <p className="text-gray-400 text-sm">Cliente: {contract.client_name}</p>
-                        <p className="text-gray-500 text-xs">Data: {new Date(contract.date).toLocaleDateString('pt-BR')}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-gray-400 text-sm">{contract.file_name}</p>
-                        <Badge className="bg-blue-600">Enviado</Badge>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => deleteMessage(message.id)}
+                        >
+                          <Trash2 className="w-4 h-4 mr-1" />
+                          Excluir
+                        </Button>
                       </div>
                     </div>
                   ))}
@@ -393,88 +502,54 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
 
-          <TabsContent value="reports" className="space-y-6">
-            {/* Upload de Relatório */}
-            <Card className="bg-idDarkBlack border-gray-800">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <Upload className="w-5 h-5 mr-2 text-idOrange" />
-                  Enviar Relatório
-                </CardTitle>
-                <CardDescription className="text-gray-400">
-                  Fazer upload de um relatório para um cliente
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="client-select" className="text-white">Cliente</Label>
-                    <select
-                      id="client-select"
-                      value={reportUpload.client_id}
-                      onChange={(e) => setReportUpload({...reportUpload, client_id: e.target.value})}
-                      className="w-full h-10 bg-gray-800 border border-gray-700 text-white rounded-md px-3"
-                    >
-                      <option value="">Selecione um cliente</option>
-                      {clients.map((client) => (
-                        <option key={client.id} value={client.id}>{client.name}</option>
-                      ))}
-                    </select>
+          <TabsContent value="analytics">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total de Clientes</CardTitle>
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{clients.length}</div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Clientes Premium</CardTitle>
+                  <Badge className="h-4 w-4" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {clients.filter(c => c.plan === 'Premium').length}
                   </div>
-                  <div>
-                    <Label htmlFor="report-title" className="text-white">Título do Relatório</Label>
-                    <Input
-                      id="report-title"
-                      value={reportUpload.title}
-                      onChange={(e) => setReportUpload({...reportUpload, title: e.target.value})}
-                      className="bg-gray-800 border-gray-700 text-white"
-                      placeholder="Ex: Relatório Janeiro 2024"
-                    />
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Relatórios Enviados</CardTitle>
+                  <FileText className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {reports.filter(r => r.status === 'Enviado').length}
                   </div>
-                  <div>
-                    <Label htmlFor="report-file" className="text-white">Arquivo PDF</Label>
-                    <Input
-                      id="report-file"
-                      type="file"
-                      accept=".pdf"
-                      onChange={(e) => setReportUpload({...reportUpload, file: e.target.files?.[0] || null})}
-                      className="bg-gray-800 border-gray-700 text-white"
-                    />
-                  </div>
-                </div>
-                <Button onClick={handleUploadReport} className="mt-4 btn-primary">
-                  <Upload className="w-4 h-4 mr-2" />
-                  Enviar Relatório
-                </Button>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
 
-            {/* Lista de Relatórios */}
-            <Card className="bg-idDarkBlack border-gray-800">
-              <CardHeader>
-                <CardTitle className="text-white">Relatórios Enviados</CardTitle>
-                <CardDescription className="text-gray-400">
-                  {reports.length} relatório(s) no sistema
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {reports.map((report) => (
-                    <div key={report.id} className="flex items-center justify-between p-4 border border-gray-700 rounded-lg">
-                      <div>
-                        <h4 className="text-white font-medium">{report.title}</h4>
-                        <p className="text-gray-400 text-sm">Cliente: {report.client_name}</p>
-                        <p className="text-gray-500 text-xs">Data: {new Date(report.date).toLocaleDateString('pt-BR')}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-gray-400 text-sm">{report.file_name}</p>
-                        <Badge className="bg-blue-600">Enviado</Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Mensagens Novas</CardTitle>
+                  <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {formMessages.filter(m => m.status === 'Novo').length}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </div>

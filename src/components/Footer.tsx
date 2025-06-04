@@ -44,10 +44,10 @@ const Footer = () => {
             { name: 'Contact', href: '#contact' },
           ],
           serviceLinks: [
-            { name: 'Google Ads', href: '#services' },
-            { name: 'Meta Ads', href: '#services' },
-            { name: 'LinkedIn Ads', href: '#services' },
-            { name: 'Landing Pages', href: '#services' },
+            { name: 'Ads That Generate Sales and Qualified Leads', href: '#services' },
+            { name: 'AI Automation That Works 24/7', href: '#services' },
+            { name: 'Landing Pages That Convert Into Customers', href: '#services' },
+            { name: 'Content That Engages and Converts', href: '#services' },
           ]
         };
       case 'ES':
@@ -68,10 +68,10 @@ const Footer = () => {
             { name: 'Contacto', href: '#contact' },
           ],
           serviceLinks: [
-            { name: 'Google Ads', href: '#services' },
-            { name: 'Meta Ads', href: '#services' },
-            { name: 'LinkedIn Ads', href: '#services' },
-            { name: 'Landing Pages', href: '#services' },
+            { name: 'Anuncios Que Generan Ventas y Leads Calificados', href: '#services' },
+            { name: 'Automatización con IA Que Funciona 24/7', href: '#services' },
+            { name: 'Landing Pages Que Convierten en Clientes', href: '#services' },
+            { name: 'Contenido Que Involucra y Convierte', href: '#services' },
           ]
         };
       default: // PT
@@ -92,10 +92,10 @@ const Footer = () => {
             { name: 'Contato', href: '#contact' },
           ],
           serviceLinks: [
-            { name: 'Google Ads', href: '#services' },
-            { name: 'Meta Ads', href: '#services' },
-            { name: 'LinkedIn Ads', href: '#services' },
-            { name: 'Landing Pages', href: '#services' },
+            { name: 'Anúncios Que Geram Vendas e Leads Qualificados', href: '#services' },
+            { name: 'Automação com IA Que Funciona 24/7', href: '#services' },
+            { name: 'Landing Pages Que Convertem em Clientes', href: '#services' },
+            { name: 'Conteúdo Que Engaja e Converte', href: '#services' },
           ]
         };
     }
@@ -166,7 +166,7 @@ const Footer = () => {
             <ul className="space-y-2">
               {content.serviceLinks.map((service, index) => (
                 <li key={index}>
-                  <a href={service.href} className="text-gray-400 hover:text-idOrange transition-colors duration-300">
+                  <a href={service.href} className="text-gray-400 hover:text-idOrange transition-colors duration-300 text-sm">
                     {service.name}
                   </a>
                 </li>
