@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -23,8 +22,9 @@ const Login = () => {
     setError('');
 
     try {
-      // Check for admin credentials
+      // Check for admin credentials first
       if (email === 'admin' && password === 'mhrn#2025') {
+        localStorage.setItem('isAdminLoggedIn', 'true');
         toast({
           title: "Login administrativo realizado!",
           description: "Redirecionando para o painel administrativo.",
@@ -33,22 +33,42 @@ const Login = () => {
         return;
       }
 
-      // Check if Supabase is configured
+      // For regular clients, check localStorage for demo purposes
+      const savedClients = localStorage.getItem('adminClients');
+      if (savedClients) {
+        const clients = JSON.parse(savedClients);
+        const client = clients.find((c: any) => 
+          (c.email === email && c.password === password) ||
+          (c.name === email && c.password === password)
+        );
+        
+        if (client) {
+          localStorage.setItem('currentClient', JSON.stringify(client));
+          toast({
+            title: "Login realizado com sucesso!",
+            description: "Bem-vindo à área do cliente.",
+          });
+          navigate('/cliente/dashboard');
+          return;
+        }
+      }
+
+      // Check if Supabase is configured for real authentication
       if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-        setError('Sistema de autenticação não configurado. Entre em contato com o administrador.');
+        setError('Credenciais não encontradas. Verifique se você foi cadastrado pelo administrador ou tente novamente.');
         setLoading(false);
         return;
       }
 
-      // Regular user login
+      // Try Supabase authentication
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
-
-      if (data.user) {
+      if (error) {
+        setError('Credenciais inválidas. Verifique seu email e senha.');
+      } else if (data.user) {
         toast({
           title: "Login realizado com sucesso!",
           description: "Bem-vindo à área do cliente.",
@@ -56,7 +76,8 @@ const Login = () => {
         navigate('/cliente/dashboard');
       }
     } catch (error: any) {
-      setError(error.message);
+      setError('Erro ao fazer login. Tente novamente.');
+      console.error('Login error:', error);
     } finally {
       setLoading(false);
     }
@@ -100,14 +121,14 @@ const Login = () => {
             )}
             
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-white">E-mail ou Login</Label>
+              <Label htmlFor="email" className="text-white">E-mail ou Nome</Label>
               <Input
                 id="email"
                 type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="bg-gray-800 border-gray-700 text-white"
-                placeholder="seu@email.com ou admin"
+                placeholder="seu@email.com ou seu nome"
                 required
               />
             </div>
@@ -132,26 +153,6 @@ const Login = () => {
               {loading ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
-          
-          <div className="mt-4">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-gray-700" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-idDarkBlack px-2 text-gray-400">Ou</span>
-              </div>
-            </div>
-            
-            <Button
-              type="button"
-              variant="outline"
-              className="w-full mt-4 border-gray-700 text-white hover:bg-gray-800"
-              onClick={handleGoogleLogin}
-            >
-              Entrar com Google
-            </Button>
-          </div>
           
           <div className="mt-6 text-center">
             <Link to="/cliente/forgot-password" className="text-idOrange hover:underline text-sm">

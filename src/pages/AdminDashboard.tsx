@@ -1,13 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, FileText, Plus, Users, MessageSquare, Eye, Trash2, UserPlus, Key, Upload } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useFormMessages } from '@/hooks/useFormMessages';
 import { useToast } from '@/hooks/use-toast';
+import { Plus, Users, MessageSquare, FileText, Settings, LogOut, Trash2, Eye } from 'lucide-react';
 
 // Mock data for demonstration
 const mockClients = [
@@ -96,6 +99,7 @@ const mockFormMessages = [
 ];
 
 const AdminDashboard = () => {
+  const navigate = useNavigate();
   const [clients, setClients] = useState(mockClients);
   const [reports, setReports] = useState(mockReports);
   const [contracts, setContracts] = useState(mockContracts);
@@ -107,6 +111,18 @@ const AdminDashboard = () => {
     plan: 'Start',
     password: ''
   });
+  const [isAddingClient, setIsAddingClient] = useState(false);
+
+  const checkAdminAuth = () => {
+    const isAdmin = localStorage.getItem('isAdminLoggedIn');
+    if (!isAdmin) {
+      navigate('/cliente/login');
+    }
+  };
+
+  useEffect(() => {
+    checkAdminAuth();
+  }, []);
 
   const generatePassword = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -117,22 +133,36 @@ const AdminDashboard = () => {
     setNewClient(prev => ({ ...prev, password }));
   };
 
-  const handleAddClient = () => {
-    if (newClient.name && newClient.email) {
-      const client = {
-        id: clients.length + 1,
-        ...newClient,
-        status: 'Ativo',
-        startDate: new Date().toISOString().split('T')[0]
-      };
-      setClients([...clients, client]);
-      setNewClient({ name: '', email: '', plan: 'Start', password: '' });
-      
+  const handleAddClient = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!newClient.name || !newClient.email || !newClient.plan || !newClient.password) {
       toast({
-        title: "Cliente adicionado",
-        description: `${newClient.name} foi adicionado com sucesso.`,
+        title: "Erro",
+        description: "Por favor, preencha todos os campos obrigatórios.",
+        variant: "destructive"
       });
+      return;
     }
+
+    const client = {
+      ...newClient,
+      id: Date.now(),
+      createdAt: new Date().toLocaleDateString('pt-BR'),
+      status: 'active' as const
+    };
+
+    const updatedClients = [...clients, client];
+    setClients(updatedClients);
+    localStorage.setItem('adminClients', JSON.stringify(updatedClients));
+
+    setNewClient({ name: '', email: '', plan: '', password: '' });
+    setIsAddingClient(false);
+
+    toast({
+      title: "Cliente adicionado!",
+      description: `${client.name} foi cadastrado com sucesso.`,
+    });
   };
 
   const handleDeleteClient = (clientId: number) => {
@@ -203,7 +233,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-idBlack text-white">
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
@@ -220,8 +250,8 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Tabs defaultValue="clients" className="space-y-6">
+      <div className="container mx-auto px-4 py-8">
+        <Tabs defaultValue="clients" className="space-y-8">
           <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="clients" className="flex items-center gap-2">
               <Users className="w-4 h-4" />

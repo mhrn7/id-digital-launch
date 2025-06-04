@@ -1,11 +1,8 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { supabase } from '@/lib/supabase';
-import { User } from '@supabase/supabase-js';
 import { LogOut, FileText, CreditCard, TrendingUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -24,7 +21,7 @@ interface Report {
 }
 
 const ClientDashboard = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const [client, setClient] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [clientPlan, setClientPlan] = useState<ClientPlan | null>(null);
   const [reports, setReports] = useState<Report[]>([]);
@@ -32,70 +29,73 @@ const ClientDashboard = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    checkUser();
+    checkClient();
     fetchClientData();
   }, []);
 
-  const checkUser = async () => {
+  const checkClient = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate('/cliente/login');
+      // Check if client is logged in via localStorage (demo mode)
+      const savedClient = localStorage.getItem('currentClient');
+      if (savedClient) {
+        setClient(JSON.parse(savedClient));
+        setLoading(false);
         return;
       }
-      setUser(user);
-    } catch (error) {
-      console.error('Error checking user:', error);
+
+      // If no saved client, redirect to login
       navigate('/cliente/login');
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      console.error('Error checking client:', error);
+      navigate('/cliente/login');
     }
   };
 
   const fetchClientData = async () => {
-    // Dados simulados - em produção, buscar do Supabase
-    const mockPlan: ClientPlan = {
-      name: 'Start',
-      price: 1500,
-      features: [
-        'Gestão Google Ads',
-        'Relatórios mensais',
-        'Suporte via WhatsApp',
-        'Otimização básica'
-      ],
-      status: 'active'
-    };
+    // Get client data from localStorage
+    const savedClient = localStorage.getItem('currentClient');
+    if (savedClient) {
+      const clientData = JSON.parse(savedClient);
+      
+      const mockPlan: ClientPlan = {
+        name: clientData.plan || 'Start',
+        price: clientData.plan === 'Premium' ? 2500 : clientData.plan === 'Growth' ? 2000 : 1500,
+        features: [
+          'Gestão Google Ads',
+          'Relatórios mensais',
+          'Suporte via WhatsApp',
+          'Otimização básica'
+        ],
+        status: 'active'
+      };
 
-    const mockReports: Report[] = [
-      {
-        id: '1',
-        title: 'Relatório Janeiro 2024',
-        date: '2024-01-31',
-        file_url: '#'
-      },
-      {
-        id: '2',
-        title: 'Relatório Dezembro 2023',
-        date: '2023-12-31',
-        file_url: '#'
-      }
-    ];
+      const mockReports: Report[] = [
+        {
+          id: '1',
+          title: 'Relatório Janeiro 2024',
+          date: '2024-01-31',
+          file_url: '#'
+        },
+        {
+          id: '2',
+          title: 'Relatório Dezembro 2023',
+          date: '2023-12-31',
+          file_url: '#'
+        }
+      ];
 
-    setClientPlan(mockPlan);
-    setReports(mockReports);
+      setClientPlan(mockPlan);
+      setReports(mockReports);
+    }
   };
 
   const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      toast({
-        title: "Erro ao sair",
-        description: error.message,
-        variant: "destructive"
-      });
-    } else {
-      navigate('/cliente/login');
-    }
+    localStorage.removeItem('currentClient');
+    navigate('/cliente/login');
+    toast({
+      title: "Logout realizado",
+      description: "Você foi desconectado com sucesso.",
+    });
   };
 
   const downloadReport = (report: Report) => {
@@ -120,7 +120,7 @@ const ClientDashboard = () => {
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-idOrange">Área do Cliente</h1>
-            <p className="text-gray-400">Bem-vindo, {user?.email}</p>
+            <p className="text-gray-400">Bem-vindo, {client?.name || client?.email}</p>
           </div>
           <Button variant="outline" onClick={handleLogout} className="border-gray-700">
             <LogOut className="w-4 h-4 mr-2" />

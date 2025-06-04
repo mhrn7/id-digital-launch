@@ -35,9 +35,6 @@ const TestimonialCard = ({ quote, author, company, image }: TestimonialProps) =>
       </div>
       
       <div className="mb-4">
-        <svg className="w-8 h-8 text-idOrange/40 mb-2" fill="currentColor" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-          <path d="M10 8c-2.2 0-4 1.8-4 4v16h16v-8h-8c0-4.4 3.6-8 8-8V8c-4.4 0-8.4 2.4-10.8 6.4C10.4 10.4 8.6 8 10 8zm18 0c-2.2 0-4 1.8-4 4v16h16v-8h-8c0-4.4 3.6-8 8-8V8c-4.4 0-8.4 2.4-10.8 6.4C28.4 10.4 26.6 8 28 8z" />
-        </svg>
         <p className="text-gray-300">{quote}</p>
       </div>
     </div>
