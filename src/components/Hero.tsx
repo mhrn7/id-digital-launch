@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from './LanguageProvider';
+
 const Hero = () => {
   const {
     language
   } = useLanguage();
   const [count, setCount] = useState(0);
+
   useEffect(() => {
     // Apply animation to elements
     const observer = new IntersectionObserver(entries => {
@@ -39,6 +41,7 @@ const Hero = () => {
       clearInterval(timer);
     };
   }, []);
+
   const getContent = () => {
     switch (language) {
       case 'EN':
@@ -74,6 +77,7 @@ const Hero = () => {
         };
     }
   };
+
   const content = getContent();
   const formatNumber = (num: number) => {
     if (num >= 1000000) {
@@ -83,7 +87,9 @@ const Hero = () => {
     }
     return num.toString();
   };
-  return <section id="home" className="relative min-h-screen flex items-center pt-20 bg-idBlack overflow-hidden">
+
+  return (
+    <section id="home" className="relative min-h-screen flex items-center pt-20 bg-idBlack overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-1/4 -left-10 w-72 h-72 bg-idOrange/20 rounded-full blur-[100px]"></div>
@@ -144,24 +150,30 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* Profile Image with Circle Background */}
+          {/* Profile Image with Circle Background - Increased size by 1.5x */}
           <div className="flex justify-center animate-on-scroll">
             <div className="relative">
-              {/* Gradient Circle Background */}
-              <div className="w-80 h-80 rounded-full bg-gradient-to-br from-idOrange/30 to-idOrange/10 p-1">
+              {/* Gradient Circle Background - increased from w-80 h-80 to w-[480px] h-[480px] */}
+              <div className="w-[480px] h-[480px] rounded-full bg-gradient-to-br from-idOrange/30 to-idOrange/10 p-1">
                 <div className="w-full h-full rounded-full bg-gradient-to-br from-idOrange/20 to-transparent p-4">
-                  <img src="/lovable-uploads/e8edba01-542f-42bc-851a-f1cbbdf62975.png" alt="CEO da Agência iD" className="w-full h-full rounded-full border-4 border-idOrange/40 object-cover" />
+                  <img 
+                    src="/lovable-uploads/e8edba01-542f-42bc-851a-f1cbbdf62975.png" 
+                    alt="CEO da Agência iD" 
+                    className="w-full h-full rounded-full border-4 border-idOrange/40 object-cover" 
+                  />
                 </div>
               </div>
               
-              {/* Floating Animation Effects */}
-              <div className="absolute -top-4 -right-4 w-8 h-8 bg-idOrange/60 rounded-full animate-pulse"></div>
-              <div className="absolute -bottom-6 -left-6 w-12 h-12 bg-idOrange/40 rounded-full animate-pulse"></div>
-              <div className="absolute top-1/2 -right-8 w-6 h-6 bg-idOrange/50 rounded-full animate-bounce"></div>
+              {/* Floating Animation Effects - adjusted positions for larger image */}
+              <div className="absolute -top-6 -right-6 w-10 h-10 bg-idOrange/60 rounded-full animate-pulse"></div>
+              <div className="absolute -bottom-8 -left-8 w-16 h-16 bg-idOrange/40 rounded-full animate-pulse"></div>
+              <div className="absolute top-1/2 -right-10 w-8 h-8 bg-idOrange/50 rounded-full animate-bounce"></div>
             </div>
           </div>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default Hero;
