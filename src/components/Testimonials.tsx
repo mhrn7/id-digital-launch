@@ -1,7 +1,7 @@
-
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from './LanguageProvider';
+import { Star } from 'lucide-react';
 
 interface TestimonialProps {
   quote: string;
@@ -25,12 +25,12 @@ const TestimonialCard = ({ quote, author, company, image }: TestimonialProps) =>
         </div>
         <div>
           <h4 className="font-bold text-white">{author}</h4>
-          <p className="text-gray-400 text-sm flex items-center">
-            <svg className="w-4 h-4 text-idOrange/40 mr-2" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-            </svg>
-            {company}
-          </p>
+          <p className="text-gray-400 text-sm">{company}</p>
+          <div className="flex items-center mt-1">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} className="w-4 h-4 text-idOrange fill-idOrange" />
+            ))}
+          </div>
         </div>
       </div>
       

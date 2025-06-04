@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, FileText, Plus, Users, MessageSquare, Eye, Trash2, UserPlus, Key, Upload } from 'lucide-react';
+import { useFormMessages } from '@/hooks/useFormMessages';
+import { useToast } from '@/hooks/use-toast';
 
 // Mock data for demonstration
 const mockClients = [
@@ -98,7 +99,8 @@ const AdminDashboard = () => {
   const [clients, setClients] = useState(mockClients);
   const [reports, setReports] = useState(mockReports);
   const [contracts, setContracts] = useState(mockContracts);
-  const [formMessages, setFormMessages] = useState(mockFormMessages);
+  const { messages, updateMessageStatus, deleteMessage: deleteFormMessage } = useFormMessages();
+  const { toast } = useToast();
   const [newClient, setNewClient] = useState({
     name: '',
     email: '',
@@ -125,6 +127,22 @@ const AdminDashboard = () => {
       };
       setClients([...clients, client]);
       setNewClient({ name: '', email: '', plan: 'Start', password: '' });
+      
+      toast({
+        title: "Cliente adicionado",
+        description: `${newClient.name} foi adicionado com sucesso.`,
+      });
+    }
+  };
+
+  const handleDeleteClient = (clientId: number) => {
+    const clientToDelete = clients.find(c => c.id === clientId);
+    if (clientToDelete) {
+      setClients(clients.filter(c => c.id !== clientId));
+      toast({
+        title: "Cliente excluído",
+        description: `${clientToDelete.name} foi removido do sistema.`,
+      });
     }
   };
 
@@ -145,6 +163,10 @@ const AdminDashboard = () => {
             date: new Date().toISOString().split('T')[0]
           };
           setReports([...reports, newReport]);
+          toast({
+            title: "Relatório adicionado",
+            description: `Relatório para ${client?.name} foi enviado.`,
+          });
         } else {
           const newContract = {
             id: contracts.length + 1,
@@ -154,20 +176,30 @@ const AdminDashboard = () => {
             status: 'Ativo'
           };
           setContracts([...contracts, newContract]);
+          toast({
+            title: "Contrato adicionado",
+            description: `Contrato para ${client?.name} foi enviado.`,
+          });
         }
       }
     };
     input.click();
   };
 
-  const updateMessageStatus = (messageId: number, status: string) => {
-    setFormMessages(formMessages.map(msg => 
-      msg.id === messageId ? { ...msg, status } : msg
-    ));
+  const handleUpdateMessageStatus = (messageId: number, status: 'Novo' | 'Respondido') => {
+    updateMessageStatus(messageId, status);
+    toast({
+      title: "Status atualizado",
+      description: `Mensagem marcada como ${status.toLowerCase()}.`,
+    });
   };
 
-  const deleteMessage = (messageId: number) => {
-    setFormMessages(formMessages.filter(msg => msg.id !== messageId));
+  const handleDeleteMessage = (messageId: number) => {
+    deleteFormMessage(messageId);
+    toast({
+      title: "Mensagem excluída",
+      description: "A mensagem foi removida do sistema.",
+    });
   };
 
   return (
@@ -176,9 +208,14 @@ const AdminDashboard = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <h1 className="text-3xl font-bold text-gray-900">Painel Administrativo</h1>
-            <Badge variant="secondary" className="text-sm">
-              Admin Dashboard
-            </Badge>
+            <div className="flex items-center gap-4">
+              <Badge variant="secondary" className="text-sm">
+                Admin Dashboard
+              </Badge>
+              <Badge variant="outline" className="text-sm bg-green-50 text-green-700 border-green-200">
+                Acesso Restrito - Admin
+              </Badge>
+            </div>
           </div>
         </div>
       </div>
@@ -201,6 +238,11 @@ const AdminDashboard = () => {
             <TabsTrigger value="messages" className="flex items-center gap-2">
               <MessageSquare className="w-4 h-4" />
               Mensagens
+              {messages.filter(m => m.status === 'Novo').length > 0 && (
+                <Badge variant="destructive" className="ml-1 text-xs">
+                  {messages.filter(m => m.status === 'Novo').length}
+                </Badge>
+              )}
             </TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
@@ -217,7 +259,10 @@ const AdminDashboard = () => {
                     Adicionar Novo Cliente
                   </CardTitle>
                   <CardDescription>
-                    Cadastre um novo cliente e gere uma senha de acesso automaticamente.
+                    Cadastre um novo cliente e gere uma senha de acesso automaticamente. 
+                    <span className="block mt-1 text-blue-600 font-medium">
+                      Clientes terão acesso apenas ao painel de usuário comum com detalhes do contrato, plano e relatórios.
+                    </span>
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -342,6 +387,13 @@ const AdminDashboard = () => {
                                   <Upload className="w-4 h-4 mr-1" />
                                   Contrato
                                 </Button>
+                                <Button
+                                  size="sm"
+                                  variant="destructive"
+                                  onClick={() => handleDeleteClient(client.id)}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
                               </div>
                             </td>
                           </tr>
@@ -452,51 +504,62 @@ const AdminDashboard = () => {
                 <CardTitle>Mensagens do Formulário</CardTitle>
                 <CardDescription>
                   Mensagens recebidas através do formulário de contato do site.
+                  <span className="block mt-1 text-green-600 font-medium">
+                    ✅ Sistema integrado - Todas as mensagens do site chegam automaticamente aqui!
+                  </span>
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {formMessages.map((message) => (
-                    <div key={message.id} className="border rounded-lg p-4 bg-white">
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="flex items-center gap-3">
-                          <div>
-                            <h3 className="font-semibold text-lg">{message.name}</h3>
-                            <p className="text-sm text-gray-600">{message.email} • {message.phone}</p>
+                  {messages.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                      <p>Nenhuma mensagem recebida ainda.</p>
+                      <p className="text-sm">As mensagens do formulário aparecerão aqui automaticamente.</p>
+                    </div>
+                  ) : (
+                    messages.map((message) => (
+                      <div key={message.id} className="border rounded-lg p-4 bg-white">
+                        <div className="flex justify-between items-start mb-3">
+                          <div className="flex items-center gap-3">
+                            <div>
+                              <h3 className="font-semibold text-lg">{message.name}</h3>
+                              <p className="text-sm text-gray-600">{message.email} • {message.phone}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Badge variant={message.status === 'Novo' ? 'destructive' : 'default'}>
+                              {message.status}
+                            </Badge>
+                            <span className="text-xs text-gray-500">{message.date}</span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant={message.status === 'Novo' ? 'destructive' : 'default'}>
-                            {message.status}
-                          </Badge>
-                          <span className="text-xs text-gray-500">{message.date}</span>
+                        
+                        <div className="mb-4">
+                          <p className="text-gray-700 leading-relaxed">{message.message}</p>
                         </div>
-                      </div>
-                      
-                      <div className="mb-4">
-                        <p className="text-gray-700 leading-relaxed">{message.message}</p>
-                      </div>
-                      
-                      <div className="flex gap-2">
-                        {message.status === 'Novo' && (
+                        
+                        <div className="flex gap-2">
+                          {message.status === 'Novo' && (
+                            <Button
+                              size="sm"
+                              onClick={() => handleUpdateMessageStatus(message.id, 'Respondido')}
+                            >
+                              Marcar como Respondido
+                            </Button>
+                          )}
                           <Button
                             size="sm"
-                            onClick={() => updateMessageStatus(message.id, 'Respondido')}
+                            variant="outline"
+                            onClick={() => handleDeleteMessage(message.id)}
                           >
-                            Marcar como Respondido
+                            <Trash2 className="w-4 h-4 mr-1" />
+                            Excluir
                           </Button>
-                        )}
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => deleteMessage(message.id)}
-                        >
-                          <Trash2 className="w-4 h-4 mr-1" />
-                          Excluir
-                        </Button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -545,7 +608,7 @@ const AdminDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {formMessages.filter(m => m.status === 'Novo').length}
+                    {messages.filter(m => m.status === 'Novo').length}
                   </div>
                 </CardContent>
               </Card>
