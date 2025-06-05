@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,10 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { LogOut, FileText, CreditCard, TrendingUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useLanguage } from '@/components/LanguageProvider';
 
 interface ClientPlan {
   name: string;
   price: number;
+  currency: string;
   features: string[];
   status: 'active' | 'expired' | 'pending';
 }
@@ -20,6 +23,102 @@ interface Report {
   file_url: string;
 }
 
+// Plan details
+const planDetails = {
+  Start: [
+    'Landingpage',
+    'Tráfego Google Ads + GMN',
+    'Relatórios quinzenais',
+    'Suporte WhatsApp seg a sáb horário comercial'
+  ],
+  Pro: [
+    'Landingpage',
+    'Tráfego Google ADS + GMN',
+    'Tráfego Meta ADS + Outras plataformas',
+    'Planejamento estratégico de marketing',
+    'Relatórios Semanais',
+    'Suporte 24/7'
+  ]
+};
+
+const translations = {
+  PT: {
+    clientArea: 'Área do Cliente',
+    welcome: 'Bem-vindo',
+    logout: 'Sair',
+    contract: 'Contrato',
+    plan: 'Plano',
+    reports: 'Relatórios',
+    serviceContract: 'Contrato de Serviços',
+    contractDescription: 'Seu contrato de prestação de serviços',
+    trafficManagement: 'Contrato de Gestão de Tráfego',
+    signedOn: 'Assinado em',
+    active: 'Ativo',
+    downloadPdf: 'Baixar PDF',
+    planDetails: 'Detalhes do seu plano atual',
+    monthlyValue: 'Valor Mensal',
+    status: 'Status',
+    includedServices: 'Serviços Inclusos',
+    performanceReports: 'Relatórios de Performance',
+    reportsDescription: 'Seus relatórios mensais organizados por data',
+    date: 'Data',
+    download: 'Baixar',
+    noReports: 'Nenhum relatório disponível ainda.',
+    reportsWillAppear: 'Os relatórios aparecerão aqui conforme forem publicados.',
+    loading: 'Carregando...'
+  },
+  EN: {
+    clientArea: 'Client Area',
+    welcome: 'Welcome',
+    logout: 'Logout',
+    contract: 'Contract',
+    plan: 'Plan',
+    reports: 'Reports',
+    serviceContract: 'Service Contract',
+    contractDescription: 'Your service agreement',
+    trafficManagement: 'Traffic Management Contract',
+    signedOn: 'Signed on',
+    active: 'Active',
+    downloadPdf: 'Download PDF',
+    planDetails: 'Details of your current plan',
+    monthlyValue: 'Monthly Value',
+    status: 'Status',
+    includedServices: 'Included Services',
+    performanceReports: 'Performance Reports',
+    reportsDescription: 'Your monthly reports organized by date',
+    date: 'Date',
+    download: 'Download',
+    noReports: 'No reports available yet.',
+    reportsWillAppear: 'Reports will appear here as they are published.',
+    loading: 'Loading...'
+  },
+  ES: {
+    clientArea: 'Área del Cliente',
+    welcome: 'Bienvenido',
+    logout: 'Salir',
+    contract: 'Contrato',
+    plan: 'Plan',
+    reports: 'Informes',
+    serviceContract: 'Contrato de Servicios',
+    contractDescription: 'Su contrato de prestación de servicios',
+    trafficManagement: 'Contrato de Gestión de Tráfico',
+    signedOn: 'Firmado el',
+    active: 'Activo',
+    downloadPdf: 'Descargar PDF',
+    planDetails: 'Detalles de su plan actual',
+    monthlyValue: 'Valor Mensual',
+    status: 'Estado',
+    includedServices: 'Servicios Incluidos',
+    performanceReports: 'Informes de Rendimiento',
+    reportsDescription: 'Sus informes mensuales organizados por fecha',
+    date: 'Fecha',
+    download: 'Descargar',
+    noReports: 'Aún no hay informes disponibles.',
+    reportsWillAppear: 'Los informes aparecerán aquí cuando se publiquen.',
+    loading: 'Cargando...'
+  }
+};
+
 const ClientDashboard = () => {
   const [client, setClient] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -27,6 +126,8 @@ const ClientDashboard = () => {
   const [reports, setReports] = useState<Report[]>([]);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { language } = useLanguage();
+  const t = translations[language];
 
   useEffect(() => {
     checkClient();
@@ -52,20 +153,28 @@ const ClientDashboard = () => {
   };
 
   const fetchClientData = async () => {
-    // Get client data from localStorage
+    // Get client data from localStorage or adminClients
     const savedClient = localStorage.getItem('currentClient');
+    let clientData = null;
+    
     if (savedClient) {
-      const clientData = JSON.parse(savedClient);
+      clientData = JSON.parse(savedClient);
+      
+      // Try to get updated data from adminClients
+      const adminClients = localStorage.getItem('adminClients');
+      if (adminClients) {
+        const clients = JSON.parse(adminClients);
+        const updatedClient = clients.find((c: any) => c.email === clientData.email);
+        if (updatedClient) {
+          clientData = updatedClient;
+        }
+      }
       
       const mockPlan: ClientPlan = {
         name: clientData.plan || 'Start',
-        price: clientData.plan === 'Premium' ? 2500 : clientData.plan === 'Growth' ? 2000 : 1500,
-        features: [
-          'Gestão Google Ads',
-          'Relatórios mensais',
-          'Suporte via WhatsApp',
-          'Otimização básica'
-        ],
+        price: clientData.monthlyValue || (clientData.plan === 'Pro' ? 2500 : 1500),
+        currency: clientData.currency || 'BRL',
+        features: planDetails[clientData.plan as keyof typeof planDetails] || planDetails.Start,
         status: 'active'
       };
 
@@ -93,7 +202,7 @@ const ClientDashboard = () => {
     localStorage.removeItem('currentClient');
     navigate('/cliente/login');
     toast({
-      title: "Logout realizado",
+      title: t.logout,
       description: "Você foi desconectado com sucesso.",
     });
   };
@@ -105,10 +214,25 @@ const ClientDashboard = () => {
     });
   };
 
+  const formatCurrency = (value: number, currency: string) => {
+    switch (currency) {
+      case 'BRL':
+        return `R$ ${value.toLocaleString('pt-BR')}`;
+      case 'USD':
+        return `$ ${value.toLocaleString('en-US')}`;
+      case 'EUR':
+        return `€ ${value.toLocaleString('de-DE')}`;
+      case 'GBP':
+        return `£ ${value.toLocaleString('en-GB')}`;
+      default:
+        return `${currency} ${value.toLocaleString()}`;
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-idBlack flex items-center justify-center">
-        <div className="text-white">Carregando...</div>
+        <div className="text-white">{t.loading}</div>
       </div>
     );
   }
@@ -119,12 +243,12 @@ const ClientDashboard = () => {
       <div className="border-b border-gray-800 bg-idDarkBlack">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold text-idOrange">Área do Cliente</h1>
-            <p className="text-gray-400">Bem-vindo, {client?.name || client?.email}</p>
+            <h1 className="text-2xl font-bold text-idOrange">{t.clientArea}</h1>
+            <p className="text-gray-400">{t.welcome}, {client?.name || client?.email}</p>
           </div>
           <Button variant="outline" onClick={handleLogout} className="border-gray-700">
             <LogOut className="w-4 h-4 mr-2" />
-            Sair
+            {t.logout}
           </Button>
         </div>
       </div>
@@ -134,15 +258,15 @@ const ClientDashboard = () => {
         <div className="flex space-x-1 mb-8 bg-idDarkBlack p-1 rounded-lg">
           <Button variant="ghost" className="flex-1 bg-idOrange text-white">
             <FileText className="w-4 h-4 mr-2" />
-            Contrato
+            {t.contract}
           </Button>
           <Button variant="ghost" className="flex-1 text-gray-400 hover:text-white">
             <CreditCard className="w-4 h-4 mr-2" />
-            Plano
+            {t.plan}
           </Button>
           <Button variant="ghost" className="flex-1 text-gray-400 hover:text-white">
             <TrendingUp className="w-4 h-4 mr-2" />
-            Relatórios
+            {t.reports}
           </Button>
         </div>
 
@@ -152,22 +276,22 @@ const ClientDashboard = () => {
             <CardHeader>
               <CardTitle className="text-white flex items-center">
                 <FileText className="w-5 h-5 mr-2 text-idOrange" />
-                Contrato de Serviços
+                {t.serviceContract}
               </CardTitle>
               <CardDescription className="text-gray-400">
-                Seu contrato de prestação de serviços
+                {t.contractDescription}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between p-4 border border-gray-700 rounded-lg">
                 <div>
-                  <h4 className="text-white font-medium">Contrato de Gestão de Tráfego - Start</h4>
-                  <p className="text-gray-400 text-sm">Assinado em 15/01/2024</p>
-                  <Badge className="mt-2 bg-green-600">Ativo</Badge>
+                  <h4 className="text-white font-medium">{t.trafficManagement} - {clientPlan?.name}</h4>
+                  <p className="text-gray-400 text-sm">{t.signedOn} 15/01/2024</p>
+                  <Badge className="mt-2 bg-green-600">{t.active}</Badge>
                 </div>
                 <Button variant="outline" className="border-gray-700">
                   <FileText className="w-4 h-4 mr-2" />
-                  Baixar PDF
+                  {t.downloadPdf}
                 </Button>
               </div>
             </CardContent>
@@ -179,30 +303,30 @@ const ClientDashboard = () => {
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
                   <CreditCard className="w-5 h-5 mr-2 text-idOrange" />
-                  Plano {clientPlan.name}
+                  {t.plan} {clientPlan.name}
                 </CardTitle>
                 <CardDescription className="text-gray-400">
-                  Detalhes do seu plano atual
+                  {t.planDetails}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Valor Mensal:</span>
+                    <span className="text-gray-400">{t.monthlyValue}:</span>
                     <span className="text-2xl font-bold text-idOrange">
-                      R$ {clientPlan.price.toLocaleString()}
+                      {formatCurrency(clientPlan.price, clientPlan.currency)}
                     </span>
                   </div>
                   
                   <div className="flex justify-between items-center">
-                    <span className="text-gray-400">Status:</span>
+                    <span className="text-gray-400">{t.status}:</span>
                     <Badge className={clientPlan.status === 'active' ? 'bg-green-600' : 'bg-red-600'}>
-                      {clientPlan.status === 'active' ? 'Ativo' : 'Inativo'}
+                      {clientPlan.status === 'active' ? t.active : 'Inativo'}
                     </Badge>
                   </div>
 
                   <div>
-                    <h4 className="text-white font-medium mb-3">Serviços Inclusos:</h4>
+                    <h4 className="text-white font-medium mb-3">{t.includedServices}:</h4>
                     <ul className="space-y-2">
                       {clientPlan.features.map((feature, index) => (
                         <li key={index} className="flex items-center text-gray-300">
@@ -222,10 +346,10 @@ const ClientDashboard = () => {
             <CardHeader>
               <CardTitle className="text-white flex items-center">
                 <TrendingUp className="w-5 h-5 mr-2 text-idOrange" />
-                Relatórios de Performance
+                {t.performanceReports}
               </CardTitle>
               <CardDescription className="text-gray-400">
-                Seus relatórios mensais organizados por data
+                {t.reportsDescription}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -236,7 +360,7 @@ const ClientDashboard = () => {
                       <div>
                         <h4 className="text-white font-medium">{report.title}</h4>
                         <p className="text-gray-400 text-sm">
-                          Data: {new Date(report.date).toLocaleDateString('pt-BR')}
+                          {t.date}: {new Date(report.date).toLocaleDateString('pt-BR')}
                         </p>
                       </div>
                       <Button 
@@ -245,15 +369,15 @@ const ClientDashboard = () => {
                         onClick={() => downloadReport(report)}
                       >
                         <FileText className="w-4 h-4 mr-2" />
-                        Baixar
+                        {t.download}
                       </Button>
                     </div>
                   ))
                 ) : (
                   <div className="text-center py-8">
                     <TrendingUp className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-                    <p className="text-gray-400">Nenhum relatório disponível ainda.</p>
-                    <p className="text-gray-500 text-sm">Os relatórios aparecerão aqui conforme forem publicados.</p>
+                    <p className="text-gray-400">{t.noReports}</p>
+                    <p className="text-gray-500 text-sm">{t.reportsWillAppear}</p>
                   </div>
                 )}
               </div>

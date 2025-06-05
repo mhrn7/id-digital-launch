@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,6 +12,24 @@ import { useFormMessages } from '@/hooks/useFormMessages';
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Users, MessageSquare, FileText, Settings, LogOut, Trash2, Eye, Calendar, UserPlus, Key, Upload } from 'lucide-react';
 
+// Plan details
+const planDetails = {
+  Start: [
+    'Landingpage',
+    'Tráfego Google Ads + GMN',
+    'Relatórios quinzenais',
+    'Suporte WhatsApp seg a sáb horário comercial'
+  ],
+  Pro: [
+    'Landingpage',
+    'Tráfego Google ADS + GMN',
+    'Tráfego Meta ADS + Outras plataformas',
+    'Planejamento estratégico de marketing',
+    'Relatórios Semanais',
+    'Suporte 24/7'
+  ]
+};
+
 // Mock data for demonstration
 const mockClients = [
   {
@@ -22,16 +39,20 @@ const mockClients = [
     plan: 'Start',
     status: 'Ativo',
     startDate: '2024-01-15',
-    password: 'temp123'
+    password: 'temp123',
+    currency: 'BRL',
+    monthlyValue: 1500
   },
   {
     id: 2,
     name: 'Maria Santos',
     email: 'maria@loja.com',
-    plan: 'Premium',
+    plan: 'Pro',
     status: 'Ativo',
     startDate: '2024-02-01',
-    password: 'temp456'
+    password: 'temp456',
+    currency: 'USD',
+    monthlyValue: 500
   }
 ];
 
@@ -110,9 +131,10 @@ const AdminDashboard = () => {
     name: '',
     email: '',
     plan: 'Start',
-    password: ''
+    password: '',
+    currency: 'BRL',
+    monthlyValue: ''
   });
-  const [isAddingClient, setIsAddingClient] = useState(false);
 
   const checkAdminAuth = () => {
     const isAdmin = localStorage.getItem('isAdminLoggedIn');
@@ -124,6 +146,15 @@ const AdminDashboard = () => {
   useEffect(() => {
     checkAdminAuth();
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('isAdminLoggedIn');
+    navigate('/cliente/login');
+    toast({
+      title: "Logout realizado",
+      description: "Você foi desconectado com sucesso.",
+    });
+  };
 
   const generatePassword = () => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -137,7 +168,7 @@ const AdminDashboard = () => {
   const handleAddClient = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!newClient.name || !newClient.email || !newClient.plan || !newClient.password) {
+    if (!newClient.name || !newClient.email || !newClient.plan || !newClient.password || !newClient.currency || !newClient.monthlyValue) {
       toast({
         title: "Erro",
         description: "Por favor, preencha todos os campos obrigatórios.",
@@ -150,15 +181,15 @@ const AdminDashboard = () => {
       ...newClient,
       id: Date.now(),
       startDate: new Date().toISOString().split('T')[0],
-      status: 'Ativo'
+      status: 'Ativo',
+      monthlyValue: parseFloat(newClient.monthlyValue)
     };
 
     const updatedClients = [...clients, client];
     setClients(updatedClients);
     localStorage.setItem('adminClients', JSON.stringify(updatedClients));
 
-    setNewClient({ name: '', email: '', plan: 'Start', password: '' });
-    setIsAddingClient(false);
+    setNewClient({ name: '', email: '', plan: 'Start', password: '', currency: 'BRL', monthlyValue: '' });
 
     toast({
       title: "Cliente adicionado!",
@@ -248,6 +279,10 @@ const AdminDashboard = () => {
               <Badge variant="outline" className="text-sm bg-green-50 text-green-700 border-green-200">
                 Acesso Restrito - Admin
               </Badge>
+              <Button variant="outline" onClick={handleLogout} className="border-gray-700">
+                <LogOut className="w-4 h-4 mr-2" />
+                Sair
+              </Button>
             </div>
           </div>
         </div>
@@ -299,7 +334,7 @@ const AdminDashboard = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4">
                     <div>
                       <Label htmlFor="clientName">Nome</Label>
                       <Input
@@ -328,8 +363,32 @@ const AdminDashboard = () => {
                         className="w-full p-2 border border-gray-300 rounded-md bg-black text-idOrange"
                       >
                         <option value="Start">Start</option>
-                        <option value="Premium">Premium</option>
+                        <option value="Pro">Pro</option>
                       </select>
+                    </div>
+                    <div>
+                      <Label htmlFor="clientCurrency">Moeda</Label>
+                      <select
+                        id="clientCurrency"
+                        value={newClient.currency}
+                        onChange={(e) => setNewClient(prev => ({ ...prev, currency: e.target.value }))}
+                        className="w-full p-2 border border-gray-300 rounded-md bg-black text-idOrange"
+                      >
+                        <option value="BRL">BRL (R$)</option>
+                        <option value="USD">USD ($)</option>
+                        <option value="EUR">EUR (€)</option>
+                        <option value="GBP">GBP (£)</option>
+                      </select>
+                    </div>
+                    <div>
+                      <Label htmlFor="clientValue">Valor Mensal</Label>
+                      <Input
+                        id="clientValue"
+                        type="number"
+                        value={newClient.monthlyValue}
+                        onChange={(e) => setNewClient(prev => ({ ...prev, monthlyValue: e.target.value }))}
+                        placeholder="1500"
+                      />
                     </div>
                     <div>
                       <Label htmlFor="clientPassword">Senha</Label>
@@ -375,6 +434,7 @@ const AdminDashboard = () => {
                           <th className="text-left p-2">Nome</th>
                           <th className="text-left p-2">Email</th>
                           <th className="text-left p-2">Plano</th>
+                          <th className="text-left p-2">Valor Mensal</th>
                           <th className="text-left p-2">Status</th>
                           <th className="text-left p-2">Data Início</th>
                           <th className="text-left p-2">Senha</th>
@@ -387,9 +447,16 @@ const AdminDashboard = () => {
                             <td className="p-2">{client.name}</td>
                             <td className="p-2">{client.email}</td>
                             <td className="p-2">
-                              <Badge variant={client.plan === 'Premium' ? 'default' : 'secondary'}>
+                              <Badge variant={client.plan === 'Pro' ? 'default' : 'secondary'}>
                                 {client.plan}
                               </Badge>
+                            </td>
+                            <td className="p-2">
+                              {client.currency === 'BRL' && 'R$ '}
+                              {client.currency === 'USD' && '$ '}
+                              {client.currency === 'EUR' && '€ '}
+                              {client.currency === 'GBP' && '£ '}
+                              {client.monthlyValue?.toLocaleString()}
                             </td>
                             <td className="p-2">
                               <Badge variant={client.status === 'Ativo' ? 'default' : 'destructive'}>
@@ -617,7 +684,7 @@ const AdminDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">
-                    {clients.filter(c => c.plan === 'Premium').length}
+                    {clients.filter(c => c.plan === 'Pro').length}
                   </div>
                 </CardContent>
               </Card>
