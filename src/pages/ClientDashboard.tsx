@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { LogOut, FileText, CreditCard, TrendingUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/components/LanguageProvider';
+import LanguageSelector from '@/components/LanguageSelector';
 
 interface ClientPlan {
   name: string;
@@ -23,22 +24,56 @@ interface Report {
   file_url: string;
 }
 
-// Plan details
+// Professional plan details with translations
 const planDetails = {
-  Start: [
-    'Landingpage',
-    'Tráfego Google Ads + GMN',
-    'Relatórios quinzenais',
-    'Suporte WhatsApp seg a sáb horário comercial'
-  ],
-  Pro: [
-    'Landingpage',
-    'Tráfego Google ADS + GMN',
-    'Tráfego Meta ADS + Outras plataformas',
-    'Planejamento estratégico de marketing',
-    'Relatórios Semanais',
-    'Suporte 24/7'
-  ]
+  PT: {
+    Start: [
+      'Landing Page Profissional',
+      'Gestão de Tráfego Google Ads + Google Merchant Center',
+      'Relatórios de Performance Quinzenais',
+      'Suporte Especializado via WhatsApp (Segunda a Sábado - Horário Comercial)'
+    ],
+    Pro: [
+      'Landing Page Profissional',
+      'Gestão de Tráfego Google Ads + Google Merchant Center',
+      'Gestão de Tráfego Meta Ads + Plataformas Complementares',
+      'Planejamento Estratégico de Marketing Digital',
+      'Relatórios de Performance Semanais',
+      'Suporte Premium 24/7'
+    ]
+  },
+  EN: {
+    Start: [
+      'Professional Landing Page',
+      'Google Ads + Google Merchant Center Traffic Management',
+      'Bi-weekly Performance Reports',
+      'Specialized WhatsApp Support (Monday to Saturday - Business Hours)'
+    ],
+    Pro: [
+      'Professional Landing Page',
+      'Google Ads + Google Merchant Center Traffic Management',
+      'Meta Ads + Complementary Platforms Traffic Management',
+      'Digital Marketing Strategic Planning',
+      'Weekly Performance Reports',
+      'Premium 24/7 Support'
+    ]
+  },
+  ES: {
+    Start: [
+      'Landing Page Profesional',
+      'Gestión de Tráfico Google Ads + Google Merchant Center',
+      'Informes de Rendimiento Quincenales',
+      'Soporte Especializado vía WhatsApp (Lunes a Sábado - Horario Comercial)'
+    ],
+    Pro: [
+      'Landing Page Profesional',
+      'Gestión de Tráfico Google Ads + Google Merchant Center',
+      'Gestión de Tráfico Meta Ads + Plataformas Complementarias',
+      'Planificación Estratégica de Marketing Digital',
+      'Informes de Rendimiento Semanales',
+      'Soporte Premium 24/7'
+    ]
+  }
 };
 
 const translations = {
@@ -180,7 +215,7 @@ const ClientDashboard = () => {
           name: clientData.plan || 'Start',
           price: clientData.monthlyValue || (clientData.plan === 'Pro' ? 2500 : 1500),
           currency: clientData.currency || 'BRL',
-          features: planDetails[clientData.plan] || planDetails.Start,
+          features: planDetails[language][clientData.plan] || planDetails[language].Start,
           status: 'active'
         };
 
@@ -246,10 +281,13 @@ const ClientDashboard = () => {
             <h1 className="text-2xl font-bold text-idOrange">{t.clientArea}</h1>
             <p className="text-gray-400">{t.welcome}, {client?.name || client?.email}</p>
           </div>
-          <Button variant="outline" onClick={handleLogout} className="border-gray-700">
-            <LogOut className="w-4 h-4 mr-2" />
-            {t.logout}
-          </Button>
+          <div className="flex items-center space-x-4">
+            <LanguageSelector />
+            <Button variant="outline" onClick={handleLogout} className="border-gray-700">
+              <LogOut className="w-4 h-4 mr-2" />
+              {t.logout}
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -324,7 +362,7 @@ const ClientDashboard = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-400">{t.monthlyValue}:</span>
                     <span className="text-2xl font-bold text-idOrange">
@@ -340,12 +378,12 @@ const ClientDashboard = () => {
                   </div>
 
                   <div>
-                    <h4 className="text-white font-medium mb-3">{t.includedServices}:</h4>
-                    <ul className="space-y-2">
+                    <h4 className="text-white font-medium mb-4 text-lg">{t.includedServices}:</h4>
+                    <ul className="space-y-3">
                       {clientPlan.features.map((feature, index) => (
-                        <li key={index} className="flex items-center text-gray-300">
-                          <div className="w-2 h-2 bg-idOrange rounded-full mr-3"></div>
-                          {feature}
+                        <li key={index} className="flex items-start text-gray-300">
+                          <div className="w-2 h-2 bg-idOrange rounded-full mr-4 mt-2 flex-shrink-0"></div>
+                          <span className="leading-relaxed">{feature}</span>
                         </li>
                       ))}
                     </ul>
