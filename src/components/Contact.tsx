@@ -33,7 +33,6 @@ const Contact = () => {
           sending: 'Sending...',
           successMessage: 'Message sent successfully! We will contact you soon.',
           errorMessage: 'Error sending message. Please try again.',
-          addressTitle: 'Our Office',
           contactInfo: 'Contact Information'
         };
       case 'ES':
@@ -48,7 +47,6 @@ const Contact = () => {
           sending: 'Enviando...',
           successMessage: '¡Mensaje enviado con éxito! Te contactaremos pronto.',
           errorMessage: 'Error al enviar mensaje. Por favor, inténtalo de nuevo.',
-          addressTitle: 'Nuestra Oficina',
           contactInfo: 'Información de Contacto'
         };
       default: // PT
@@ -63,7 +61,6 @@ const Contact = () => {
           sending: 'Enviando...',
           successMessage: 'Mensagem enviada com sucesso! Entraremos em contato em breve.',
           errorMessage: 'Erro ao enviar mensagem. Tente novamente.',
-          addressTitle: 'Nosso Escritório',
           contactInfo: 'Informações de Contato'
         };
     }
@@ -219,25 +216,6 @@ const Contact = () => {
                       <p className="text-gray-300">WhatsApp</p>
                       <p className="text-white font-semibold">+55 (61) 99960-1534</p>
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-xl font-bold mb-4">{content.addressTitle}</h3>
-                <div className="flex items-start">
-                  <div className="w-12 h-12 bg-idOrange/20 rounded-lg flex items-center justify-center mr-4">
-                    <svg className="w-6 h-6 text-idOrange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-gray-300">Endereço</p>
-                    <p className="text-white font-semibold">
-                      Av. Paulista, 1000<br />
-                      São Paulo, SP - Brasil
-                    </p>
                   </div>
                 </div>
               </div>

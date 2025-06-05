@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -229,7 +228,9 @@ const ClientDashboard = () => {
         let clientReports = [];
         if (adminReports) {
           const allReports = JSON.parse(adminReports);
-          clientReports = allReports.filter(report => report.clientName === clientData.name);
+          clientReports = allReports.filter(report => 
+            report.clientName === clientData.name || report.clientId === clientData.id
+          );
         }
 
         setClientPlan(mockPlan);
@@ -416,7 +417,7 @@ const ClientDashboard = () => {
                     reports.map((report) => (
                       <div key={report.id} className="flex items-center justify-between p-4 border border-gray-700 rounded-lg">
                         <div>
-                          <h4 className="text-white font-medium">{report.title || `Relatório ${report.month}`}</h4>
+                          <h4 className="text-white font-medium">{report.title}</h4>
                           <p className="text-gray-400 text-sm">
                             {t.date}: {new Date(report.date).toLocaleDateString('pt-BR')}
                           </p>

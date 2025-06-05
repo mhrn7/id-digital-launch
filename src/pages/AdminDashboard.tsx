@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,7 +18,9 @@ import {
   Edit, 
   Trash2, 
   Download,
-  LogOut
+  LogOut,
+  Upload,
+  Eye
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/components/LanguageProvider';
@@ -29,6 +30,7 @@ interface Client {
   id: string;
   name: string;
   email: string;
+  password: string;
   plan: 'Start' | 'Pro';
   monthlyValue: number;
   currency: string;
@@ -38,9 +40,20 @@ interface Client {
 interface Report {
   id: string;
   clientName: string;
+  clientId: string;
   title: string;
   date: string;
   file_url: string;
+}
+
+interface Message {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  date: string;
+  read: boolean;
 }
 
 // Professional plan details with translations
@@ -102,11 +115,13 @@ const translations = {
     clients: 'Clientes',
     reports: 'Relatórios',
     settings: 'Configurações',
+    messages: 'Mensagens',
     addClient: 'Adicionar Cliente',
     editClient: 'Editar Cliente',
     deleteClient: 'Excluir Cliente',
     name: 'Nome',
     email: 'Email',
+    password: 'Senha',
     plan: 'Plano',
     monthlyValue: 'Valor Mensal',
     currency: 'Moeda',
@@ -122,6 +137,23 @@ const translations = {
     no: 'Não',
     planDetails: 'Detalhes do Plano',
     includedServices: 'Serviços Inclusos',
+    uploadReport: 'Enviar Relatório',
+    selectClient: 'Selecionar Cliente',
+    reportTitle: 'Título do Relatório',
+    selectFile: 'Selecionar Arquivo',
+    upload: 'Enviar',
+    clientReports: 'Relatórios dos Clientes',
+    contactMessages: 'Mensagens de Contato',
+    from: 'De',
+    phone: 'Telefone',
+    date: 'Data',
+    markAsRead: 'Marcar como Lida',
+    systemSettings: 'Configurações do Sistema',
+    noMessages: 'Nenhuma mensagem encontrada.',
+    noReports: 'Nenhum relatório encontrado.',
+    messageFrom: 'Mensagem de',
+    reportUploaded: 'Relatório enviado com sucesso!',
+    messageMarkedRead: 'Mensagem marcada como lida.',
   },
   EN: {
     adminPanel: 'Admin Panel',
@@ -129,11 +161,13 @@ const translations = {
     clients: 'Clients',
     reports: 'Reports',
     settings: 'Settings',
+    messages: 'Messages',
     addClient: 'Add Client',
     editClient: 'Edit Client',
     deleteClient: 'Delete Client',
     name: 'Name',
     email: 'Email',
+    password: 'Password',
     plan: 'Plan',
     monthlyValue: 'Monthly Value',
     currency: 'Currency',
@@ -149,6 +183,23 @@ const translations = {
     no: 'No',
     planDetails: 'Plan Details',
     includedServices: 'Included Services',
+    uploadReport: 'Upload Report',
+    selectClient: 'Select Client',
+    reportTitle: 'Report Title',
+    selectFile: 'Select File',
+    upload: 'Upload',
+    clientReports: 'Client Reports',
+    contactMessages: 'Contact Messages',
+    from: 'From',
+    phone: 'Phone',
+    date: 'Date',
+    markAsRead: 'Mark as Read',
+    systemSettings: 'System Settings',
+    noMessages: 'No messages found.',
+    noReports: 'No reports found.',
+    messageFrom: 'Message from',
+    reportUploaded: 'Report uploaded successfully!',
+    messageMarkedRead: 'Message marked as read.',
   },
   ES: {
     adminPanel: 'Panel Administrativo',
@@ -156,11 +207,13 @@ const translations = {
     clients: 'Clientes',
     reports: 'Informes',
     settings: 'Configuraciones',
+    messages: 'Mensajes',
     addClient: 'Agregar Cliente',
     editClient: 'Editar Cliente',
     deleteClient: 'Eliminar Cliente',
     name: 'Nombre',
     email: 'Correo electrónico',
+    password: 'Contraseña',
     plan: 'Plan',
     monthlyValue: 'Valor Mensual',
     currency: 'Moneda',
@@ -176,23 +229,49 @@ const translations = {
     no: 'No',
     planDetails: 'Detalles del Plan',
     includedServices: 'Servicios Incluidos',
+    uploadReport: 'Subir Informe',
+    selectClient: 'Seleccionar Cliente',
+    reportTitle: 'Título del Informe',
+    selectFile: 'Seleccionar Archivo',
+    upload: 'Subir',
+    clientReports: 'Informes de Clientes',
+    contactMessages: 'Mensajes de Contacto',
+    from: 'De',
+    phone: 'Teléfono',
+    date: 'Fecha',
+    markAsRead: 'Marcar como Leído',
+    systemSettings: 'Configuraciones del Sistema',
+    noMessages: 'No se encontraron mensajes.',
+    noReports: 'No se encontraron informes.',
+    messageFrom: 'Mensaje de',
+    reportUploaded: '¡Informe subido exitosamente!',
+    messageMarkedRead: 'Mensaje marcado como leído.',
   }
 };
 
 const AdminDashboard = () => {
   const [clients, setClients] = useState<Client[]>([]);
+  const [reports, setReports] = useState<Report[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    password: '',
     plan: 'Start' as 'Start' | 'Pro',
     monthlyValue: 0,
     currency: 'BRL',
     startDate: '',
+  });
+  const [reportFormData, setReportFormData] = useState({
+    clientId: '',
+    title: '',
+    file: null as File | null,
   });
 
   const { toast } = useToast();
@@ -201,10 +280,25 @@ const AdminDashboard = () => {
   const t = translations[language];
 
   useEffect(() => {
-    // Load clients from localStorage or API
+    // Load data from localStorage
     const storedClients = localStorage.getItem('adminClients');
+    const storedReports = localStorage.getItem('adminReports');
+    const storedMessages = localStorage.getItem('formMessages');
+    
     if (storedClients) {
       setClients(JSON.parse(storedClients));
+    }
+    if (storedReports) {
+      setReports(JSON.parse(storedReports));
+    }
+    if (storedMessages) {
+      const formMessages = JSON.parse(storedMessages);
+      const convertedMessages = formMessages.map((msg: any) => ({
+        ...msg,
+        read: msg.read || false,
+        date: msg.timestamp || msg.date || new Date().toISOString()
+      }));
+      setMessages(convertedMessages);
     }
     setLoading(false);
   }, []);
@@ -212,6 +306,16 @@ const AdminDashboard = () => {
   const saveClients = (updatedClients: Client[]) => {
     setClients(updatedClients);
     localStorage.setItem('adminClients', JSON.stringify(updatedClients));
+  };
+
+  const saveReports = (updatedReports: Report[]) => {
+    setReports(updatedReports);
+    localStorage.setItem('adminReports', JSON.stringify(updatedReports));
+  };
+
+  const saveMessages = (updatedMessages: Message[]) => {
+    setMessages(updatedMessages);
+    localStorage.setItem('formMessages', JSON.stringify(updatedMessages));
   };
 
   const handleLogout = () => {
@@ -228,6 +332,7 @@ const AdminDashboard = () => {
     setFormData({
       name: '',
       email: '',
+      password: '',
       plan: 'Start',
       monthlyValue: 0,
       currency: 'BRL',
@@ -241,6 +346,7 @@ const AdminDashboard = () => {
     setFormData({
       name: client.name,
       email: client.email,
+      password: client.password || '',
       plan: client.plan,
       monthlyValue: client.monthlyValue,
       currency: client.currency,
@@ -266,14 +372,6 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleDialogClose = () => {
-    setIsDialogOpen(false);
-  };
-
-  const handleDeleteDialogClose = () => {
-    setIsDeleteDialogOpen(false);
-  };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -283,10 +381,10 @@ const AdminDashboard = () => {
   };
 
   const handleSaveClient = () => {
-    if (!formData.name || !formData.email) {
+    if (!formData.name || !formData.email || !formData.password) {
       toast({
         title: 'Erro',
-        description: 'Nome e email são obrigatórios.',
+        description: 'Nome, email e senha são obrigatórios.',
         variant: 'destructive',
       });
       return;
@@ -315,6 +413,48 @@ const AdminDashboard = () => {
       });
     }
     setIsDialogOpen(false);
+  };
+
+  const handleReportUpload = () => {
+    if (!reportFormData.clientId || !reportFormData.title || !reportFormData.file) {
+      toast({
+        title: 'Erro',
+        description: 'Todos os campos são obrigatórios.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const client = clients.find(c => c.id === reportFormData.clientId);
+    if (!client) return;
+
+    const newReport: Report = {
+      id: Date.now().toString(),
+      clientId: reportFormData.clientId,
+      clientName: client.name,
+      title: reportFormData.title,
+      date: new Date().toISOString(),
+      file_url: `reports/${reportFormData.file.name}`, // Mock URL
+    };
+
+    saveReports([...reports, newReport]);
+    setIsReportDialogOpen(false);
+    setReportFormData({ clientId: '', title: '', file: null });
+    
+    toast({
+      title: t.reportUploaded,
+      description: `Relatório para ${client.name} enviado.`,
+    });
+  };
+
+  const markMessageAsRead = (messageId: string) => {
+    const updatedMessages = messages.map(msg => 
+      msg.id === messageId ? { ...msg, read: true } : msg
+    );
+    saveMessages(updatedMessages);
+    toast({
+      title: t.messageMarkedRead,
+    });
   };
 
   if (loading) {
@@ -348,8 +488,9 @@ const AdminDashboard = () => {
         <Tabs defaultValue="clients" className="w-full">
           <TabsList className="mb-6">
             <TabsTrigger value="clients">{t.clients}</TabsTrigger>
-            <TabsTrigger value="reports" disabled>{t.reports}</TabsTrigger>
-            <TabsTrigger value="settings" disabled>{t.settings}</TabsTrigger>
+            <TabsTrigger value="reports">{t.reports}</TabsTrigger>
+            <TabsTrigger value="messages">{t.messages}</TabsTrigger>
+            <TabsTrigger value="settings">{t.settings}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="clients">
@@ -420,16 +561,98 @@ const AdminDashboard = () => {
           </TabsContent>
 
           <TabsContent value="reports">
-            <p className="text-gray-400">Funcionalidade de relatórios em desenvolvimento.</p>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">{t.clientReports}</h2>
+              <Button onClick={() => setIsReportDialogOpen(true)}>
+                <Upload className="w-4 h-4 mr-2" />
+                {t.uploadReport}
+              </Button>
+            </div>
+            <div className="space-y-4">
+              {reports.length === 0 ? (
+                <p className="text-gray-400 text-center py-8">{t.noReports}</p>
+              ) : (
+                reports.map(report => (
+                  <Card key={report.id} className="bg-idDarkBlack border-gray-700">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <h4 className="font-medium text-white">{report.title}</h4>
+                          <p className="text-gray-400 text-sm">Cliente: {report.clientName}</p>
+                          <p className="text-gray-400 text-sm">{t.date}: {new Date(report.date).toLocaleDateString()}</p>
+                        </div>
+                        <Button variant="outline" size="sm">
+                          <Download className="w-4 h-4 mr-2" />
+                          {t.download || 'Download'}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="messages">
+            <div className="mb-4">
+              <h2 className="text-xl font-semibold">{t.contactMessages}</h2>
+            </div>
+            <div className="space-y-4">
+              {messages.length === 0 ? (
+                <p className="text-gray-400 text-center py-8">{t.noMessages}</p>
+              ) : (
+                messages.map(message => (
+                  <Card key={message.id} className={`bg-idDarkBlack border-gray-700 ${!message.read ? 'border-idOrange' : ''}`}>
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h4 className="font-medium text-white">{t.messageFrom} {message.name}</h4>
+                            {!message.read && <Badge className="bg-idOrange text-black">Nova</Badge>}
+                          </div>
+                          <p className="text-gray-400 text-sm mb-1">{t.email}: {message.email}</p>
+                          {message.phone && <p className="text-gray-400 text-sm mb-2">{t.phone}: {message.phone}</p>}
+                          <p className="text-gray-300 mb-2">{message.message}</p>
+                          <p className="text-gray-500 text-xs">{new Date(message.date).toLocaleString()}</p>
+                        </div>
+                        {!message.read && (
+                          <Button variant="outline" size="sm" onClick={() => markMessageAsRead(message.id)}>
+                            <Eye className="w-4 h-4 mr-2" />
+                            {t.markAsRead}
+                          </Button>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
           </TabsContent>
 
           <TabsContent value="settings">
-            <p className="text-gray-400">Configurações do sistema em desenvolvimento.</p>
+            <Card className="bg-idDarkBlack border-gray-700">
+              <CardHeader>
+                <CardTitle className="text-white">{t.systemSettings}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="language">{language === 'PT' ? 'Idioma do Sistema' : language === 'EN' ? 'System Language' : 'Idioma del Sistema'}</Label>
+                    <LanguageSelector />
+                  </div>
+                  <p className="text-gray-400 text-sm">
+                    {language === 'PT' ? 'Mais configurações serão adicionadas em futuras atualizações.' : 
+                     language === 'EN' ? 'More settings will be added in future updates.' : 
+                     'Más configuraciones se agregarán en futuras actualizaciones.'}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
 
-      {/* Add/Edit Client Dialog */}
+      {/* Client Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-lg">
           <DialogHeader>
@@ -458,6 +681,17 @@ const AdminDashboard = () => {
                 value={formData.email} 
                 onChange={handleInputChange} 
                 placeholder={t.email} 
+              />
+            </div>
+            <div>
+              <Label htmlFor="password">{t.password}</Label>
+              <Input 
+                id="password" 
+                name="password" 
+                type="password" 
+                value={formData.password} 
+                onChange={handleInputChange} 
+                placeholder={t.password} 
               />
             </div>
             <div>
@@ -532,8 +766,56 @@ const AdminDashboard = () => {
             </div>
           </div>
           <DialogFooter className="mt-6 flex justify-end space-x-4">
-            <Button variant="outline" onClick={handleDialogClose}>{t.cancel}</Button>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t.cancel}</Button>
             <Button onClick={handleSaveClient}>{t.save}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Report Upload Dialog */}
+      <Dialog open={isReportDialogOpen} onOpenChange={setIsReportDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{t.uploadReport}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div>
+              <Label htmlFor="reportClient">{t.selectClient}</Label>
+              <Select value={reportFormData.clientId} onValueChange={(value) => setReportFormData(prev => ({ ...prev, clientId: value }))}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t.selectClient} />
+                </SelectTrigger>
+                <SelectContent>
+                  {clients.map(client => (
+                    <SelectItem key={client.id} value={client.id}>
+                      {client.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="reportTitle">{t.reportTitle}</Label>
+              <Input 
+                id="reportTitle" 
+                value={reportFormData.title} 
+                onChange={(e) => setReportFormData(prev => ({ ...prev, title: e.target.value }))} 
+                placeholder={t.reportTitle}
+              />
+            </div>
+            <div>
+              <Label htmlFor="reportFile">{t.selectFile}</Label>
+              <Input 
+                id="reportFile" 
+                type="file" 
+                onChange={(e) => setReportFormData(prev => ({ ...prev, file: e.target.files?.[0] || null }))}
+                accept=".pdf,.doc,.docx,.xls,.xlsx"
+              />
+            </div>
+          </div>
+          <DialogFooter className="mt-6">
+            <Button variant="outline" onClick={() => setIsReportDialogOpen(false)}>{t.cancel}</Button>
+            <Button onClick={handleReportUpload}>{t.upload}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -546,7 +828,7 @@ const AdminDashboard = () => {
             <DialogDescription>{t.confirmDeleteMessage}</DialogDescription>
           </DialogHeader>
           <DialogFooter className="mt-6 flex justify-end space-x-4">
-            <Button variant="outline" onClick={handleDeleteDialogClose}>{t.no}</Button>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>{t.no}</Button>
             <Button className="bg-red-600 hover:bg-red-700 text-white" onClick={confirmDeleteClient}>{t.yes}</Button>
           </DialogFooter>
         </DialogContent>
