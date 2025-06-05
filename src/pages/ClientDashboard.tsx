@@ -120,10 +120,11 @@ const translations = {
 };
 
 const ClientDashboard = () => {
-  const [client, setClient] = useState<any>(null);
+  const [client, setClient] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [clientPlan, setClientPlan] = useState<ClientPlan | null>(null);
-  const [reports, setReports] = useState<Report[]>([]);
+  const [clientPlan, setClientPlan] = useState(null);
+  const [reports, setReports] = useState([]);
+  const [activeTab, setActiveTab] = useState('contract');
   const navigate = useNavigate();
   const { toast } = useToast();
   const { language } = useLanguage();
@@ -136,10 +137,11 @@ const ClientDashboard = () => {
 
   const checkClient = async () => {
     try {
-      // Check if client is logged in via localStorage (demo mode)
+      // Check if client is logged in via localStorage
       const savedClient = localStorage.getItem('currentClient');
       if (savedClient) {
-        setClient(JSON.parse(savedClient));
+        const clientData = JSON.parse(savedClient);
+        setClient(clientData);
         setLoading(false);
         return;
       }
@@ -153,7 +155,7 @@ const ClientDashboard = () => {
   };
 
   const fetchClientData = async () => {
-    // Get client data from localStorage or adminClients
+    // Get client data from localStorage
     const savedClient = localStorage.getItem('currentClient');
     let clientData = null;
     
@@ -164,37 +166,35 @@ const ClientDashboard = () => {
       const adminClients = localStorage.getItem('adminClients');
       if (adminClients) {
         const clients = JSON.parse(adminClients);
-        const updatedClient = clients.find((c: any) => c.email === clientData.email);
+        const updatedClient = clients.find((c) => c.email === clientData.email);
         if (updatedClient) {
           clientData = updatedClient;
+          // Update current client data
+          localStorage.setItem('currentClient', JSON.stringify(updatedClient));
+          setClient(updatedClient);
         }
       }
       
-      const mockPlan: ClientPlan = {
-        name: clientData.plan || 'Start',
-        price: clientData.monthlyValue || (clientData.plan === 'Pro' ? 2500 : 1500),
-        currency: clientData.currency || 'BRL',
-        features: planDetails[clientData.plan as keyof typeof planDetails] || planDetails.Start,
-        status: 'active'
-      };
+      if (clientData) {
+        const mockPlan = {
+          name: clientData.plan || 'Start',
+          price: clientData.monthlyValue || (clientData.plan === 'Pro' ? 2500 : 1500),
+          currency: clientData.currency || 'BRL',
+          features: planDetails[clientData.plan] || planDetails.Start,
+          status: 'active'
+        };
 
-      const mockReports: Report[] = [
-        {
-          id: '1',
-          title: 'Relatório Janeiro 2024',
-          date: '2024-01-31',
-          file_url: '#'
-        },
-        {
-          id: '2',
-          title: 'Relatório Dezembro 2023',
-          date: '2023-12-31',
-          file_url: '#'
+        // Get reports from localStorage that belong to this client
+        const adminReports = localStorage.getItem('adminReports');
+        let clientReports = [];
+        if (adminReports) {
+          const allReports = JSON.parse(adminReports);
+          clientReports = allReports.filter(report => report.clientName === clientData.name);
         }
-      ];
 
-      setClientPlan(mockPlan);
-      setReports(mockReports);
+        setClientPlan(mockPlan);
+        setReports(clientReports);
+      }
     }
   };
 
@@ -207,14 +207,14 @@ const ClientDashboard = () => {
     });
   };
 
-  const downloadReport = (report: Report) => {
+  const downloadReport = (report) => {
     toast({
       title: "Download iniciado",
       description: `Baixando ${report.title}...`
     });
   };
 
-  const formatCurrency = (value: number, currency: string) => {
+  const formatCurrency = (value, currency) => {
     switch (currency) {
       case 'BRL':
         return `R$ ${value.toLocaleString('pt-BR')}`;
@@ -256,15 +256,27 @@ const ClientDashboard = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Navigation Tabs */}
         <div className="flex space-x-1 mb-8 bg-idDarkBlack p-1 rounded-lg">
-          <Button variant="ghost" className="flex-1 bg-idOrange text-white">
+          <Button 
+            variant="ghost" 
+            className={`flex-1 ${activeTab === 'contract' ? 'bg-idOrange text-white' : 'text-gray-400 hover:text-white'}`}
+            onClick={() => setActiveTab('contract')}
+          >
             <FileText className="w-4 h-4 mr-2" />
             {t.contract}
           </Button>
-          <Button variant="ghost" className="flex-1 text-gray-400 hover:text-white">
+          <Button 
+            variant="ghost" 
+            className={`flex-1 ${activeTab === 'plan' ? 'bg-idOrange text-white' : 'text-gray-400 hover:text-white'}`}
+            onClick={() => setActiveTab('plan')}
+          >
             <CreditCard className="w-4 h-4 mr-2" />
             {t.plan}
           </Button>
-          <Button variant="ghost" className="flex-1 text-gray-400 hover:text-white">
+          <Button 
+            variant="ghost" 
+            className={`flex-1 ${activeTab === 'reports' ? 'bg-idOrange text-white' : 'text-gray-400 hover:text-white'}`}
+            onClick={() => setActiveTab('reports')}
+          >
             <TrendingUp className="w-4 h-4 mr-2" />
             {t.reports}
           </Button>
@@ -272,33 +284,35 @@ const ClientDashboard = () => {
 
         <div className="space-y-8">
           {/* Contrato Section */}
-          <Card className="bg-idDarkBlack border-gray-800">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center">
-                <FileText className="w-5 h-5 mr-2 text-idOrange" />
-                {t.serviceContract}
-              </CardTitle>
-              <CardDescription className="text-gray-400">
-                {t.contractDescription}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between p-4 border border-gray-700 rounded-lg">
-                <div>
-                  <h4 className="text-white font-medium">{t.trafficManagement} - {clientPlan?.name}</h4>
-                  <p className="text-gray-400 text-sm">{t.signedOn} 15/01/2024</p>
-                  <Badge className="mt-2 bg-green-600">{t.active}</Badge>
+          {activeTab === 'contract' && (
+            <Card className="bg-idDarkBlack border-gray-800">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <FileText className="w-5 h-5 mr-2 text-idOrange" />
+                  {t.serviceContract}
+                </CardTitle>
+                <CardDescription className="text-gray-400">
+                  {t.contractDescription}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between p-4 border border-gray-700 rounded-lg">
+                  <div>
+                    <h4 className="text-white font-medium">{t.trafficManagement} - {clientPlan?.name}</h4>
+                    <p className="text-gray-400 text-sm">{t.signedOn} {client?.startDate ? new Date(client.startDate).toLocaleDateString('pt-BR') : '15/01/2024'}</p>
+                    <Badge className="mt-2 bg-green-600">{t.active}</Badge>
+                  </div>
+                  <Button variant="outline" className="border-gray-700">
+                    <FileText className="w-4 h-4 mr-2" />
+                    {t.downloadPdf}
+                  </Button>
                 </div>
-                <Button variant="outline" className="border-gray-700">
-                  <FileText className="w-4 h-4 mr-2" />
-                  {t.downloadPdf}
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Plano Section */}
-          {clientPlan && (
+          {activeTab === 'plan' && clientPlan && (
             <Card className="bg-idDarkBlack border-gray-800">
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
@@ -342,47 +356,49 @@ const ClientDashboard = () => {
           )}
 
           {/* Relatórios Section */}
-          <Card className="bg-idDarkBlack border-gray-800">
-            <CardHeader>
-              <CardTitle className="text-white flex items-center">
-                <TrendingUp className="w-5 h-5 mr-2 text-idOrange" />
-                {t.performanceReports}
-              </CardTitle>
-              <CardDescription className="text-gray-400">
-                {t.reportsDescription}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {reports.length > 0 ? (
-                  reports.map((report) => (
-                    <div key={report.id} className="flex items-center justify-between p-4 border border-gray-700 rounded-lg">
-                      <div>
-                        <h4 className="text-white font-medium">{report.title}</h4>
-                        <p className="text-gray-400 text-sm">
-                          {t.date}: {new Date(report.date).toLocaleDateString('pt-BR')}
-                        </p>
+          {activeTab === 'reports' && (
+            <Card className="bg-idDarkBlack border-gray-800">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center">
+                  <TrendingUp className="w-5 h-5 mr-2 text-idOrange" />
+                  {t.performanceReports}
+                </CardTitle>
+                <CardDescription className="text-gray-400">
+                  {t.reportsDescription}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {reports.length > 0 ? (
+                    reports.map((report) => (
+                      <div key={report.id} className="flex items-center justify-between p-4 border border-gray-700 rounded-lg">
+                        <div>
+                          <h4 className="text-white font-medium">{report.title || `Relatório ${report.month}`}</h4>
+                          <p className="text-gray-400 text-sm">
+                            {t.date}: {new Date(report.date).toLocaleDateString('pt-BR')}
+                          </p>
+                        </div>
+                        <Button 
+                          variant="outline" 
+                          className="border-gray-700"
+                          onClick={() => downloadReport(report)}
+                        >
+                          <FileText className="w-4 h-4 mr-2" />
+                          {t.download}
+                        </Button>
                       </div>
-                      <Button 
-                        variant="outline" 
-                        className="border-gray-700"
-                        onClick={() => downloadReport(report)}
-                      >
-                        <FileText className="w-4 h-4 mr-2" />
-                        {t.download}
-                      </Button>
+                    ))
+                  ) : (
+                    <div className="text-center py-8">
+                      <TrendingUp className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                      <p className="text-gray-400">{t.noReports}</p>
+                      <p className="text-gray-500 text-sm">{t.reportsWillAppear}</p>
                     </div>
-                  ))
-                ) : (
-                  <div className="text-center py-8">
-                    <TrendingUp className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-                    <p className="text-gray-400">{t.noReports}</p>
-                    <p className="text-gray-500 text-sm">{t.reportsWillAppear}</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -6,11 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useFormMessages } from '@/hooks/useFormMessages';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Users, MessageSquare, FileText, Settings, LogOut, Trash2, Eye, Calendar, UserPlus, Key, Upload } from 'lucide-react';
+import { Plus, Users, MessageSquare, FileText, LogOut, Trash2, Eye, Calendar, UserPlus, Key, Upload, Edit } from 'lucide-react';
 
 // Plan details
 const planDetails = {
@@ -30,103 +32,14 @@ const planDetails = {
   ]
 };
 
-// Mock data for demonstration
-const mockClients = [
-  {
-    id: 1,
-    name: 'João Silva',
-    email: 'joao@empresa.com',
-    plan: 'Start',
-    status: 'Ativo',
-    startDate: '2024-01-15',
-    password: 'temp123',
-    currency: 'BRL',
-    monthlyValue: 1500
-  },
-  {
-    id: 2,
-    name: 'Maria Santos',
-    email: 'maria@loja.com',
-    plan: 'Pro',
-    status: 'Ativo',
-    startDate: '2024-02-01',
-    password: 'temp456',
-    currency: 'USD',
-    monthlyValue: 500
-  }
-];
-
-const mockReports = [
-  {
-    id: 1,
-    clientName: 'João Silva',
-    month: 'Janeiro 2024',
-    status: 'Enviado',
-    date: '2024-01-31'
-  },
-  {
-    id: 2,
-    clientName: 'Maria Santos',
-    month: 'Janeiro 2024',
-    status: 'Pendente',
-    date: '2024-01-31'
-  }
-];
-
-const mockContracts = [
-  {
-    id: 1,
-    clientName: 'João Silva',
-    fileName: 'contrato_joao_silva.pdf',
-    uploadDate: '2024-01-15',
-    status: 'Ativo'
-  },
-  {
-    id: 2,
-    clientName: 'Maria Santos',
-    fileName: 'contrato_maria_santos.pdf',
-    uploadDate: '2024-02-01',
-    status: 'Ativo'
-  }
-];
-
-const mockFormMessages = [
-  {
-    id: 1,
-    name: 'Carlos Oliveira',
-    email: 'carlos@email.com',
-    phone: '+55 (11) 99999-9999',
-    message: 'Gostaria de saber mais sobre os serviços de Google Ads para minha empresa.',
-    date: '2024-01-20 14:30',
-    status: 'Novo'
-  },
-  {
-    id: 2,
-    name: 'Ana Costa',
-    email: 'ana@startup.com',
-    phone: '+55 (21) 88888-8888',
-    message: 'Preciso de ajuda com automação de vendas e landing pages.',
-    date: '2024-01-19 10:15',
-    status: 'Respondido'
-  },
-  {
-    id: 3,
-    name: 'Pedro Lima',
-    email: 'pedro@comercio.com',
-    phone: '+55 (31) 77777-7777',
-    message: 'Quero entender melhor como funcionam as campanhas no Facebook e Instagram.',
-    date: '2024-01-18 16:45',
-    status: 'Novo'
-  }
-];
-
 const AdminDashboard = () => {
   const navigate = useNavigate();
-  const [clients, setClients] = useState(mockClients);
-  const [reports, setReports] = useState(mockReports);
-  const [contracts, setContracts] = useState(mockContracts);
+  const [clients, setClients] = useState([]);
+  const [reports, setReports] = useState([]);
+  const [contracts, setContracts] = useState([]);
   const { messages, updateMessageStatus, deleteMessage: deleteFormMessage } = useFormMessages();
   const { toast } = useToast();
+  const [editingClient, setEditingClient] = useState(null);
   const [newClient, setNewClient] = useState({
     name: '',
     email: '',
@@ -145,7 +58,28 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     checkAdminAuth();
+    loadData();
   }, []);
+
+  const loadData = () => {
+    // Load clients from localStorage
+    const savedClients = localStorage.getItem('adminClients');
+    if (savedClients) {
+      setClients(JSON.parse(savedClients));
+    }
+
+    // Load reports from localStorage
+    const savedReports = localStorage.getItem('adminReports');
+    if (savedReports) {
+      setReports(JSON.parse(savedReports));
+    }
+
+    // Load contracts from localStorage
+    const savedContracts = localStorage.getItem('adminContracts');
+    if (savedContracts) {
+      setContracts(JSON.parse(savedContracts));
+    }
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('isAdminLoggedIn');
@@ -162,10 +96,14 @@ const AdminDashboard = () => {
     for (let i = 0; i < 8; i++) {
       password += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    setNewClient(prev => ({ ...prev, password }));
+    if (editingClient) {
+      setEditingClient(prev => ({ ...prev, password }));
+    } else {
+      setNewClient(prev => ({ ...prev, password }));
+    }
   };
 
-  const handleAddClient = (e: React.FormEvent) => {
+  const handleAddClient = (e) => {
     e.preventDefault();
     
     if (!newClient.name || !newClient.email || !newClient.plan || !newClient.password || !newClient.currency || !newClient.monthlyValue) {
@@ -197,7 +135,36 @@ const AdminDashboard = () => {
     });
   };
 
-  const handleDeleteClient = (clientId: number) => {
+  const handleEditClient = (client) => {
+    setEditingClient({ ...client });
+  };
+
+  const handleUpdateClient = (e) => {
+    e.preventDefault();
+    
+    if (!editingClient.name || !editingClient.email || !editingClient.plan || !editingClient.password || !editingClient.currency || !editingClient.monthlyValue) {
+      toast({
+        title: "Erro",
+        description: "Por favor, preencha todos os campos obrigatórios.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const updatedClients = clients.map(c => 
+      c.id === editingClient.id ? { ...editingClient, monthlyValue: parseFloat(editingClient.monthlyValue) } : c
+    );
+    setClients(updatedClients);
+    localStorage.setItem('adminClients', JSON.stringify(updatedClients));
+    setEditingClient(null);
+
+    toast({
+      title: "Cliente atualizado!",
+      description: `${editingClient.name} foi atualizado com sucesso.`,
+    });
+  };
+
+  const handleDeleteClient = (clientId) => {
     const clientToDelete = clients.find(c => c.id === clientId);
     if (clientToDelete) {
       const updatedClients = clients.filter(c => c.id !== clientId);
@@ -210,36 +177,66 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleFileUpload = (type: 'report' | 'contract', clientId: number) => {
+  const handleDeleteReport = (reportId) => {
+    const reportToDelete = reports.find(r => r.id === reportId);
+    if (reportToDelete) {
+      const updatedReports = reports.filter(r => r.id !== reportId);
+      setReports(updatedReports);
+      localStorage.setItem('adminReports', JSON.stringify(updatedReports));
+      toast({
+        title: "Relatório excluído",
+        description: `Relatório de ${reportToDelete.clientName} foi removido.`,
+      });
+    }
+  };
+
+  const handleDeleteContract = (contractId) => {
+    const contractToDelete = contracts.find(c => c.id === contractId);
+    if (contractToDelete) {
+      const updatedContracts = contracts.filter(c => c.id !== contractId);
+      setContracts(updatedContracts);
+      localStorage.setItem('adminContracts', JSON.stringify(updatedContracts));
+      toast({
+        title: "Contrato excluído",
+        description: `Contrato de ${contractToDelete.clientName} foi removido.`,
+      });
+    }
+  };
+
+  const handleFileUpload = (type, clientId) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.pdf,.doc,.docx';
     input.onchange = (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
+      const file = e.target.files?.[0];
       if (file) {
         const client = clients.find(c => c.id === clientId);
         if (type === 'report') {
           const newReport = {
-            id: reports.length + 1,
+            id: Date.now(),
             clientName: client?.name || '',
             month: new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }),
             status: 'Enviado',
             date: new Date().toISOString().split('T')[0]
           };
-          setReports([...reports, newReport]);
+          const updatedReports = [...reports, newReport];
+          setReports(updatedReports);
+          localStorage.setItem('adminReports', JSON.stringify(updatedReports));
           toast({
             title: "Relatório adicionado",
             description: `Relatório para ${client?.name} foi enviado.`,
           });
         } else {
           const newContract = {
-            id: contracts.length + 1,
+            id: Date.now(),
             clientName: client?.name || '',
             fileName: file.name,
             uploadDate: new Date().toISOString().split('T')[0],
             status: 'Ativo'
           };
-          setContracts([...contracts, newContract]);
+          const updatedContracts = [...contracts, newContract];
+          setContracts(updatedContracts);
+          localStorage.setItem('adminContracts', JSON.stringify(updatedContracts));
           toast({
             title: "Contrato adicionado",
             description: `Contrato para ${client?.name} foi enviado.`,
@@ -250,7 +247,7 @@ const AdminDashboard = () => {
     input.click();
   };
 
-  const handleUpdateMessageStatus = (messageId: number, status: 'Novo' | 'Respondido') => {
+  const handleUpdateMessageStatus = (messageId, status) => {
     updateMessageStatus(messageId, status);
     toast({
       title: "Status atualizado",
@@ -258,7 +255,7 @@ const AdminDashboard = () => {
     });
   };
 
-  const handleDeleteMessage = (messageId: number) => {
+  const handleDeleteMessage = (messageId) => {
     deleteFormMessage(messageId);
     toast({
       title: "Mensagem excluída",
@@ -327,95 +324,100 @@ const AdminDashboard = () => {
                     Adicionar Novo Cliente
                   </CardTitle>
                   <CardDescription>
-                    Cadastre um novo cliente e gere uma senha de acesso automaticamente. 
-                    <span className="block mt-1 text-blue-600 font-medium">
-                      Clientes terão acesso apenas ao painel de usuário comum com detalhes do contrato, plano e relatórios.
-                    </span>
+                    Cadastre um novo cliente e gere uma senha de acesso automaticamente.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4">
-                    <div>
-                      <Label htmlFor="clientName">Nome</Label>
-                      <Input
-                        id="clientName"
-                        value={newClient.name}
-                        onChange={(e) => setNewClient(prev => ({ ...prev, name: e.target.value }))}
-                        placeholder="Nome do cliente"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="clientEmail">Email</Label>
-                      <Input
-                        id="clientEmail"
-                        type="email"
-                        value={newClient.email}
-                        onChange={(e) => setNewClient(prev => ({ ...prev, email: e.target.value }))}
-                        placeholder="email@cliente.com"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="clientPlan">Plano</Label>
-                      <select
-                        id="clientPlan"
-                        value={newClient.plan}
-                        onChange={(e) => setNewClient(prev => ({ ...prev, plan: e.target.value }))}
-                        className="w-full p-2 border border-gray-300 rounded-md bg-black text-idOrange"
-                      >
-                        <option value="Start">Start</option>
-                        <option value="Pro">Pro</option>
-                      </select>
-                    </div>
-                    <div>
-                      <Label htmlFor="clientCurrency">Moeda</Label>
-                      <select
-                        id="clientCurrency"
-                        value={newClient.currency}
-                        onChange={(e) => setNewClient(prev => ({ ...prev, currency: e.target.value }))}
-                        className="w-full p-2 border border-gray-300 rounded-md bg-black text-idOrange"
-                      >
-                        <option value="BRL">BRL (R$)</option>
-                        <option value="USD">USD ($)</option>
-                        <option value="EUR">EUR (€)</option>
-                        <option value="GBP">GBP (£)</option>
-                      </select>
-                    </div>
-                    <div>
-                      <Label htmlFor="clientValue">Valor Mensal</Label>
-                      <Input
-                        id="clientValue"
-                        type="number"
-                        value={newClient.monthlyValue}
-                        onChange={(e) => setNewClient(prev => ({ ...prev, monthlyValue: e.target.value }))}
-                        placeholder="1500"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="clientPassword">Senha</Label>
-                      <div className="flex gap-2">
+                  <form onSubmit={handleAddClient}>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-4">
+                      <div>
+                        <Label htmlFor="clientName">Nome</Label>
                         <Input
-                          id="clientPassword"
-                          value={newClient.password}
-                          onChange={(e) => setNewClient(prev => ({ ...prev, password: e.target.value }))}
-                          placeholder="Senha"
+                          id="clientName"
+                          value={newClient.name}
+                          onChange={(e) => setNewClient(prev => ({ ...prev, name: e.target.value }))}
+                          placeholder="Nome do cliente"
+                          required
                         />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          onClick={generatePassword}
+                      </div>
+                      <div>
+                        <Label htmlFor="clientEmail">Email</Label>
+                        <Input
+                          id="clientEmail"
+                          type="email"
+                          value={newClient.email}
+                          onChange={(e) => setNewClient(prev => ({ ...prev, email: e.target.value }))}
+                          placeholder="email@cliente.com"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="clientPlan">Plano</Label>
+                        <select
+                          id="clientPlan"
+                          value={newClient.plan}
+                          onChange={(e) => setNewClient(prev => ({ ...prev, plan: e.target.value }))}
+                          className="w-full p-2 border border-gray-300 rounded-md bg-black text-idOrange"
+                          required
                         >
-                          <Key className="w-4 h-4" />
+                          <option value="Start">Start</option>
+                          <option value="Pro">Pro</option>
+                        </select>
+                      </div>
+                      <div>
+                        <Label htmlFor="clientCurrency">Moeda</Label>
+                        <select
+                          id="clientCurrency"
+                          value={newClient.currency}
+                          onChange={(e) => setNewClient(prev => ({ ...prev, currency: e.target.value }))}
+                          className="w-full p-2 border border-gray-300 rounded-md bg-black text-idOrange"
+                          required
+                        >
+                          <option value="BRL">BRL (R$)</option>
+                          <option value="USD">USD ($)</option>
+                          <option value="EUR">EUR (€)</option>
+                          <option value="GBP">GBP (£)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <Label htmlFor="clientValue">Valor Mensal</Label>
+                        <Input
+                          id="clientValue"
+                          type="number"
+                          value={newClient.monthlyValue}
+                          onChange={(e) => setNewClient(prev => ({ ...prev, monthlyValue: e.target.value }))}
+                          placeholder="1500"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="clientPassword">Senha</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            id="clientPassword"
+                            value={newClient.password}
+                            onChange={(e) => setNewClient(prev => ({ ...prev, password: e.target.value }))}
+                            placeholder="Senha"
+                            required
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={generatePassword}
+                          >
+                            <Key className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      <div className="flex items-end">
+                        <Button type="submit" className="w-full">
+                          <Plus className="w-4 h-4 mr-2" />
+                          Adicionar
                         </Button>
                       </div>
                     </div>
-                    <div className="flex items-end">
-                      <Button onClick={handleAddClient} className="w-full">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Adicionar
-                      </Button>
-                    </div>
-                  </div>
+                  </form>
                 </CardContent>
               </Card>
 
@@ -427,50 +429,64 @@ const AdminDashboard = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="overflow-x-auto">
-                    <table className="w-full border-collapse">
-                      <thead>
-                        <tr className="border-b">
-                          <th className="text-left p-2">Nome</th>
-                          <th className="text-left p-2">Email</th>
-                          <th className="text-left p-2">Plano</th>
-                          <th className="text-left p-2">Valor Mensal</th>
-                          <th className="text-left p-2">Status</th>
-                          <th className="text-left p-2">Data Início</th>
-                          <th className="text-left p-2">Senha</th>
-                          <th className="text-left p-2">Ações</th>
-                        </tr>
-                      </thead>
-                      <tbody>
+                  {clients.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <Users className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                      <p>Nenhum cliente cadastrado ainda.</p>
+                      <p className="text-sm">Adicione seu primeiro cliente usando o formulário acima.</p>
+                    </div>
+                  ) : (
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Nome</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Plano</TableHead>
+                          <TableHead>Valor Mensal</TableHead>
+                          <TableHead>Status</TableHead>
+                          <TableHead>Data Início</TableHead>
+                          <TableHead>Senha</TableHead>
+                          <TableHead>Ações</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
                         {clients.map((client) => (
-                          <tr key={client.id} className="border-b">
-                            <td className="p-2">{client.name}</td>
-                            <td className="p-2">{client.email}</td>
-                            <td className="p-2">
+                          <TableRow key={client.id}>
+                            <TableCell>{client.name}</TableCell>
+                            <TableCell>{client.email}</TableCell>
+                            <TableCell>
                               <Badge variant={client.plan === 'Pro' ? 'default' : 'secondary'}>
                                 {client.plan}
                               </Badge>
-                            </td>
-                            <td className="p-2">
+                            </TableCell>
+                            <TableCell>
                               {client.currency === 'BRL' && 'R$ '}
                               {client.currency === 'USD' && '$ '}
                               {client.currency === 'EUR' && '€ '}
                               {client.currency === 'GBP' && '£ '}
                               {client.monthlyValue?.toLocaleString()}
-                            </td>
-                            <td className="p-2">
+                            </TableCell>
+                            <TableCell>
                               <Badge variant={client.status === 'Ativo' ? 'default' : 'destructive'}>
                                 {client.status}
                               </Badge>
-                            </td>
-                            <td className="p-2">{new Date(client.startDate).toLocaleDateString('pt-BR')}</td>
-                            <td className="p-2">
-                              <code className="bg-gray-100 px-2 py-1 rounded text-sm">
+                            </TableCell>
+                            <TableCell>{new Date(client.startDate).toLocaleDateString('pt-BR')}</TableCell>
+                            <TableCell>
+                              <code className="bg-gray-100 px-2 py-1 rounded text-sm text-black">
                                 {client.password}
                               </code>
-                            </td>
-                            <td className="p-2">
+                            </TableCell>
+                            <TableCell>
                               <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleEditClient(client)}
+                                >
+                                  <Edit className="w-4 h-4 mr-1" />
+                                  Editar
+                                </Button>
                                 <Button
                                   size="sm"
                                   variant="outline"
@@ -487,22 +503,138 @@ const AdminDashboard = () => {
                                   <Upload className="w-4 h-4 mr-1" />
                                   Contrato
                                 </Button>
-                                <Button
-                                  size="sm"
-                                  variant="destructive"
-                                  onClick={() => handleDeleteClient(client.id)}
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </Button>
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button size="sm" variant="destructive">
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        Tem certeza que deseja excluir o cliente {client.name}? Esta ação não pode ser desfeita.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                      <AlertDialogAction onClick={() => handleDeleteClient(client.id)}>
+                                        Excluir
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
                               </div>
-                            </td>
-                          </tr>
+                            </TableCell>
+                          </TableRow>
                         ))}
-                      </tbody>
-                    </table>
-                  </div>
+                      </TableBody>
+                    </Table>
+                  )}
                 </CardContent>
               </Card>
+
+              {/* Edit Client Dialog */}
+              <Dialog open={!!editingClient} onOpenChange={() => setEditingClient(null)}>
+                <DialogContent className="max-w-2xl">
+                  <DialogHeader>
+                    <DialogTitle>Editar Cliente</DialogTitle>
+                    <DialogDescription>
+                      Atualize as informações do cliente.
+                    </DialogDescription>
+                  </DialogHeader>
+                  {editingClient && (
+                    <form onSubmit={handleUpdateClient}>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="editName">Nome</Label>
+                          <Input
+                            id="editName"
+                            value={editingClient.name}
+                            onChange={(e) => setEditingClient(prev => ({ ...prev, name: e.target.value }))}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="editEmail">Email</Label>
+                          <Input
+                            id="editEmail"
+                            type="email"
+                            value={editingClient.email}
+                            onChange={(e) => setEditingClient(prev => ({ ...prev, email: e.target.value }))}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="editPlan">Plano</Label>
+                          <select
+                            id="editPlan"
+                            value={editingClient.plan}
+                            onChange={(e) => setEditingClient(prev => ({ ...prev, plan: e.target.value }))}
+                            className="w-full p-2 border border-gray-300 rounded-md"
+                            required
+                          >
+                            <option value="Start">Start</option>
+                            <option value="Pro">Pro</option>
+                          </select>
+                        </div>
+                        <div>
+                          <Label htmlFor="editCurrency">Moeda</Label>
+                          <select
+                            id="editCurrency"
+                            value={editingClient.currency}
+                            onChange={(e) => setEditingClient(prev => ({ ...prev, currency: e.target.value }))}
+                            className="w-full p-2 border border-gray-300 rounded-md"
+                            required
+                          >
+                            <option value="BRL">BRL (R$)</option>
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="GBP">GBP (£)</option>
+                          </select>
+                        </div>
+                        <div>
+                          <Label htmlFor="editValue">Valor Mensal</Label>
+                          <Input
+                            id="editValue"
+                            type="number"
+                            value={editingClient.monthlyValue}
+                            onChange={(e) => setEditingClient(prev => ({ ...prev, monthlyValue: e.target.value }))}
+                            required
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="editPassword">Senha</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              id="editPassword"
+                              value={editingClient.password}
+                              onChange={(e) => setEditingClient(prev => ({ ...prev, password: e.target.value }))}
+                              required
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              onClick={generatePassword}
+                            >
+                              <Key className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex justify-end gap-2 mt-4">
+                        <Button type="button" variant="outline" onClick={() => setEditingClient(null)}>
+                          Cancelar
+                        </Button>
+                        <Button type="submit">
+                          Salvar Alterações
+                        </Button>
+                      </div>
+                    </form>
+                  )}
+                </DialogContent>
+              </Dialog>
             </div>
           </TabsContent>
 
@@ -515,39 +647,68 @@ const AdminDashboard = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left p-2">Cliente</th>
-                        <th className="text-left p-2">Período</th>
-                        <th className="text-left p-2">Status</th>
-                        <th className="text-left p-2">Data</th>
-                        <th className="text-left p-2">Ações</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+                {reports.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <FileText className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                    <p>Nenhum relatório enviado ainda.</p>
+                    <p className="text-sm">Os relatórios aparecerão aqui quando forem enviados para os clientes.</p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Cliente</TableHead>
+                        <TableHead>Período</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Data</TableHead>
+                        <TableHead>Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
                       {reports.map((report) => (
-                        <tr key={report.id} className="border-b">
-                          <td className="p-2">{report.clientName}</td>
-                          <td className="p-2">{report.month}</td>
-                          <td className="p-2">
+                        <TableRow key={report.id}>
+                          <TableCell>{report.clientName}</TableCell>
+                          <TableCell>{report.month}</TableCell>
+                          <TableCell>
                             <Badge variant={report.status === 'Enviado' ? 'default' : 'secondary'}>
                               {report.status}
                             </Badge>
-                          </td>
-                          <td className="p-2">{new Date(report.date).toLocaleDateString('pt-BR')}</td>
-                          <td className="p-2">
-                            <Button size="sm" variant="outline">
-                              <Eye className="w-4 h-4 mr-1" />
-                              Visualizar
-                            </Button>
-                          </td>
-                        </tr>
+                          </TableCell>
+                          <TableCell>{new Date(report.date).toLocaleDateString('pt-BR')}</TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button size="sm" variant="outline">
+                                <Eye className="w-4 h-4 mr-1" />
+                                Visualizar
+                              </Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button size="sm" variant="destructive">
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Tem certeza que deseja excluir este relatório? Esta ação não pode ser desfeita.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleDeleteReport(report.id)}>
+                                      Excluir
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </TableCell>
+                        </TableRow>
                       ))}
-                    </tbody>
-                  </table>
-                </div>
+                    </TableBody>
+                  </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -561,39 +722,68 @@ const AdminDashboard = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full border-collapse">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left p-2">Cliente</th>
-                        <th className="text-left p-2">Arquivo</th>
-                        <th className="text-left p-2">Data Upload</th>
-                        <th className="text-left p-2">Status</th>
-                        <th className="text-left p-2">Ações</th>
-                      </tr>
-                    </thead>
-                    <tbody>
+                {contracts.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <FileText className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                    <p>Nenhum contrato enviado ainda.</p>
+                    <p className="text-sm">Os contratos aparecerão aqui quando forem enviados para os clientes.</p>
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Cliente</TableHead>
+                        <TableHead>Arquivo</TableHead>
+                        <TableHead>Data Upload</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Ações</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
                       {contracts.map((contract) => (
-                        <tr key={contract.id} className="border-b">
-                          <td className="p-2">{contract.clientName}</td>
-                          <td className="p-2">{contract.fileName}</td>
-                          <td className="p-2">{new Date(contract.uploadDate).toLocaleDateString('pt-BR')}</td>
-                          <td className="p-2">
+                        <TableRow key={contract.id}>
+                          <TableCell>{contract.clientName}</TableCell>
+                          <TableCell>{contract.fileName}</TableCell>
+                          <TableCell>{new Date(contract.uploadDate).toLocaleDateString('pt-BR')}</TableCell>
+                          <TableCell>
                             <Badge variant="default">
                               {contract.status}
                             </Badge>
-                          </td>
-                          <td className="p-2">
-                            <Button size="sm" variant="outline">
-                              <Eye className="w-4 h-4 mr-1" />
-                              Visualizar
-                            </Button>
-                          </td>
-                        </tr>
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex gap-2">
+                              <Button size="sm" variant="outline">
+                                <Eye className="w-4 h-4 mr-1" />
+                                Visualizar
+                              </Button>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <Button size="sm" variant="destructive">
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      Tem certeza que deseja excluir este contrato? Esta ação não pode ser desfeita.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handleDeleteContract(contract.id)}>
+                                      Excluir
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
+                            </div>
+                          </TableCell>
+                        </TableRow>
                       ))}
-                    </tbody>
-                  </table>
-                </div>
+                    </TableBody>
+                  </Table>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
@@ -604,9 +794,6 @@ const AdminDashboard = () => {
                 <CardTitle>Mensagens do Formulário</CardTitle>
                 <CardDescription>
                   Mensagens recebidas através do formulário de contato do site.
-                  <span className="block mt-1 text-green-600 font-medium">
-                    ✅ Sistema integrado - Todas as mensagens do site chegam automaticamente aqui!
-                  </span>
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -623,7 +810,7 @@ const AdminDashboard = () => {
                         <div className="flex justify-between items-start mb-3">
                           <div className="flex items-center gap-3">
                             <div>
-                              <h3 className="font-semibold text-lg">{message.name}</h3>
+                              <h3 className="font-semibold text-lg text-black">{message.name}</h3>
                               <p className="text-sm text-gray-600">{message.email} • {message.phone}</p>
                             </div>
                           </div>
@@ -648,14 +835,28 @@ const AdminDashboard = () => {
                               Marcar como Respondido
                             </Button>
                           )}
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleDeleteMessage(message.id)}
-                          >
-                            <Trash2 className="w-4 h-4 mr-1" />
-                            Excluir
-                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button size="sm" variant="outline">
+                                <Trash2 className="w-4 h-4 mr-1" />
+                                Excluir
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Tem certeza que deseja excluir esta mensagem? Esta ação não pode ser desfeita.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDeleteMessage(message.id)}>
+                                  Excluir
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </div>
                     ))
