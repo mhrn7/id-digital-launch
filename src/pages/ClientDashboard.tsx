@@ -24,18 +24,18 @@ interface Report {
   file_url: string;
 }
 
-// Professional plan details with translations
+// Professional plan details with translations - Updated services
 const planDetails = {
   PT: {
     Start: [
       'Landing Page Profissional',
-      'Gestão de Tráfego Google Ads + Google Merchant Center',
+      'Gestão de Tráfego Google Ads + Google My Business',
       'Relatórios de Performance Quinzenais',
       'Suporte Especializado via WhatsApp (Segunda a Sábado - Horário Comercial)'
     ],
     Pro: [
       'Landing Page Profissional',
-      'Gestão de Tráfego Google Ads + Google Merchant Center',
+      'Gestão de Tráfego Google Ads + Google My Business',
       'Gestão de Tráfego Meta Ads + Plataformas Complementares',
       'Planejamento Estratégico de Marketing Digital',
       'Relatórios de Performance Semanais',
@@ -45,13 +45,13 @@ const planDetails = {
   EN: {
     Start: [
       'Professional Landing Page',
-      'Google Ads + Google Merchant Center Traffic Management',
+      'Google Ads + Google My Business Traffic Management',
       'Bi-weekly Performance Reports',
       'Specialized WhatsApp Support (Monday to Saturday - Business Hours)'
     ],
     Pro: [
       'Professional Landing Page',
-      'Google Ads + Google Merchant Center Traffic Management',
+      'Google Ads + Google My Business Traffic Management',
       'Meta Ads + Complementary Platforms Traffic Management',
       'Digital Marketing Strategic Planning',
       'Weekly Performance Reports',
@@ -61,13 +61,13 @@ const planDetails = {
   ES: {
     Start: [
       'Landing Page Profesional',
-      'Gestión de Tráfico Google Ads + Google Merchant Center',
+      'Gestión de Tráfico Google Ads + Google My Business',
       'Informes de Rendimiento Quincenales',
       'Soporte Especializado vía WhatsApp (Lunes a Sábado - Horario Comercial)'
     ],
     Pro: [
       'Landing Page Profesional',
-      'Gestión de Tráfico Google Ads + Google Merchant Center',
+      'Gestión de Tráfico Google Ads + Google My Business',
       'Gestión de Tráfico Meta Ads + Plataformas Complementarias',
       'Planificación Estratégica de Marketing Digital',
       'Informes de Rendimiento Semanales',
@@ -170,6 +170,11 @@ const ClientDashboard = () => {
     fetchClientData();
   }, []);
 
+  useEffect(() => {
+    // Re-fetch client data when language changes to update plan details
+    fetchClientData();
+  }, [language]);
+
   const checkClient = async () => {
     try {
       // Check if client is logged in via localStorage
@@ -215,7 +220,7 @@ const ClientDashboard = () => {
           name: clientData.plan || 'Start',
           price: clientData.monthlyValue || (clientData.plan === 'Pro' ? 2500 : 1500),
           currency: clientData.currency || 'BRL',
-          features: planDetails[language][clientData.plan] || planDetails[language].Start,
+          features: planDetails[language][clientData.plan || 'Start'] || planDetails[language].Start,
           status: 'active'
         };
 

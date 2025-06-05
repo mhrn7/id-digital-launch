@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -42,6 +43,58 @@ interface Report {
   file_url: string;
 }
 
+// Professional plan details with translations
+const planDetails = {
+  PT: {
+    Start: [
+      'Landing Page Profissional',
+      'Gestão de Tráfego Google Ads + Google My Business',
+      'Relatórios de Performance Quinzenais',
+      'Suporte Especializado via WhatsApp (Segunda a Sábado - Horário Comercial)'
+    ],
+    Pro: [
+      'Landing Page Profissional',
+      'Gestão de Tráfego Google Ads + Google My Business',
+      'Gestão de Tráfego Meta Ads + Plataformas Complementares',
+      'Planejamento Estratégico de Marketing Digital',
+      'Relatórios de Performance Semanais',
+      'Suporte Premium 24/7'
+    ]
+  },
+  EN: {
+    Start: [
+      'Professional Landing Page',
+      'Google Ads + Google My Business Traffic Management',
+      'Bi-weekly Performance Reports',
+      'Specialized WhatsApp Support (Monday to Saturday - Business Hours)'
+    ],
+    Pro: [
+      'Professional Landing Page',
+      'Google Ads + Google My Business Traffic Management',
+      'Meta Ads + Complementary Platforms Traffic Management',
+      'Digital Marketing Strategic Planning',
+      'Weekly Performance Reports',
+      'Premium 24/7 Support'
+    ]
+  },
+  ES: {
+    Start: [
+      'Landing Page Profesional',
+      'Gestión de Tráfico Google Ads + Google My Business',
+      'Informes de Rendimiento Quincenales',
+      'Soporte Especializado vía WhatsApp (Lunes a Sábado - Horario Comercial)'
+    ],
+    Pro: [
+      'Landing Page Profesional',
+      'Gestión de Tráfico Google Ads + Google My Business',
+      'Gestión de Tráfico Meta Ads + Plataformas Complementarias',
+      'Planificación Estratégica de Marketing Digital',
+      'Informes de Rendimiento Semanales',
+      'Soporte Premium 24/7'
+    ]
+  }
+};
+
 const translations = {
   PT: {
     adminPanel: 'Painel Administrativo',
@@ -67,6 +120,8 @@ const translations = {
     confirmDeleteMessage: 'Tem certeza que deseja excluir este cliente?',
     yes: 'Sim',
     no: 'Não',
+    planDetails: 'Detalhes do Plano',
+    includedServices: 'Serviços Inclusos',
   },
   EN: {
     adminPanel: 'Admin Panel',
@@ -92,6 +147,8 @@ const translations = {
     confirmDeleteMessage: 'Are you sure you want to delete this client?',
     yes: 'Yes',
     no: 'No',
+    planDetails: 'Plan Details',
+    includedServices: 'Included Services',
   },
   ES: {
     adminPanel: 'Panel Administrativo',
@@ -117,6 +174,8 @@ const translations = {
     confirmDeleteMessage: '¿Está seguro de que desea eliminar este cliente?',
     yes: 'Sí',
     no: 'No',
+    planDetails: 'Detalles del Plan',
+    includedServices: 'Servicios Incluidos',
   }
 };
 
@@ -326,7 +385,22 @@ const AdminDashboard = () => {
                     <tr key={client.id} className="border-b border-gray-700 hover:bg-idDarkBlack">
                       <td className="px-4 py-2">{client.name}</td>
                       <td className="px-4 py-2">{client.email}</td>
-                      <td className="px-4 py-2">{client.plan}</td>
+                      <td className="px-4 py-2">
+                        <div>
+                          <div className="font-medium">{client.plan}</div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            <div className="text-sm font-medium mb-2">{t.includedServices}:</div>
+                            <ul className="space-y-1">
+                              {planDetails[language][client.plan]?.map((service, index) => (
+                                <li key={index} className="flex items-start text-gray-300">
+                                  <div className="w-1 h-1 bg-idOrange rounded-full mr-2 mt-2 flex-shrink-0"></div>
+                                  <span className="text-xs leading-relaxed">{service}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+                      </td>
                       <td className="px-4 py-2">{client.monthlyValue}</td>
                       <td className="px-4 py-2">{client.currency}</td>
                       <td className="px-4 py-2">{client.startDate}</td>
@@ -393,8 +467,30 @@ const AdminDashboard = () => {
                   <SelectValue placeholder={t.plan} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Start">Start</SelectItem>
-                  <SelectItem value="Pro">Pro</SelectItem>
+                  <SelectItem value="Start">
+                    <div>
+                      <div className="font-medium">Start</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {planDetails[language].Start?.map((service, index) => (
+                          <div key={index} className="flex items-start">
+                            <span className="text-xs leading-relaxed">• {service}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="Pro">
+                    <div>
+                      <div className="font-medium">Pro</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        {planDetails[language].Pro?.map((service, index) => (
+                          <div key={index} className="flex items-start">
+                            <span className="text-xs leading-relaxed">• {service}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
