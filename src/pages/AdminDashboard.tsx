@@ -107,7 +107,7 @@ const translations = {
     plan: 'Plan',
     monthlyValue: 'Valor Mensual',
     currency: 'Moneda',
-    startDate: 'Fecha de Inicio',
+    startDate: 'Fecha de Início',
     actions: 'Acciones',
     save: 'Guardar',
     cancel: 'Cancelar',
@@ -296,7 +296,8 @@ const AdminDashboard = () => {
           <TabsContent value="clients">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold">{t.clients}</h2>
-              <Button onClick={openAddClientDialog} leftIcon={<Plus />}>
+              <Button onClick={openAddClientDialog}>
+                <Plus className="w-4 h-4 mr-2" />
                 {t.addClient}
               </Button>
             </div>
