@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useFormMessages } from '@/hooks/useFormMessages';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Users, MessageSquare, FileText, Settings, LogOut, Trash2, Eye } from 'lucide-react';
+import { Plus, Users, MessageSquare, FileText, Settings, LogOut, Trash2, Eye, Calendar, UserPlus, Key, Upload } from 'lucide-react';
 
 // Mock data for demonstration
 const mockClients = [
@@ -148,15 +149,15 @@ const AdminDashboard = () => {
     const client = {
       ...newClient,
       id: Date.now(),
-      createdAt: new Date().toLocaleDateString('pt-BR'),
-      status: 'active' as const
+      startDate: new Date().toISOString().split('T')[0],
+      status: 'Ativo'
     };
 
     const updatedClients = [...clients, client];
     setClients(updatedClients);
     localStorage.setItem('adminClients', JSON.stringify(updatedClients));
 
-    setNewClient({ name: '', email: '', plan: '', password: '' });
+    setNewClient({ name: '', email: '', plan: 'Start', password: '' });
     setIsAddingClient(false);
 
     toast({
@@ -168,7 +169,9 @@ const AdminDashboard = () => {
   const handleDeleteClient = (clientId: number) => {
     const clientToDelete = clients.find(c => c.id === clientId);
     if (clientToDelete) {
-      setClients(clients.filter(c => c.id !== clientId));
+      const updatedClients = clients.filter(c => c.id !== clientId);
+      setClients(updatedClients);
+      localStorage.setItem('adminClients', JSON.stringify(updatedClients));
       toast({
         title: "Cliente excluído",
         description: `${clientToDelete.name} foi removido do sistema.`,
@@ -322,7 +325,7 @@ const AdminDashboard = () => {
                         id="clientPlan"
                         value={newClient.plan}
                         onChange={(e) => setNewClient(prev => ({ ...prev, plan: e.target.value }))}
-                        className="w-full p-2 border border-gray-300 rounded-md"
+                        className="w-full p-2 border border-gray-300 rounded-md bg-black text-idOrange"
                       >
                         <option value="Start">Start</option>
                         <option value="Premium">Premium</option>
