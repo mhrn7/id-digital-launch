@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -208,7 +207,8 @@ const AdminDashboard = () => {
     input.type = 'file';
     input.accept = '.pdf,.doc,.docx';
     input.onchange = (e) => {
-      const file = e.target.files?.[0];
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
       if (file) {
         const client = clients.find(c => c.id === clientId);
         if (type === 'report') {
