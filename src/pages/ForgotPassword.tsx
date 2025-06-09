@@ -1,18 +1,20 @@
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { supabase } from '@/lib/supabase';
+import { useToast } from '@/hooks/use-toast';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,15 +23,37 @@ const ForgotPassword = () => {
     setMessage('');
 
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/cliente/reset-password`,
+      // Criar mensagem de recuperação de senha
+      const passwordRecoveryMessage = {
+        id: Date.now(),
+        name: 'Recuperação de Senha',
+        email: email,
+        message: `Solicitação de recuperação de senha para o email: ${email}`,
+        date: new Date().toLocaleString('pt-BR'),
+        status: 'Novo' as const,
+        type: 'password-recovery'
+      };
+
+      // Adicionar às mensagens existentes
+      const existingMessages = localStorage.getItem('formMessages');
+      const messages = existingMessages ? JSON.parse(existingMessages) : [];
+      messages.unshift(passwordRecoveryMessage);
+      localStorage.setItem('formMessages', JSON.stringify(messages));
+
+      toast({
+        title: "Solicitação enviada!",
+        description: "Sua solicitação foi enviada para o administrador.",
       });
 
-      if (error) throw error;
-
-      setMessage('Verifique seu email para redefinir sua senha.');
+      setMessage('Sua solicitação de recuperação de senha foi enviada para o administrador.');
+      
+      // Redirecionar após 3 segundos
+      setTimeout(() => {
+        navigate('/cliente/login');
+      }, 3000);
+      
     } catch (error: any) {
-      setError(error.message);
+      setError('Erro ao enviar solicitação. Tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -41,7 +65,7 @@ const ForgotPassword = () => {
         <CardHeader className="text-center">
           <CardTitle className="text-2xl text-white">Recuperar Senha</CardTitle>
           <CardDescription className="text-gray-400">
-            Digite seu email para receber o link de recuperação
+            Digite seu email para solicitar recuperação de senha
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -66,16 +90,17 @@ const ForgotPassword = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="bg-gray-800 border-gray-700 text-white"
+                placeholder="seu@email.com"
                 required
               />
             </div>
             
             <Button 
               type="submit" 
-              className="w-full btn-primary"
+              className="w-full bg-idOrange hover:bg-idOrange/90 text-black font-semibold"
               disabled={loading}
             >
-              {loading ? 'Enviando...' : 'Enviar Link de Recuperação'}
+              {loading ? 'Enviando...' : 'Enviar Solicitação'}
             </Button>
           </form>
           

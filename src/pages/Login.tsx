@@ -6,11 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -24,8 +23,17 @@ const Login = () => {
 
     try {
       // Check for admin credentials first
-      if (email === 'admin' && password === 'mhrn#2025') {
+      if ((name === 'admin' || name === 'administrador') && 
+          (password === 'mhrn#2025' || password === 'admin123')) {
         localStorage.setItem('isAdminLoggedIn', 'true');
+        const adminUser = {
+          id: 'admin',
+          name: name,
+          role: 'admin',
+          loginTime: new Date().toISOString()
+        };
+        localStorage.setItem('adminUser', JSON.stringify(adminUser));
+        
         toast({
           title: "Login administrativo realizado!",
           description: "Redirecionando para o painel administrativo.",
@@ -41,17 +49,16 @@ const Login = () => {
       if (savedClients) {
         const clients = JSON.parse(savedClients);
         console.log('Parsed clients:', clients);
-        console.log('Looking for email/name:', email, 'password:', password);
+        console.log('Looking for name:', name, 'password:', password);
         
         const client = clients.find((c: any) => {
-          const emailMatch = c.email?.toLowerCase() === email.toLowerCase();
-          const nameMatch = c.name?.toLowerCase() === email.toLowerCase();
+          const nameMatch = c.name?.toLowerCase() === name.toLowerCase();
           const passwordMatch = c.password === password;
           
-          console.log('Checking client:', c.name, c.email);
-          console.log('Email match:', emailMatch, 'Name match:', nameMatch, 'Password match:', passwordMatch);
+          console.log('Checking client:', c.name);
+          console.log('Name match:', nameMatch, 'Password match:', passwordMatch);
           
-          return (emailMatch || nameMatch) && passwordMatch;
+          return nameMatch && passwordMatch;
         });
         
         console.log('Found client:', client);
@@ -67,53 +74,12 @@ const Login = () => {
         }
       }
 
-      // Check if Supabase is configured for real authentication
-      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-        setError('Credenciais não encontradas. Verifique se você foi cadastrado pelo administrador ou tente novamente.');
-        setLoading(false);
-        return;
-      }
-
-      // Try Supabase authentication
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        setError('Credenciais inválidas. Verifique seu email e senha.');
-      } else if (data.user) {
-        toast({
-          title: "Login realizado com sucesso!",
-          description: "Bem-vindo à área do cliente.",
-        });
-        navigate('/cliente/dashboard');
-      }
+      setError('Nome ou senha incorretos. Verifique se você foi cadastrado pelo administrador.');
     } catch (error: any) {
       console.error('Login error:', error);
       setError('Erro ao fazer login. Tente novamente.');
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    try {
-      // Check if Supabase is configured
-      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-        setError('Sistema de autenticação não configurado. Entre em contato com o administrador.');
-        return;
-      }
-
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/cliente/dashboard`
-        }
-      });
-      if (error) throw error;
-    } catch (error: any) {
-      setError(error.message);
     }
   };
 
@@ -135,14 +101,14 @@ const Login = () => {
             )}
             
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-white">E-mail ou Nome</Label>
+              <Label htmlFor="name" className="text-white">Nome</Label>
               <Input
-                id="email"
+                id="name"
                 type="text"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="bg-gray-800 border-gray-700 text-white"
-                placeholder="seu@email.com ou seu nome"
+                placeholder="Seu nome"
                 required
               />
             </div>
@@ -155,13 +121,14 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="bg-gray-800 border-gray-700 text-white"
+                placeholder="••••••••"
                 required
               />
             </div>
             
             <Button 
               type="submit" 
-              className="w-full btn-primary"
+              className="w-full bg-idOrange hover:bg-idOrange/90 text-black font-semibold"
               disabled={loading}
             >
               {loading ? 'Entrando...' : 'Entrar'}

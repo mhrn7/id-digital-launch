@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash, Mail } from 'lucide-react';
+import { Plus, Pencil, Trash, Mail, LogOut } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/components/LanguageProvider';
 import ClientForm from '@/components/ClientForm';
@@ -21,11 +22,14 @@ interface Client {
 }
 
 interface Message {
-  id: string;
+  id: number;
   name: string;
   email: string;
-  phone: string;
+  phone?: string;
   message: string;
+  date: string;
+  status: 'Novo' | 'Respondido';
+  type?: 'contact' | 'password-recovery';
 }
 
 const AdminDashboard = () => {
@@ -35,7 +39,6 @@ const AdminDashboard = () => {
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
-  const [activeTab, setActiveTab] = useState('clients');
   const navigate = useNavigate();
   const { toast } = useToast();
   const { language } = useLanguage();
@@ -64,8 +67,6 @@ const AdminDashboard = () => {
     PT: {
       adminPanel: 'Painel Administrativo',
       welcome: 'Bem-vindo, Administrador!',
-      manageClients: 'Gerenciar Clientes',
-      manageMessages: 'Gerenciar Mensagens',
       addClient: 'Adicionar Cliente',
       editClient: 'Editar',
       deleteClient: 'Excluir',
@@ -77,7 +78,7 @@ const AdminDashboard = () => {
       clientPhone: 'Telefone',
       clientPlan: 'Plano',
       clientCurrency: 'Moeda',
-      clientMonthlyValue: 'Valor Mensal',
+      clientValue: 'Valor Mensal',
       actions: 'Ações',
       messageName: 'Nome',
       messageEmail: 'Email',
@@ -86,21 +87,16 @@ const AdminDashboard = () => {
       logout: 'Sair',
       logoutSuccess: 'Logout realizado com sucesso!',
       confirmDeleteClient: 'Tem certeza que deseja excluir este cliente?',
-      deleteConfirmation: 'Excluir Cliente',
-      cancel: 'Cancelar',
-      delete: 'Excluir',
       clientDeleted: 'Cliente excluído com sucesso.',
       clientUpdated: 'Cliente atualizado com sucesso.',
       clientAdded: 'Cliente adicionado com sucesso.',
-      close: 'Fechar',
       clients: 'Clientes',
-      messages: 'Mensagens'
+      messages: 'Mensagens',
+      passwordRecovery: 'Recuperação de Senha'
     },
     EN: {
       adminPanel: 'Admin Panel',
       welcome: 'Welcome, Administrator!',
-      manageClients: 'Manage Clients',
-      manageMessages: 'Manage Messages',
       addClient: 'Add Client',
       editClient: 'Edit',
       deleteClient: 'Delete',
@@ -112,7 +108,7 @@ const AdminDashboard = () => {
       clientPhone: 'Phone',
       clientPlan: 'Plan',
       clientCurrency: 'Currency',
-      clientMonthlyValue: 'Monthly Value',
+      clientValue: 'Monthly Value',
       actions: 'Actions',
       messageName: 'Name',
       messageEmail: 'Email',
@@ -121,21 +117,16 @@ const AdminDashboard = () => {
       logout: 'Logout',
       logoutSuccess: 'Logout successful!',
       confirmDeleteClient: 'Are you sure you want to delete this client?',
-      deleteConfirmation: 'Delete Client',
-      cancel: 'Cancel',
-      delete: 'Delete',
       clientDeleted: 'Client deleted successfully.',
       clientUpdated: 'Client updated successfully.',
       clientAdded: 'Client added successfully.',
-      close: 'Close',
       clients: 'Clients',
-      messages: 'Messages'
+      messages: 'Messages',
+      passwordRecovery: 'Password Recovery'
     },
     ES: {
       adminPanel: 'Panel Administrativo',
       welcome: '¡Bienvenido, Administrador!',
-      manageClients: 'Gestionar Clientes',
-      manageMessages: 'Gestionar Mensajes',
       addClient: 'Añadir Cliente',
       editClient: 'Editar',
       deleteClient: 'Eliminar',
@@ -147,7 +138,7 @@ const AdminDashboard = () => {
       clientPhone: 'Teléfono',
       clientPlan: 'Plan',
       clientCurrency: 'Moneda',
-      clientMonthlyValue: 'Valor Mensual',
+      clientValue: 'Valor Mensual',
       actions: 'Acciones',
       messageName: 'Nombre',
       messageEmail: 'Email',
@@ -156,32 +147,39 @@ const AdminDashboard = () => {
       logout: 'Cerrar sesión',
       logoutSuccess: '¡Cierre de sesión exitoso!',
       confirmDeleteClient: '¿Está seguro de que desea eliminar este cliente?',
-      deleteConfirmation: 'Eliminar Cliente',
-      cancel: 'Cancelar',
-      delete: 'Eliminar',
       clientDeleted: 'Cliente eliminado con éxito.',
       clientUpdated: 'Cliente actualizado con éxito.',
       clientAdded: 'Cliente añadido con éxito.',
-      close: 'Cerrar',
       clients: 'Clientes',
-      messages: 'Mensajes'
+      messages: 'Mensajes',
+      passwordRecovery: 'Recuperación de Contraseña'
     }
   };
 
   const t = translations[language];
 
   useEffect(() => {
-    // Mock data loading from localStorage
+    // Carregar dados do localStorage
     const savedClients = localStorage.getItem('adminClients');
     const savedMessages = localStorage.getItem('contactMessages');
-
+    const savedFormMessages = localStorage.getItem('formMessages');
+    
     if (savedClients) {
       setClients(JSON.parse(savedClients));
     }
-
+    
+    // Combinar mensagens de contato e formulário
+    let allMessages: Message[] = [];
+    
     if (savedMessages) {
-      setMessages(JSON.parse(savedMessages));
+      allMessages = [...allMessages, ...JSON.parse(savedMessages)];
     }
+    
+    if (savedFormMessages) {
+      allMessages = [...allMessages, ...JSON.parse(savedFormMessages)];
+    }
+    
+    setMessages(allMessages);
   }, []);
 
   const handleAddClient = () => {
@@ -195,12 +193,12 @@ const AdminDashboard = () => {
   };
 
   const handleDeleteClient = (client: Client) => {
-    if (window.confirm(t.confirmDeleteClient || "Tem certeza que deseja excluir este cliente?")) {
-      const updatedClients = clients.filter((c) => c.id !== client.id);
+    if (window.confirm(t.confirmDeleteClient)) {
+      const updatedClients = clients.filter(c => c.id !== client.id);
       setClients(updatedClients);
       localStorage.setItem('adminClients', JSON.stringify(updatedClients));
       toast({
-        title: t.clientDeleted || "Cliente excluído com sucesso.",
+        title: t.clientDeleted,
       });
     }
   };
@@ -208,17 +206,17 @@ const AdminDashboard = () => {
   const handleClientFormSubmit = (client: Client, isEdit: boolean) => {
     let updatedClients;
     if (isEdit) {
-      updatedClients = clients.map((c) => (c.id === client.id ? client : c));
+      updatedClients = clients.map(c => c.id === client.id ? client : c);
       toast({
-        title: t.clientUpdated || "Cliente atualizado com sucesso.",
+        title: t.clientUpdated,
       });
     } else {
       updatedClients = [...clients, client];
       toast({
-        title: t.clientAdded || "Cliente adicionado com sucesso.",
+        title: t.clientAdded,
       });
     }
-  
+    
     setClients(updatedClients);
     localStorage.setItem('adminClients', JSON.stringify(updatedClients));
     setShowClientForm(false);
@@ -238,10 +236,10 @@ const AdminDashboard = () => {
     localStorage.removeItem('adminUser');
     localStorage.removeItem('isAdminLoggedIn');
     toast({
-      title: t.logoutSuccess || "Logout realizado com sucesso!",
+      title: t.logoutSuccess,
       description: "Você foi desconectado do sistema.",
     });
-    navigate('/admin/login');
+    navigate('/'); // Voltar direto para o home
   };
 
   const formatCurrency = (value: number, currency: string) => {
@@ -261,124 +259,166 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-idBlack text-white">
-      <div className="container mx-auto p-4">
-        <Card className="bg-idDarkBlack border-gray-800">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">{t.adminPanel}</CardTitle>
-            <CardDescription className="text-gray-400">{t.welcome}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="clients" className="w-full">
-              <TabsList>
-                <TabsTrigger value="clients" onClick={() => setActiveTab('clients')}>{t.clients}</TabsTrigger>
-                <TabsTrigger value="messages" onClick={() => setActiveTab('messages')}>{t.messages}</TabsTrigger>
-              </TabsList>
-              <TabsContent value="clients">
-                <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl font-semibold">{t.manageClients}</h2>
-                  <Button onClick={handleAddClient} className="bg-idOrange hover:bg-idOrange/90 text-black">
-                    <Plus className="mr-2 h-4 w-4" />
-                    {t.addClient}
-                  </Button>
-                </div>
-                {clients.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-700">
-                      <thead>
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.clientName}</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.clientEmail}</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.clientPhone}</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.clientPlan}</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.clientMonthlyValue}</th>
-                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t.actions}</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-800">
-                        {clients.map((client) => (
-                          <tr key={client.id}>
-                            <td className="px-6 py-4 whitespace-nowrap">{client.name}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">{client.email}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">{client.phone}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">{client.plan}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">{formatCurrency(client.monthlyValue, client.currency)}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right">
-                              <Button onClick={() => handleEditClient(client)} size="icon" variant="ghost" className="text-gray-400 hover:text-white">
-                                <Pencil className="h-4 w-4" />
-                                <span className="sr-only">{t.editClient}</span>
-                              </Button>
-                              <Button onClick={() => handleDeleteClient(client)} size="icon" variant="ghost" className="text-gray-400 hover:text-white">
-                                <Trash className="h-4 w-4" />
-                                <span className="sr-only">{t.deleteClient}</span>
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p className="text-gray-500">{t.noClients}</p>
-                )}
-              </TabsContent>
-              <TabsContent value="messages">
-                <h2 className="text-xl font-semibold mb-4">{t.manageMessages}</h2>
-                {messages.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-700">
-                      <thead>
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.messageName}</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.messageEmail}</th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.messagePhone}</th>
-                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t.actions}</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-800">
-                        {messages.map((message) => (
-                          <tr key={message.id}>
-                            <td className="px-6 py-4 whitespace-nowrap">{message.name}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">{message.email}</td>
-                            <td className="px-6 py-4 whitespace-nowrap">{message.phone}</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right">
-                              <Button onClick={() => handleViewMessage(message)} size="icon" variant="ghost" className="text-gray-400 hover:text-white">
-                                <Mail className="h-4 w-4" />
-                                <span className="sr-only">{t.viewMessage}</span>
-                              </Button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <p className="text-gray-500">{t.noMessages}</p>
-                )}
-              </TabsContent>
-            </Tabs>
-            <Button onClick={handleLogout} variant="secondary" className="mt-4 bg-gray-800 hover:bg-gray-700">{t.logout}</Button>
-          </CardContent>
-        </Card>
+      {/* Header com botão de logout */}
+      <div className="border-b border-gray-800 bg-idDarkBlack">
+        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold text-idOrange">{t.adminPanel}</h1>
+            <p className="text-gray-400">{t.welcome}</p>
+          </div>
+          <Button variant="outline" onClick={handleLogout} className="border-gray-700">
+            <LogOut className="w-4 h-4 mr-2" />
+            {t.logout}
+          </Button>
+        </div>
       </div>
 
-      {/* Client Form Modal */}
-      {showClientForm && (
-        <ClientForm
-          open={showClientForm}
-          onOpenChange={setShowClientForm}
-          onSubmit={handleClientFormSubmit}
-          editingClient={editingClient}
-        />
-      )}
+      <div className="container mx-auto p-4">
+        <Tabs defaultValue="clients" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="clients">{t.clients}</TabsTrigger>
+            <TabsTrigger value="messages">{t.messages}</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="clients" className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-semibold">Gerenciar Clientes</h2>
+              <Button onClick={handleAddClient} className="bg-idOrange hover:bg-idOrange/90 text-black">
+                <Plus className="w-4 h-4 mr-2" />
+                {t.addClient}
+              </Button>
+            </div>
+            
+            <Card className="bg-idDarkBlack border-gray-800">
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-700">
+                        <th className="text-left p-4 text-white">{t.clientName}</th>
+                        <th className="text-left p-4 text-white">{t.clientEmail}</th>
+                        <th className="text-left p-4 text-white">{t.clientPhone}</th>
+                        <th className="text-left p-4 text-white">{t.clientPlan}</th>
+                        <th className="text-left p-4 text-white">{t.clientValue}</th>
+                        <th className="text-left p-4 text-white">{t.actions}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {clients.length > 0 ? (
+                        clients.map((client) => (
+                          <tr key={client.id} className="border-b border-gray-800">
+                            <td className="p-4 text-gray-300">{client.name}</td>
+                            <td className="p-4 text-gray-300">{client.email}</td>
+                            <td className="p-4 text-gray-300">{client.phone}</td>
+                            <td className="p-4 text-gray-300">{client.plan}</td>
+                            <td className="p-4 text-gray-300">
+                              {formatCurrency(client.monthlyValue, client.currency)}
+                            </td>
+                            <td className="p-4">
+                              <div className="flex space-x-2">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleEditClient(client)}
+                                  className="border-gray-700"
+                                >
+                                  <Pencil className="w-4 h-4" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleDeleteClient(client)}
+                                  className="border-red-700 text-red-400 hover:bg-red-900"
+                                >
+                                  <Trash className="w-4 h-4" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={6} className="p-8 text-center text-gray-400">
+                            {t.noClients}
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-      {/* Message Modal */}
-      {showMessageModal && selectedMessage && (
-        <MessageModal
-          open={showMessageModal}
-          onOpenChange={setShowMessageModal}
-          message={selectedMessage}
-        />
-      )}
+          <TabsContent value="messages" className="space-y-4">
+            <h2 className="text-xl font-semibold">Gerenciar Mensagens</h2>
+            
+            <Card className="bg-idDarkBlack border-gray-800">
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-gray-700">
+                        <th className="text-left p-4 text-white">{t.messageName}</th>
+                        <th className="text-left p-4 text-white">{t.messageEmail}</th>
+                        <th className="text-left p-4 text-white">Tipo</th>
+                        <th className="text-left p-4 text-white">Data</th>
+                        <th className="text-left p-4 text-white">{t.actions}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {messages.length > 0 ? (
+                        messages.map((message) => (
+                          <tr key={message.id} className="border-b border-gray-800">
+                            <td className="p-4 text-gray-300">{message.name}</td>
+                            <td className="p-4 text-gray-300">{message.email}</td>
+                            <td className="p-4 text-gray-300">
+                              {message.type === 'password-recovery' ? t.passwordRecovery : 'Contato'}
+                            </td>
+                            <td className="p-4 text-gray-300">{message.date}</td>
+                            <td className="p-4">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleViewMessage(message)}
+                                className="border-gray-700"
+                              >
+                                <Mail className="w-4 h-4 mr-2" />
+                                {t.viewMessage}
+                              </Button>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={5} className="p-8 text-center text-gray-400">
+                            {t.noMessages}
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Modais */}
+      <ClientForm
+        open={showClientForm}
+        onOpenChange={setShowClientForm}
+        onSubmit={handleClientFormSubmit}
+        editingClient={editingClient}
+      />
+
+      <MessageModal
+        open={showMessageModal}
+        onOpenChange={setShowMessageModal}
+        message={selectedMessage}
+        onClose={handleCloseMessageModal}
+      />
     </div>
   );
 };

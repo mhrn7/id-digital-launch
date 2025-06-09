@@ -28,7 +28,7 @@ const WhatsAppButton = () => {
   return (
     <button
       onClick={handleWhatsAppClick}
-      className={`fixed right-6 bottom-6 z-50 w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 ${
+      className={`fixed right-6 bottom-24 z-40 w-14 h-14 bg-green-500 hover:bg-green-600 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 ${
         isVisible ? 'translate-y-0 opacity-100' : 'translate-y-16 opacity-0'
       }`}
       aria-label="Contato via WhatsApp"

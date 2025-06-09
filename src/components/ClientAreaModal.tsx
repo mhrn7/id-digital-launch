@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -5,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { supabase } from '@/lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 import { KeyRound, Mail } from 'lucide-react';
 
@@ -15,7 +15,7 @@ interface ClientAreaModalProps {
 }
 
 const ClientAreaModal = ({ isOpen, onClose }: ClientAreaModalProps) => {
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -30,25 +30,39 @@ const ClientAreaModal = ({ isOpen, onClose }: ClientAreaModalProps) => {
     setError('');
 
     try {
-      // Check for admin credentials first
-      if (email === 'admin' && password === 'mhrn#2025') {
+      console.log('Tentando fazer login com:', { name, password });
+      
+      // Check admin credentials first
+      if ((name === 'admin' || name === 'administrador') && 
+          (password === 'mhrn#2025' || password === 'admin123')) {
+        const adminUser = {
+          id: 'admin',
+          name: name,
+          role: 'admin',
+          loginTime: new Date().toISOString()
+        };
+
+        localStorage.setItem('adminUser', JSON.stringify(adminUser));
         localStorage.setItem('isAdminLoggedIn', 'true');
+        
+        console.log('Admin logado com sucesso:', adminUser);
+
         toast({
           title: "Login administrativo realizado!",
           description: "Redirecionando para o painel administrativo.",
         });
+
         navigate('/admin/dashboard');
         onClose();
         return;
       }
 
-      // For regular clients, check localStorage for demo purposes
+      // For regular clients, check localStorage
       const savedClients = localStorage.getItem('adminClients');
       if (savedClients) {
         const clients = JSON.parse(savedClients);
         const client = clients.find((c: any) => 
-          (c.email === email && c.password === password) ||
-          (c.name === email && c.password === password)
+          c.name.toLowerCase() === name.toLowerCase() && c.password === password
         );
         
         if (client) {
@@ -63,29 +77,7 @@ const ClientAreaModal = ({ isOpen, onClose }: ClientAreaModalProps) => {
         }
       }
 
-      // Check if Supabase is configured for real authentication
-      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-        setError('Credenciais não encontradas. Verifique se você foi cadastrado pelo administrador.');
-        setLoading(false);
-        return;
-      }
-
-      // Try Supabase authentication
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) {
-        setError('Credenciais inválidas. Verifique seu email e senha.');
-      } else if (data.user) {
-        toast({
-          title: "Login realizado com sucesso!",
-          description: "Bem-vindo à área do cliente.",
-        });
-        navigate('/cliente/dashboard');
-        onClose();
-      }
+      setError('Nome ou senha incorretos. Verifique suas credenciais.');
     } catch (error: any) {
       setError('Erro ao fazer login. Tente novamente.');
       console.error('Login error:', error);
@@ -100,34 +92,39 @@ const ClientAreaModal = ({ isOpen, onClose }: ClientAreaModalProps) => {
     setError('');
 
     try {
-      // Check if Supabase is configured
-      if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
-        setError('Sistema de recuperação não configurado. Entre em contato com o administrador.');
-        setLoading(false);
-        return;
-      }
+      // Criar mensagem de recuperação de senha
+      const passwordRecoveryMessage = {
+        id: Date.now(),
+        name: 'Recuperação de Senha',
+        email: forgotEmail,
+        message: `Solicitação de recuperação de senha para o email: ${forgotEmail}`,
+        date: new Date().toLocaleString('pt-BR'),
+        status: 'Novo' as const,
+        type: 'password-recovery'
+      };
 
-      const { error } = await supabase.auth.resetPasswordForEmail(forgotEmail, {
-        redirectTo: `${window.location.origin}/cliente/login`
-      });
-
-      if (error) throw error;
+      // Adicionar às mensagens existentes
+      const existingMessages = localStorage.getItem('formMessages');
+      const messages = existingMessages ? JSON.parse(existingMessages) : [];
+      messages.unshift(passwordRecoveryMessage);
+      localStorage.setItem('formMessages', JSON.stringify(messages));
 
       toast({
-        title: "E-mail enviado!",
-        description: "Verifique sua caixa de entrada para redefinir sua senha.",
+        title: "Solicitação enviada!",
+        description: "Sua solicitação de recuperação foi enviada para o administrador.",
       });
+      
       setShowForgotPassword(false);
       setForgotEmail('');
     } catch (error: any) {
-      setError(error.message);
+      setError('Erro ao enviar solicitação. Tente novamente.');
     } finally {
       setLoading(false);
     }
   };
 
   const resetForm = () => {
-    setEmail('');
+    setName('');
     setPassword('');
     setError('');
     setShowForgotPassword(false);
@@ -179,11 +176,11 @@ const ClientAreaModal = ({ isOpen, onClose }: ClientAreaModalProps) => {
             <div className="flex space-x-2">
               <Button 
                 type="submit" 
-                className="flex-1 btn-primary"
+                className="flex-1 bg-idOrange hover:bg-idOrange/90 text-black"
                 disabled={loading}
               >
                 <Mail className="w-4 h-4 mr-2" />
-                {loading ? 'Enviando...' : 'Enviar Link'}
+                {loading ? 'Enviando...' : 'Enviar Solicitação'}
               </Button>
               <Button 
                 type="button" 
@@ -204,14 +201,14 @@ const ClientAreaModal = ({ isOpen, onClose }: ClientAreaModalProps) => {
             )}
             
             <div className="space-y-2">
-              <Label htmlFor="modal-email" className="text-white">E-mail ou Nome</Label>
+              <Label htmlFor="modal-name" className="text-white">Nome</Label>
               <Input
-                id="modal-email"
+                id="modal-name"
                 type="text"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 className="bg-gray-800 border-gray-700 text-white"
-                placeholder="seu@email.com ou seu nome"
+                placeholder="Seu nome"
                 required
               />
             </div>
@@ -224,13 +221,14 @@ const ClientAreaModal = ({ isOpen, onClose }: ClientAreaModalProps) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="bg-gray-800 border-gray-700 text-white"
+                placeholder="••••••••"
                 required
               />
             </div>
             
             <Button 
               type="submit" 
-              className="w-full btn-primary"
+              className="w-full bg-idOrange hover:bg-idOrange/90 text-black"
               disabled={loading}
             >
               {loading ? 'Entrando...' : 'Entrar'}
