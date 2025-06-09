@@ -61,8 +61,16 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      // Mock admin credentials - in a real app, this would be handled by backend
-      if (email === 'admin@idanuncios.com' && password === 'admin123') {
+      console.log('Tentando fazer login com:', { email, password });
+      
+      // Check admin credentials - múltiplas opções válidas
+      const isValidAdmin = (
+        (email === 'admin@idanuncios.com' && password === 'admin123') ||
+        (email === 'admin' && password === 'mhrn#2025') ||
+        (email === 'admin@agenciaidmkt.site' && password === 'admin123')
+      );
+
+      if (isValidAdmin) {
         const adminUser = {
           id: 'admin',
           email: email,
@@ -70,15 +78,21 @@ const AdminLogin = () => {
           loginTime: new Date().toISOString()
         };
 
+        // Salvar no localStorage
         localStorage.setItem('adminUser', JSON.stringify(adminUser));
+        localStorage.setItem('isAdminLoggedIn', 'true');
         
+        console.log('Admin logado com sucesso:', adminUser);
+
         toast({
           title: t.loginSuccess,
           description: "Redirecionando para o painel...",
         });
 
+        // Redirecionar para o dashboard
         navigate('/admin/dashboard');
       } else {
+        console.log('Credenciais inválidas:', { email, password });
         toast({
           title: t.invalidCredentials,
           description: t.tryAgain,
@@ -119,11 +133,11 @@ const AdminLogin = () => {
               <Label htmlFor="email" className="text-white">{t.email}</Label>
               <Input
                 id="email"
-                type="email"
+                type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="bg-idBlack border-gray-700 text-white"
-                placeholder="admin@idanuncios.com"
+                placeholder="admin@agenciaidmkt.site"
                 required
               />
             </div>
@@ -150,7 +164,8 @@ const AdminLogin = () => {
           
           <div className="mt-6 p-4 bg-gray-800/50 rounded-lg">
             <p className="text-xs text-gray-400 text-center">
-              Demo: admin@idanuncios.com / admin123
+              Demo: admin@agenciaidmkt.site / admin123<br/>
+              ou admin / mhrn#2025
             </p>
           </div>
         </CardContent>

@@ -1,50 +1,20 @@
-
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { 
-  Users, 
-  FileText, 
-  MessageSquare, 
-  Settings, 
-  Plus, 
-  Edit, 
-  Trash2, 
-  Download,
-  LogOut,
-  Upload,
-  Eye
-} from 'lucide-react';
+import { Plus, Pencil, Trash, Mail } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/components/LanguageProvider';
-import LanguageSelector from '@/components/LanguageSelector';
+import ClientForm from '@/components/ClientForm';
+import MessageModal from '@/components/MessageModal';
 
 interface Client {
   id: string;
   name: string;
   email: string;
-  password: string;
-  plan: 'Start' | 'Pro';
-  monthlyValue: number;
-  currency: string;
-  startDate: string;
-}
-
-interface Report {
-  id: string;
-  clientName: string;
-  clientId: string;
-  title: string;
-  date: string;
-  file_url: string;
+  phone: string;
+  [key: string]: any;
 }
 
 interface Message {
@@ -53,846 +23,331 @@ interface Message {
   email: string;
   phone: string;
   message: string;
-  date: string;
-  read: boolean;
 }
-
-// Professional plan details with translations
-const planDetails = {
-  PT: {
-    Start: [
-      'Landing Page Profissional',
-      'Gestão de Tráfego Google Ads + Google My Business',
-      'Relatórios de Performance Quinzenais',
-      'Suporte Especializado via WhatsApp (Segunda a Sábado - Horário Comercial)'
-    ],
-    Pro: [
-      'Landing Page Profissional',
-      'Gestão de Tráfego Google Ads + Google My Business',
-      'Gestão de Tráfego Meta Ads + Plataformas Complementares',
-      'Planejamento Estratégico de Marketing Digital',
-      'Relatórios de Performance Semanais',
-      'Suporte Premium 24/7'
-    ]
-  },
-  EN: {
-    Start: [
-      'Professional Landing Page',
-      'Google Ads + Google My Business Traffic Management',
-      'Bi-weekly Performance Reports',
-      'Specialized WhatsApp Support (Monday to Saturday - Business Hours)'
-    ],
-    Pro: [
-      'Professional Landing Page',
-      'Google Ads + Google My Business Traffic Management',
-      'Meta Ads + Complementary Platforms Traffic Management',
-      'Digital Marketing Strategic Planning',
-      'Weekly Performance Reports',
-      'Premium 24/7 Support'
-    ]
-  },
-  ES: {
-    Start: [
-      'Landing Page Profesional',
-      'Gestión de Tráfico Google Ads + Google My Business',
-      'Informes de Rendimiento Quincenales',
-      'Soporte Especializado vía WhatsApp (Lunes a Sábado - Horario Comercial)'
-    ],
-    Pro: [
-      'Landing Page Profesional',
-      'Gestión de Tráfico Google Ads + Google My Business',
-      'Gestión de Tráfico Meta Ads + Plataformas Complementarias',
-      'Planificación Estratégica de Marketing Digital',
-      'Informes de Rendimiento Semanales',
-      'Soporte Premium 24/7'
-    ]
-  }
-};
-
-const translations = {
-  PT: {
-    adminPanel: 'Painel Administrativo',
-    manageSystem: 'Gerencie o sistema e os dados',
-    clients: 'Clientes',
-    reports: 'Relatórios',
-    settings: 'Configurações',
-    messages: 'Mensagens',
-    addClient: 'Adicionar Cliente',
-    editClient: 'Editar Cliente',
-    deleteClient: 'Excluir Cliente',
-    name: 'Nome',
-    email: 'Email',
-    password: 'Senha',
-    plan: 'Plano',
-    monthlyValue: 'Valor Mensal',
-    currency: 'Moeda',
-    startDate: 'Data de Início',
-    actions: 'Ações',
-    save: 'Salvar',
-    cancel: 'Cancelar',
-    loading: 'Carregando...',
-    logout: 'Sair',
-    confirmDelete: 'Confirmar Exclusão',
-    confirmDeleteMessage: 'Tem certeza que deseja excluir este cliente?',
-    yes: 'Sim',
-    no: 'Não',
-    planDetails: 'Detalhes do Plano',
-    includedServices: 'Serviços Inclusos',
-    uploadReport: 'Enviar Relatório',
-    selectClient: 'Selecionar Cliente',
-    reportTitle: 'Título do Relatório',
-    selectFile: 'Selecionar Arquivo',
-    upload: 'Enviar',
-    download: 'Baixar',
-    clientReports: 'Relatórios dos Clientes',
-    contactMessages: 'Mensagens de Contato',
-    from: 'De',
-    phone: 'Telefone',
-    date: 'Data',
-    markAsRead: 'Marcar como Lida',
-    systemSettings: 'Configurações do Sistema',
-    noMessages: 'Nenhuma mensagem encontrada.',
-    noReports: 'Nenhum relatório encontrado.',
-    messageFrom: 'Mensagem de',
-    reportUploaded: 'Relatório enviado com sucesso!',
-    messageMarkedRead: 'Mensagem marcada como lida.',
-    clientSaved: 'Cliente salvo com sucesso!',
-    errorSaving: 'Erro ao salvar cliente',
-    fillRequired: 'Preencha todos os campos obrigatórios',
-  },
-  EN: {
-    adminPanel: 'Admin Panel',
-    manageSystem: 'Manage system and data',
-    clients: 'Clients',
-    reports: 'Reports',
-    settings: 'Settings',
-    messages: 'Messages',
-    addClient: 'Add Client',
-    editClient: 'Edit Client',
-    deleteClient: 'Delete Client',
-    name: 'Name',
-    email: 'Email',
-    password: 'Password',
-    plan: 'Plan',
-    monthlyValue: 'Monthly Value',
-    currency: 'Currency',
-    startDate: 'Start Date',
-    actions: 'Actions',
-    save: 'Save',
-    cancel: 'Cancel',
-    loading: 'Loading...',
-    logout: 'Logout',
-    confirmDelete: 'Confirm Deletion',
-    confirmDeleteMessage: 'Are you sure you want to delete this client?',
-    yes: 'Yes',
-    no: 'No',
-    planDetails: 'Plan Details',
-    includedServices: 'Included Services',
-    uploadReport: 'Upload Report',
-    selectClient: 'Select Client',
-    reportTitle: 'Report Title',
-    selectFile: 'Select File',
-    upload: 'Upload',
-    download: 'Download',
-    clientReports: 'Client Reports',
-    contactMessages: 'Contact Messages',
-    from: 'From',
-    phone: 'Phone',
-    date: 'Date',
-    markAsRead: 'Mark as Read',
-    systemSettings: 'System Settings',
-    noMessages: 'No messages found.',
-    noReports: 'No reports found.',
-    messageFrom: 'Message from',
-    reportUploaded: 'Report uploaded successfully!',
-    messageMarkedRead: 'Message marked as read.',
-    clientSaved: 'Client saved successfully!',
-    errorSaving: 'Error saving client',
-    fillRequired: 'Fill in all required fields',
-  },
-  ES: {
-    adminPanel: 'Panel Administrativo',
-    manageSystem: 'Gestionar sistema y datos',
-    clients: 'Clientes',
-    reports: 'Informes',
-    settings: 'Configuraciones',
-    messages: 'Mensajes',
-    addClient: 'Agregar Cliente',
-    editClient: 'Editar Cliente',
-    deleteClient: 'Eliminar Cliente',
-    name: 'Nombre',
-    email: 'Correo electrónico',
-    password: 'Contraseña',
-    plan: 'Plan',
-    monthlyValue: 'Valor Mensual',
-    currency: 'Moneda',
-    startDate: 'Fecha de Início',
-    actions: 'Acciones',
-    save: 'Guardar',
-    cancel: 'Cancelar',
-    loading: 'Cargando...',
-    logout: 'Salir',
-    confirmDelete: 'Confirmar Eliminación',
-    confirmDeleteMessage: '¿Está seguro de que desea eliminar este cliente?',
-    yes: 'Sí',
-    no: 'No',
-    planDetails: 'Detalles del Plan',
-    includedServices: 'Servicios Incluidos',
-    uploadReport: 'Subir Informe',
-    selectClient: 'Seleccionar Cliente',
-    reportTitle: 'Título del Informe',
-    selectFile: 'Seleccionar Archivo',
-    upload: 'Subir',
-    download: 'Descargar',
-    clientReports: 'Informes de Clientes',
-    contactMessages: 'Mensajes de Contacto',
-    from: 'De',
-    phone: 'Teléfono',
-    date: 'Fecha',
-    markAsRead: 'Marcar como Leído',
-    systemSettings: 'Configuraciones del Sistema',
-    noMessages: 'No se encontraron mensajes.',
-    noReports: 'No se encontraron informes.',
-    messageFrom: 'Mensaje de',
-    reportUploaded: '¡Informe subido exitosamente!',
-    messageMarkedRead: 'Mensaje marcado como leído.',
-    clientSaved: '¡Cliente guardado exitosamente!',
-    errorSaving: 'Error al guardar cliente',
-    fillRequired: 'Complete todos los campos requeridos',
-  }
-};
 
 const AdminDashboard = () => {
   const [clients, setClients] = useState<Client[]>([]);
-  const [reports, setReports] = useState<Report[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
-  const [clientToDelete, setClientToDelete] = useState<Client | null>(null);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    plan: 'Start' as 'Start' | 'Pro',
-    monthlyValue: 1500,
-    currency: 'BRL',
-    startDate: new Date().toISOString().split('T')[0],
-  });
-  const [reportFormData, setReportFormData] = useState({
-    clientId: '',
-    title: '',
-    file: null as File | null,
-  });
-
-  const { toast } = useToast();
+  const [showClientForm, setShowClientForm] = useState(false);
+  const [editingClient, setEditingClient] = useState<Client | null>(null);
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
+  const [activeTab, setActiveTab] = useState('clients');
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { language } = useLanguage();
+
+  // Verificar autenticação no carregamento
+  useEffect(() => {
+    const checkAuth = () => {
+      const adminUser = localStorage.getItem('adminUser');
+      const isAdminLoggedIn = localStorage.getItem('isAdminLoggedIn');
+      
+      console.log('Verificando autenticação admin:', { adminUser, isAdminLoggedIn });
+      
+      if (!adminUser || !isAdminLoggedIn || isAdminLoggedIn !== 'true') {
+        console.log('Admin não autenticado, redirecionando para login');
+        navigate('/admin/login');
+        return;
+      }
+      
+      console.log('Admin autenticado com sucesso');
+    };
+
+    checkAuth();
+  }, [navigate]);
+
+  const translations = {
+    PT: {
+      adminPanel: 'Painel Administrativo',
+      welcome: 'Bem-vindo, Administrador!',
+      manageClients: 'Gerenciar Clientes',
+      manageMessages: 'Gerenciar Mensagens',
+      addClient: 'Adicionar Cliente',
+      editClient: 'Editar',
+      deleteClient: 'Excluir',
+      viewMessage: 'Ver Mensagem',
+      noClients: 'Nenhum cliente cadastrado.',
+      noMessages: 'Nenhuma mensagem recebida.',
+      clientName: 'Nome',
+      clientEmail: 'Email',
+      clientPhone: 'Telefone',
+      actions: 'Ações',
+      messageName: 'Nome',
+      messageEmail: 'Email',
+      messagePhone: 'Telefone',
+      messageText: 'Mensagem',
+      logout: 'Sair',
+      logoutSuccess: 'Logout realizado com sucesso!',
+      confirmDeleteClient: 'Tem certeza que deseja excluir este cliente?',
+      deleteConfirmation: 'Excluir Cliente',
+      cancel: 'Cancelar',
+      delete: 'Excluir',
+      clientDeleted: 'Cliente excluído com sucesso.',
+      clientUpdated: 'Cliente atualizado com sucesso.',
+      clientAdded: 'Cliente adicionado com sucesso.',
+      close: 'Fechar',
+      clients: 'Clientes',
+      messages: 'Mensagens'
+    },
+    EN: {
+      adminPanel: 'Admin Panel',
+      welcome: 'Welcome, Administrator!',
+      manageClients: 'Manage Clients',
+      manageMessages: 'Manage Messages',
+      addClient: 'Add Client',
+      editClient: 'Edit',
+      deleteClient: 'Delete',
+      viewMessage: 'View Message',
+      noClients: 'No clients registered.',
+      noMessages: 'No messages received.',
+      clientName: 'Name',
+      clientEmail: 'Email',
+      clientPhone: 'Phone',
+      actions: 'Actions',
+      messageName: 'Name',
+      messageEmail: 'Email',
+      messagePhone: 'Phone',
+      messageText: 'Message',
+      logout: 'Logout',
+      logoutSuccess: 'Logout successful!',
+      confirmDeleteClient: 'Are you sure you want to delete this client?',
+      deleteConfirmation: 'Delete Client',
+      cancel: 'Cancel',
+      delete: 'Delete',
+      clientDeleted: 'Client deleted successfully.',
+      clientUpdated: 'Client updated successfully.',
+      clientAdded: 'Client added successfully.',
+      close: 'Close',
+      clients: 'Clients',
+      messages: 'Messages'
+    },
+    ES: {
+      adminPanel: 'Panel Administrativo',
+      welcome: '¡Bienvenido, Administrador!',
+      manageClients: 'Gestionar Clientes',
+      manageMessages: 'Gestionar Mensajes',
+      addClient: 'Añadir Cliente',
+      editClient: 'Editar',
+      deleteClient: 'Eliminar',
+      viewMessage: 'Ver Mensaje',
+      noClients: 'Ningún cliente registrado.',
+      noMessages: 'Ningún mensaje recibido.',
+      clientName: 'Nombre',
+      clientEmail: 'Email',
+      clientPhone: 'Teléfono',
+      actions: 'Acciones',
+      messageName: 'Nombre',
+      messageEmail: 'Email',
+      messagePhone: 'Teléfono',
+      messageText: 'Mensaje',
+      logout: 'Cerrar sesión',
+      logoutSuccess: '¡Cierre de sesión exitoso!',
+      confirmDeleteClient: '¿Está seguro de que desea eliminar este cliente?',
+      deleteConfirmation: 'Eliminar Cliente',
+      cancel: 'Cancelar',
+      delete: 'Eliminar',
+      clientDeleted: 'Cliente eliminado con éxito.',
+      clientUpdated: 'Cliente actualizado con éxito.',
+      clientAdded: 'Cliente añadido con éxito.',
+      close: 'Cerrar',
+      clients: 'Clientes',
+      messages: 'Mensajes'
+    }
+  };
+
   const t = translations[language];
 
   useEffect(() => {
-    checkAuth();
-    loadData();
+    // Mock data loading from localStorage
+    const savedClients = localStorage.getItem('adminClients');
+    const savedMessages = localStorage.getItem('contactMessages');
+
+    if (savedClients) {
+      setClients(JSON.parse(savedClients));
+    }
+
+    if (savedMessages) {
+      setMessages(JSON.parse(savedMessages));
+    }
   }, []);
 
-  // Check if admin is authenticated
-  const checkAuth = () => {
-    const adminUser = localStorage.getItem('adminUser');
-    if (!adminUser) {
-      navigate('/admin/login');
-      return;
-    }
+  const handleAddClient = () => {
+    setEditingClient(null);
+    setShowClientForm(true);
   };
 
-  // Load data from localStorage with better error handling
-  const loadData = () => {
-    try {
-      const storedClients = localStorage.getItem('adminClients');
-      const storedReports = localStorage.getItem('adminReports');
-      const storedMessages = localStorage.getItem('formMessages');
-      
-      if (storedClients) {
-        setClients(JSON.parse(storedClients));
-      }
-      if (storedReports) {
-        setReports(JSON.parse(storedReports));
-      }
-      if (storedMessages) {
-        const formMessages = JSON.parse(storedMessages);
-        const convertedMessages = formMessages.map((msg: any) => ({
-          ...msg,
-          read: msg.read || false,
-          date: msg.timestamp || msg.date || new Date().toISOString()
-        }));
-        setMessages(convertedMessages);
-      }
-    } catch (error) {
-      console.error('Error loading data:', error);
-      toast({
-        title: 'Erro',
-        description: 'Erro ao carregar dados',
-        variant: 'destructive',
-      });
-    }
-    setLoading(false);
+  const handleEditClient = (client: Client) => {
+    setEditingClient(client);
+    setShowClientForm(true);
   };
 
-  const saveClients = (updatedClients: Client[]) => {
-    try {
+  const handleDeleteClient = (client: Client) => {
+    if (window.confirm(t.confirmDeleteClient || "Tem certeza que deseja excluir este cliente?")) {
+      const updatedClients = clients.filter((c) => c.id !== client.id);
       setClients(updatedClients);
       localStorage.setItem('adminClients', JSON.stringify(updatedClients));
-      console.log('Clients saved:', updatedClients);
-    } catch (error) {
-      console.error('Error saving clients:', error);
       toast({
-        title: 'Erro',
-        description: 'Erro ao salvar clientes',
-        variant: 'destructive',
+        title: t.clientDeleted || "Cliente excluído com sucesso.",
       });
     }
   };
 
-  const saveReports = (updatedReports: Report[]) => {
-    setReports(updatedReports);
-    localStorage.setItem('adminReports', JSON.stringify(updatedReports));
+  const handleClientFormSubmit = (client: Client, isEdit: boolean) => {
+    let updatedClients;
+    if (isEdit) {
+      updatedClients = clients.map((c) => (c.id === client.id ? client : c));
+      toast({
+        title: t.clientUpdated || "Cliente atualizado com sucesso.",
+      });
+    } else {
+      updatedClients = [...clients, client];
+      toast({
+        title: t.clientAdded || "Cliente adicionado com sucesso.",
+      });
+    }
+  
+    setClients(updatedClients);
+    localStorage.setItem('adminClients', JSON.stringify(updatedClients));
+    setShowClientForm(false);
   };
 
-  const saveMessages = (updatedMessages: Message[]) => {
-    setMessages(updatedMessages);
-    localStorage.setItem('formMessages', JSON.stringify(updatedMessages));
+  const handleViewMessage = (message: Message) => {
+    setSelectedMessage(message);
+    setShowMessageModal(true);
+  };
+
+  const handleCloseMessageModal = () => {
+    setShowMessageModal(false);
+    setSelectedMessage(null);
   };
 
   const handleLogout = () => {
     localStorage.removeItem('adminUser');
+    localStorage.removeItem('isAdminLoggedIn');
+    toast({
+      title: t.logoutSuccess || "Logout realizado com sucesso!",
+      description: "Você foi desconectado do sistema.",
+    });
     navigate('/admin/login');
-    toast({
-      title: t.logout,
-      description: "Você foi desconectado com sucesso.",
-    });
   };
-
-  const openAddClientDialog = () => {
-    setSelectedClient(null);
-    setFormData({
-      name: '',
-      email: '',
-      password: '',
-      plan: 'Start',
-      monthlyValue: 1500,
-      currency: 'BRL',
-      startDate: new Date().toISOString().split('T')[0],
-    });
-    setIsDialogOpen(true);
-  };
-
-  const openEditClientDialog = (client: Client) => {
-    setSelectedClient(client);
-    setFormData({
-      name: client.name,
-      email: client.email,
-      password: client.password || '',
-      plan: client.plan,
-      monthlyValue: client.monthlyValue,
-      currency: client.currency,
-      startDate: client.startDate,
-    });
-    setIsDialogOpen(true);
-  };
-
-  const handleDeleteClient = (client: Client) => {
-    setClientToDelete(client);
-    setIsDeleteDialogOpen(true);
-  };
-
-  const confirmDeleteClient = () => {
-    if (clientToDelete) {
-      const updatedClients = clients.filter(c => c.id !== clientToDelete.id);
-      saveClients(updatedClients);
-      setIsDeleteDialogOpen(false);
-      toast({
-        title: 'Cliente Excluído',
-        description: `${clientToDelete.name} foi excluído com sucesso.`,
-      });
-    }
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === 'monthlyValue' ? Number(value) : value,
-    }));
-  };
-
-  const handlePlanChange = (value: string) => {
-    const newPlan = value as 'Start' | 'Pro';
-    setFormData(prev => ({
-      ...prev,
-      plan: newPlan,
-      monthlyValue: newPlan === 'Pro' ? 2500 : 1500
-    }));
-  };
-
-  const handleSaveClient = () => {
-    // Validate required fields
-    if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim()) {
-      toast({
-        title: 'Erro',
-        description: t.fillRequired,
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast({
-        title: 'Erro',
-        description: 'Por favor, insira um email válido.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    try {
-      if (selectedClient) {
-        // Edit existing client
-        const updatedClients = clients.map(c => 
-          c.id === selectedClient.id ? { ...c, ...formData } : c
-        );
-        saveClients(updatedClients);
-        toast({
-          title: 'Cliente Atualizado',
-          description: `${formData.name} foi atualizado com sucesso.`,
-        });
-      } else {
-        // Check if email already exists
-        const emailExists = clients.some(c => c.email.toLowerCase() === formData.email.toLowerCase());
-        if (emailExists) {
-          toast({
-            title: 'Erro',
-            description: 'Este email já está cadastrado.',
-            variant: 'destructive',
-          });
-          return;
-        }
-
-        // Add new client
-        const newClient: Client = {
-          id: Date.now().toString(),
-          ...formData,
-        };
-        
-        console.log('Creating new client:', newClient);
-        saveClients([...clients, newClient]);
-        
-        toast({
-          title: 'Cliente Adicionado',
-          description: `${formData.name} foi adicionado com sucesso.`,
-        });
-      }
-      setIsDialogOpen(false);
-    } catch (error) {
-      console.error('Error saving client:', error);
-      toast({
-        title: 'Erro',
-        description: t.errorSaving,
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const handleReportUpload = () => {
-    if (!reportFormData.clientId || !reportFormData.title || !reportFormData.file) {
-      toast({
-        title: 'Erro',
-        description: 'Todos os campos são obrigatórios.',
-        variant: 'destructive',
-      });
-      return;
-    }
-
-    const client = clients.find(c => c.id === reportFormData.clientId);
-    if (!client) return;
-
-    const newReport: Report = {
-      id: Date.now().toString(),
-      clientId: reportFormData.clientId,
-      clientName: client.name,
-      title: reportFormData.title,
-      date: new Date().toISOString(),
-      file_url: `reports/${reportFormData.file.name}`, // Mock URL
-    };
-
-    saveReports([...reports, newReport]);
-    setIsReportDialogOpen(false);
-    setReportFormData({ clientId: '', title: '', file: null });
-    
-    toast({
-      title: t.reportUploaded,
-      description: `Relatório para ${client.name} enviado.`,
-    });
-  };
-
-  const markMessageAsRead = (messageId: string) => {
-    const updatedMessages = messages.map(msg => 
-      msg.id === messageId ? { ...msg, read: true } : msg
-    );
-    saveMessages(updatedMessages);
-    toast({
-      title: t.messageMarkedRead,
-    });
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-idBlack flex items-center justify-center">
-        <div className="text-white">{t.loading}</div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-idBlack text-white">
-      {/* Header */}
-      <div className="border-b border-gray-800 bg-idDarkBlack">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-idOrange">{t.adminPanel}</h1>
-            <p className="text-gray-400">{t.manageSystem}</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <LanguageSelector />
-            <Button variant="outline" onClick={handleLogout} className="border-gray-700">
-              <LogOut className="w-4 h-4 mr-2" />
-              {t.logout}
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      <div className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="clients" className="w-full">
-          <TabsList className="mb-6">
-            <TabsTrigger value="clients">{t.clients}</TabsTrigger>
-            <TabsTrigger value="reports">{t.reports}</TabsTrigger>
-            <TabsTrigger value="messages">{t.messages}</TabsTrigger>
-            <TabsTrigger value="settings">{t.settings}</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="clients">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">{t.clients}</h2>
-              <Button onClick={openAddClientDialog}>
-                <Plus className="w-4 h-4 mr-2" />
-                {t.addClient}
-              </Button>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border border-gray-700 rounded-lg">
-                <thead className="bg-idDarkBlack border-b border-gray-700">
-                  <tr>
-                    <th className="px-4 py-2">{t.name}</th>
-                    <th className="px-4 py-2">{t.email}</th>
-                    <th className="px-4 py-2">{t.plan}</th>
-                    <th className="px-4 py-2">{t.monthlyValue}</th>
-                    <th className="px-4 py-2">{t.currency}</th>
-                    <th className="px-4 py-2">{t.startDate}</th>
-                    <th className="px-4 py-2">{t.actions}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {clients.length === 0 && (
-                    <tr>
-                      <td colSpan={7} className="text-center py-4 text-gray-400">
-                        Nenhum cliente encontrado.
-                      </td>
-                    </tr>
-                  )}
-                  {clients.map(client => (
-                    <tr key={client.id} className="border-b border-gray-700 hover:bg-idDarkBlack">
-                      <td className="px-4 py-2">{client.name}</td>
-                      <td className="px-4 py-2">{client.email}</td>
-                      <td className="px-4 py-2">
-                        <Badge className={client.plan === 'Pro' ? 'bg-idOrange text-black' : 'bg-gray-600'}>
-                          {client.plan}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-2">{client.monthlyValue}</td>
-                      <td className="px-4 py-2">{client.currency}</td>
-                      <td className="px-4 py-2">{new Date(client.startDate).toLocaleDateString('pt-BR')}</td>
-                      <td className="px-4 py-2 space-x-2">
-                        <Button size="sm" variant="outline" onClick={() => openEditClientDialog(client)} title={t.editClient}>
-                          <Edit className="w-4 h-4" />
-                        </Button>
-                        <Button size="sm" variant="outline" onClick={() => handleDeleteClient(client)} title={t.deleteClient} className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white">
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="reports">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">{t.clientReports}</h2>
-              <Button onClick={() => setIsReportDialogOpen(true)}>
-                <Upload className="w-4 h-4 mr-2" />
-                {t.uploadReport}
-              </Button>
-            </div>
-            <div className="space-y-4">
-              {reports.length === 0 ? (
-                <p className="text-gray-400 text-center py-8">{t.noReports}</p>
-              ) : (
-                reports.map(report => (
-                  <Card key={report.id} className="bg-idDarkBlack border-gray-700">
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <h4 className="font-medium text-white">{report.title}</h4>
-                          <p className="text-gray-400 text-sm">Cliente: {report.clientName}</p>
-                          <p className="text-gray-400 text-sm">{t.date}: {new Date(report.date).toLocaleDateString()}</p>
-                        </div>
-                        <Button variant="outline" size="sm">
-                          <Download className="w-4 h-4 mr-2" />
-                          {t.download}
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="messages">
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold">{t.contactMessages}</h2>
-            </div>
-            <div className="space-y-4">
-              {messages.length === 0 ? (
-                <p className="text-gray-400 text-center py-8">{t.noMessages}</p>
-              ) : (
-                messages.map(message => (
-                  <Card key={message.id} className={`bg-idDarkBlack border-gray-700 ${!message.read ? 'border-idOrange' : ''}`}>
-                    <CardContent className="p-4">
-                      <div className="flex justify-between items-start">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <h4 className="font-medium text-white">{t.messageFrom} {message.name}</h4>
-                            {!message.read && <Badge className="bg-idOrange text-black">Nova</Badge>}
-                          </div>
-                          <p className="text-gray-400 text-sm mb-1">{t.email}: {message.email}</p>
-                          {message.phone && <p className="text-gray-400 text-sm mb-2">{t.phone}: {message.phone}</p>}
-                          <p className="text-gray-300 mb-2">{message.message}</p>
-                          <p className="text-gray-500 text-xs">{new Date(message.date).toLocaleString()}</p>
-                        </div>
-                        {!message.read && (
-                          <Button variant="outline" size="sm" onClick={() => markMessageAsRead(message.id)}>
-                            <Eye className="w-4 h-4 mr-2" />
-                            {t.markAsRead}
-                          </Button>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="settings">
-            <Card className="bg-idDarkBlack border-gray-700">
-              <CardHeader>
-                <CardTitle className="text-white">{t.systemSettings}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="language">{language === 'PT' ? 'Idioma do Sistema' : language === 'EN' ? 'System Language' : 'Idioma del Sistema'}</Label>
-                    <LanguageSelector />
-                  </div>
-                  <p className="text-gray-400 text-sm">
-                    {language === 'PT' ? 'Mais configurações serão adicionadas em futuras atualizações.' : 
-                     language === 'EN' ? 'More settings will be added in future updates.' : 
-                     'Más configuraciones se agregarán en futuras actualizaciones.'}
-                  </p>
+      <div className="container mx-auto p-4">
+        <Card className="bg-idDarkBlack border-gray-800">
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">{t.adminPanel}</CardTitle>
+            <CardDescription className="text-gray-400">{t.welcome}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="clients" className="w-full">
+              <TabsList>
+                <TabsTrigger value="clients" onClick={() => setActiveTab('clients')}>{t.clients}</TabsTrigger>
+                <TabsTrigger value="messages" onClick={() => setActiveTab('messages')}>{t.messages}</TabsTrigger>
+              </TabsList>
+              <TabsContent value="clients">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-xl font-semibold">{t.manageClients}</h2>
+                  <Button onClick={handleAddClient} className="bg-idOrange hover:bg-idOrange/90 text-black">
+                    <Plus className="mr-2 h-4 w-4" />
+                    {t.addClient}
+                  </Button>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                {clients.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-700">
+                      <thead>
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.clientName}</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.clientEmail}</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.clientPhone}</th>
+                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t.actions}</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-800">
+                        {clients.map((client) => (
+                          <tr key={client.id}>
+                            <td className="px-6 py-4 whitespace-nowrap">{client.name}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{client.email}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{client.phone}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right">
+                              <Button onClick={() => handleEditClient(client)} size="icon" variant="ghost" className="text-gray-400 hover:text-white">
+                                <Pencil className="h-4 w-4" />
+                                <span>{t.editClient}</span>
+                              </Button>
+                              <Button onClick={() => handleDeleteClient(client)} size="icon" variant="ghost" className="text-gray-400 hover:text-white">
+                                <Trash className="h-4 w-4" />
+                                <span>{t.deleteClient}</span>
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-gray-500">{t.noClients}</p>
+                )}
+              </TabsContent>
+              <TabsContent value="messages">
+                <h2 className="text-xl font-semibold mb-4">{t.manageMessages}</h2>
+                {messages.length > 0 ? (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-700">
+                      <thead>
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.messageName}</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.messageEmail}</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.messagePhone}</th>
+                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t.actions}</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-800">
+                        {messages.map((message) => (
+                          <tr key={message.id}>
+                            <td className="px-6 py-4 whitespace-nowrap">{message.name}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{message.email}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{message.phone}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right">
+                              <Button onClick={() => handleViewMessage(message)} size="icon" variant="ghost" className="text-gray-400 hover:text-white">
+                                <Mail className="h-4 w-4" />
+                                <span>{t.viewMessage}</span>
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-gray-500">{t.noMessages}</p>
+                )}
+              </TabsContent>
+            </Tabs>
+            <Button onClick={handleLogout} variant="secondary" className="mt-4 bg-gray-800 hover:bg-gray-700">{t.logout}</Button>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Client Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>{selectedClient ? t.editClient : t.addClient}</DialogTitle>
-            <DialogDescription>
-              {selectedClient ? `Editando cliente ${selectedClient.name}` : 'Preencha os dados do novo cliente.'}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 mt-4">
-            <div>
-              <Label htmlFor="name">{t.name} *</Label>
-              <Input 
-                id="name" 
-                name="name" 
-                value={formData.name} 
-                onChange={handleInputChange} 
-                placeholder={t.name}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="email">{t.email} *</Label>
-              <Input 
-                id="email" 
-                name="email" 
-                type="email" 
-                value={formData.email} 
-                onChange={handleInputChange} 
-                placeholder={t.email}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="password">{t.password} *</Label>
-              <Input 
-                id="password" 
-                name="password" 
-                type="password" 
-                value={formData.password} 
-                onChange={handleInputChange} 
-                placeholder={t.password}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="plan">{t.plan}</Label>
-              <Select value={formData.plan} onValueChange={handlePlanChange}>
-                <SelectTrigger id="plan" className="w-full">
-                  <SelectValue placeholder={t.plan} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Start">Start</SelectItem>
-                  <SelectItem value="Pro">Pro</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="monthlyValue">{t.monthlyValue}</Label>
-              <Input 
-                id="monthlyValue" 
-                name="monthlyValue" 
-                type="number" 
-                value={formData.monthlyValue} 
-                onChange={handleInputChange} 
-                placeholder={t.monthlyValue} 
-                min={0}
-              />
-            </div>
-            <div>
-              <Label htmlFor="currency">{t.currency}</Label>
-              <Select value={formData.currency} onValueChange={(value) => setFormData(prev => ({ ...prev, currency: value }))}>
-                <SelectTrigger id="currency" className="w-full">
-                  <SelectValue placeholder={t.currency} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="BRL">BRL</SelectItem>
-                  <SelectItem value="USD">USD</SelectItem>
-                  <SelectItem value="EUR">EUR</SelectItem>
-                  <SelectItem value="GBP">GBP</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="startDate">{t.startDate}</Label>
-              <Input 
-                id="startDate" 
-                name="startDate" 
-                type="date" 
-                value={formData.startDate} 
-                onChange={handleInputChange} 
-              />
-            </div>
-          </div>
-          <DialogFooter className="mt-6 flex justify-end space-x-4">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>{t.cancel}</Button>
-            <Button onClick={handleSaveClient}>{t.save}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Client Form Modal */}
+      {showClientForm && (
+        <ClientForm
+          open={showClientForm}
+          onOpenChange={setShowClientForm}
+          onSubmit={handleClientFormSubmit}
+          editingClient={editingClient}
+        />
+      )}
 
-      {/* Report Upload Dialog */}
-      <Dialog open={isReportDialogOpen} onOpenChange={setIsReportDialogOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle>{t.uploadReport}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 mt-4">
-            <div>
-              <Label htmlFor="reportClient">{t.selectClient}</Label>
-              <Select value={reportFormData.clientId} onValueChange={(value) => setReportFormData(prev => ({ ...prev, clientId: value }))}>
-                <SelectTrigger>
-                  <SelectValue placeholder={t.selectClient} />
-                </SelectTrigger>
-                <SelectContent>
-                  {clients.map(client => (
-                    <SelectItem key={client.id} value={client.id}>
-                      {client.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="reportTitle">{t.reportTitle}</Label>
-              <Input 
-                id="reportTitle" 
-                value={reportFormData.title} 
-                onChange={(e) => setReportFormData(prev => ({ ...prev, title: e.target.value }))} 
-                placeholder={t.reportTitle}
-              />
-            </div>
-            <div>
-              <Label htmlFor="reportFile">{t.selectFile}</Label>
-              <Input 
-                id="reportFile" 
-                type="file" 
-                onChange={(e) => setReportFormData(prev => ({ ...prev, file: e.target.files?.[0] || null }))}
-                accept=".pdf,.doc,.docx,.xls,.xlsx"
-              />
-            </div>
-          </div>
-          <DialogFooter className="mt-6">
-            <Button variant="outline" onClick={() => setIsReportDialogOpen(false)}>{t.cancel}</Button>
-            <Button onClick={handleReportUpload}>{t.upload}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>{t.confirmDelete}</DialogTitle>
-            <DialogDescription>{t.confirmDeleteMessage}</DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="mt-6 flex justify-end space-x-4">
-            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>{t.no}</Button>
-            <Button className="bg-red-600 hover:bg-red-700 text-white" onClick={confirmDeleteClient}>{t.yes}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Message Modal */}
+      {showMessageModal && selectedMessage && (
+        <MessageModal
+          open={showMessageModal}
+          onOpenChange={setShowMessageModal}
+          message={selectedMessage}
+        />
+      )}
     </div>
   );
 };
