@@ -241,7 +241,7 @@ const ClientDashboard = () => {
 
   const handleLogout = async () => {
     localStorage.removeItem('currentClient');
-    navigate('/cliente/login');
+    navigate('/'); // Changed from '/cliente/login' to '/'
     toast({
       title: t.logout,
       description: "Você foi desconectado com sucesso.",
