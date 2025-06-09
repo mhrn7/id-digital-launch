@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -155,6 +156,9 @@ const translations = {
     messageFrom: 'Mensagem de',
     reportUploaded: 'Relatório enviado com sucesso!',
     messageMarkedRead: 'Mensagem marcada como lida.',
+    clientSaved: 'Cliente salvo com sucesso!',
+    errorSaving: 'Erro ao salvar cliente',
+    fillRequired: 'Preencha todos os campos obrigatórios',
   },
   EN: {
     adminPanel: 'Admin Panel',
@@ -202,6 +206,9 @@ const translations = {
     messageFrom: 'Message from',
     reportUploaded: 'Report uploaded successfully!',
     messageMarkedRead: 'Message marked as read.',
+    clientSaved: 'Client saved successfully!',
+    errorSaving: 'Error saving client',
+    fillRequired: 'Fill in all required fields',
   },
   ES: {
     adminPanel: 'Panel Administrativo',
@@ -249,6 +256,9 @@ const translations = {
     messageFrom: 'Mensaje de',
     reportUploaded: '¡Informe subido exitosamente!',
     messageMarkedRead: 'Mensaje marcado como leído.',
+    clientSaved: '¡Cliente guardado exitosamente!',
+    errorSaving: 'Error al guardar cliente',
+    fillRequired: 'Complete todos los campos requeridos',
   }
 };
 
@@ -267,9 +277,9 @@ const AdminDashboard = () => {
     email: '',
     password: '',
     plan: 'Start' as 'Start' | 'Pro',
-    monthlyValue: 0,
+    monthlyValue: 1500,
     currency: 'BRL',
-    startDate: '',
+    startDate: new Date().toISOString().split('T')[0],
   });
   const [reportFormData, setReportFormData] = useState({
     clientId: '',
@@ -283,32 +293,65 @@ const AdminDashboard = () => {
   const t = translations[language];
 
   useEffect(() => {
-    // Load data from localStorage
-    const storedClients = localStorage.getItem('adminClients');
-    const storedReports = localStorage.getItem('adminReports');
-    const storedMessages = localStorage.getItem('formMessages');
-    
-    if (storedClients) {
-      setClients(JSON.parse(storedClients));
-    }
-    if (storedReports) {
-      setReports(JSON.parse(storedReports));
-    }
-    if (storedMessages) {
-      const formMessages = JSON.parse(storedMessages);
-      const convertedMessages = formMessages.map((msg: any) => ({
-        ...msg,
-        read: msg.read || false,
-        date: msg.timestamp || msg.date || new Date().toISOString()
-      }));
-      setMessages(convertedMessages);
-    }
-    setLoading(false);
+    checkAuth();
+    loadData();
   }, []);
 
+  // Check if admin is authenticated
+  const checkAuth = () => {
+    const adminUser = localStorage.getItem('adminUser');
+    if (!adminUser) {
+      navigate('/admin/login');
+      return;
+    }
+  };
+
+  // Load data from localStorage with better error handling
+  const loadData = () => {
+    try {
+      const storedClients = localStorage.getItem('adminClients');
+      const storedReports = localStorage.getItem('adminReports');
+      const storedMessages = localStorage.getItem('formMessages');
+      
+      if (storedClients) {
+        setClients(JSON.parse(storedClients));
+      }
+      if (storedReports) {
+        setReports(JSON.parse(storedReports));
+      }
+      if (storedMessages) {
+        const formMessages = JSON.parse(storedMessages);
+        const convertedMessages = formMessages.map((msg: any) => ({
+          ...msg,
+          read: msg.read || false,
+          date: msg.timestamp || msg.date || new Date().toISOString()
+        }));
+        setMessages(convertedMessages);
+      }
+    } catch (error) {
+      console.error('Error loading data:', error);
+      toast({
+        title: 'Erro',
+        description: 'Erro ao carregar dados',
+        variant: 'destructive',
+      });
+    }
+    setLoading(false);
+  };
+
   const saveClients = (updatedClients: Client[]) => {
-    setClients(updatedClients);
-    localStorage.setItem('adminClients', JSON.stringify(updatedClients));
+    try {
+      setClients(updatedClients);
+      localStorage.setItem('adminClients', JSON.stringify(updatedClients));
+      console.log('Clients saved:', updatedClients);
+    } catch (error) {
+      console.error('Error saving clients:', error);
+      toast({
+        title: 'Erro',
+        description: 'Erro ao salvar clientes',
+        variant: 'destructive',
+      });
+    }
   };
 
   const saveReports = (updatedReports: Report[]) => {
@@ -337,9 +380,9 @@ const AdminDashboard = () => {
       email: '',
       password: '',
       plan: 'Start',
-      monthlyValue: 0,
+      monthlyValue: 1500,
       currency: 'BRL',
-      startDate: '',
+      startDate: new Date().toISOString().split('T')[0],
     });
     setIsDialogOpen(true);
   };
@@ -369,13 +412,13 @@ const AdminDashboard = () => {
       saveClients(updatedClients);
       setIsDeleteDialogOpen(false);
       toast({
-        title: t.deleteClient,
-        description: `${clientToDelete.name} ${t.deleteClient.toLowerCase()}d.`,
+        title: 'Cliente Excluído',
+        description: `${clientToDelete.name} foi excluído com sucesso.`,
       });
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -383,39 +426,83 @@ const AdminDashboard = () => {
     }));
   };
 
+  const handlePlanChange = (value: string) => {
+    const newPlan = value as 'Start' | 'Pro';
+    setFormData(prev => ({
+      ...prev,
+      plan: newPlan,
+      monthlyValue: newPlan === 'Pro' ? 2500 : 1500
+    }));
+  };
+
   const handleSaveClient = () => {
-    if (!formData.name || !formData.email || !formData.password) {
+    // Validate required fields
+    if (!formData.name.trim() || !formData.email.trim() || !formData.password.trim()) {
       toast({
         title: 'Erro',
-        description: 'Nome, email e senha são obrigatórios.',
+        description: t.fillRequired,
         variant: 'destructive',
       });
       return;
     }
 
-    if (selectedClient) {
-      // Edit existing client
-      const updatedClients = clients.map(c => 
-        c.id === selectedClient.id ? { ...c, ...formData } : c
-      );
-      saveClients(updatedClients);
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
       toast({
-        title: t.editClient,
-        description: `${formData.name} atualizado com sucesso.`,
+        title: 'Erro',
+        description: 'Por favor, insira um email válido.',
+        variant: 'destructive',
       });
-    } else {
-      // Add new client
-      const newClient: Client = {
-        id: Date.now().toString(),
-        ...formData,
-      };
-      saveClients([...clients, newClient]);
+      return;
+    }
+
+    try {
+      if (selectedClient) {
+        // Edit existing client
+        const updatedClients = clients.map(c => 
+          c.id === selectedClient.id ? { ...c, ...formData } : c
+        );
+        saveClients(updatedClients);
+        toast({
+          title: 'Cliente Atualizado',
+          description: `${formData.name} foi atualizado com sucesso.`,
+        });
+      } else {
+        // Check if email already exists
+        const emailExists = clients.some(c => c.email.toLowerCase() === formData.email.toLowerCase());
+        if (emailExists) {
+          toast({
+            title: 'Erro',
+            description: 'Este email já está cadastrado.',
+            variant: 'destructive',
+          });
+          return;
+        }
+
+        // Add new client
+        const newClient: Client = {
+          id: Date.now().toString(),
+          ...formData,
+        };
+        
+        console.log('Creating new client:', newClient);
+        saveClients([...clients, newClient]);
+        
+        toast({
+          title: 'Cliente Adicionado',
+          description: `${formData.name} foi adicionado com sucesso.`,
+        });
+      }
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error('Error saving client:', error);
       toast({
-        title: t.addClient,
-        description: `${formData.name} adicionado com sucesso.`,
+        title: 'Erro',
+        description: t.errorSaving,
+        variant: 'destructive',
       });
     }
-    setIsDialogOpen(false);
   };
 
   const handleReportUpload = () => {
@@ -530,24 +617,13 @@ const AdminDashboard = () => {
                       <td className="px-4 py-2">{client.name}</td>
                       <td className="px-4 py-2">{client.email}</td>
                       <td className="px-4 py-2">
-                        <div>
-                          <div className="font-medium">{client.plan}</div>
-                          <div className="text-xs text-gray-400 mt-1">
-                            <div className="text-sm font-medium mb-2">{t.includedServices}:</div>
-                            <ul className="space-y-1">
-                              {planDetails[language][client.plan]?.map((service, index) => (
-                                <li key={index} className="flex items-start text-gray-300">
-                                  <div className="w-1 h-1 bg-idOrange rounded-full mr-2 mt-2 flex-shrink-0"></div>
-                                  <span className="text-xs leading-relaxed">{service}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        </div>
+                        <Badge className={client.plan === 'Pro' ? 'bg-idOrange text-black' : 'bg-gray-600'}>
+                          {client.plan}
+                        </Badge>
                       </td>
                       <td className="px-4 py-2">{client.monthlyValue}</td>
                       <td className="px-4 py-2">{client.currency}</td>
-                      <td className="px-4 py-2">{client.startDate}</td>
+                      <td className="px-4 py-2">{new Date(client.startDate).toLocaleDateString('pt-BR')}</td>
                       <td className="px-4 py-2 space-x-2">
                         <Button size="sm" variant="outline" onClick={() => openEditClientDialog(client)} title={t.editClient}>
                           <Edit className="w-4 h-4" />
@@ -586,7 +662,7 @@ const AdminDashboard = () => {
                         </div>
                         <Button variant="outline" size="sm">
                           <Download className="w-4 h-4 mr-2" />
-                          {t.download || 'Download'}
+                          {t.download}
                         </Button>
                       </div>
                     </CardContent>
@@ -666,68 +742,49 @@ const AdminDashboard = () => {
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <div>
-              <Label htmlFor="name">{t.name}</Label>
+              <Label htmlFor="name">{t.name} *</Label>
               <Input 
                 id="name" 
                 name="name" 
                 value={formData.name} 
                 onChange={handleInputChange} 
-                placeholder={t.name} 
+                placeholder={t.name}
+                required
               />
             </div>
             <div>
-              <Label htmlFor="email">{t.email}</Label>
+              <Label htmlFor="email">{t.email} *</Label>
               <Input 
                 id="email" 
                 name="email" 
                 type="email" 
                 value={formData.email} 
                 onChange={handleInputChange} 
-                placeholder={t.email} 
+                placeholder={t.email}
+                required
               />
             </div>
             <div>
-              <Label htmlFor="password">{t.password}</Label>
+              <Label htmlFor="password">{t.password} *</Label>
               <Input 
                 id="password" 
                 name="password" 
                 type="password" 
                 value={formData.password} 
                 onChange={handleInputChange} 
-                placeholder={t.password} 
+                placeholder={t.password}
+                required
               />
             </div>
             <div>
               <Label htmlFor="plan">{t.plan}</Label>
-              <Select name="plan" value={formData.plan} onValueChange={(value) => setFormData(prev => ({ ...prev, plan: value as 'Start' | 'Pro' }))}>
+              <Select value={formData.plan} onValueChange={handlePlanChange}>
                 <SelectTrigger id="plan" className="w-full">
                   <SelectValue placeholder={t.plan} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Start">
-                    <div>
-                      <div className="font-medium">Start</div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        {planDetails[language].Start?.map((service, index) => (
-                          <div key={index} className="flex items-start">
-                            <span className="text-xs leading-relaxed">• {service}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="Pro">
-                    <div>
-                      <div className="font-medium">Pro</div>
-                      <div className="text-xs text-gray-500 mt-1">
-                        {planDetails[language].Pro?.map((service, index) => (
-                          <div key={index} className="flex items-start">
-                            <span className="text-xs leading-relaxed">• {service}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </SelectItem>
+                  <SelectItem value="Start">Start</SelectItem>
+                  <SelectItem value="Pro">Pro</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -745,7 +802,7 @@ const AdminDashboard = () => {
             </div>
             <div>
               <Label htmlFor="currency">{t.currency}</Label>
-              <Select name="currency" value={formData.currency} onValueChange={(value) => setFormData(prev => ({ ...prev, currency: value }))}>
+              <Select value={formData.currency} onValueChange={(value) => setFormData(prev => ({ ...prev, currency: value }))}>
                 <SelectTrigger id="currency" className="w-full">
                   <SelectValue placeholder={t.currency} />
                 </SelectTrigger>

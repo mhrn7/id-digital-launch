@@ -47,7 +47,7 @@ const Hero = () => {
     switch (language) {
       case 'EN':
         return {
-          heroTitle: <>Ready to scale your <span className="text-idOrange">sales</span> with paid traffic?</>,
+          heroTitle: <>Ready to boost your business with <span className="text-idOrange">smart strategies</span>?</>,
           heroDescription: 'Digital marketing strategies focused on results and cutting-edge AI technology to accelerate your company\'s growth.',
           requestProposal: 'I Want to Start Scaling My Business',
           ourServices: 'Our Services',
@@ -57,7 +57,7 @@ const Hero = () => {
         };
       case 'ES':
         return {
-          heroTitle: <>¿Listo para escalar tus <span className="text-idOrange">ventas</span> con tráfico pago?</>,
+          heroTitle: <>¿Listo para impulsar tu negocio con <span className="text-idOrange">estrategias inteligentes</span>?</>,
           heroDescription: 'Estrategias de marketing digital enfocadas en resultados y tecnología de punta con IA para acelerar el crecimiento de tu empresa.',
           requestProposal: 'Quiero Comenzar a Escalar Mi Negocio',
           ourServices: 'Nuestros Servicios',
@@ -68,7 +68,7 @@ const Hero = () => {
       default:
         // PT
         return {
-          heroTitle: <>Pronto para escalar suas <span className="text-idOrange">vendas</span> com tráfego pago?</>,
+          heroTitle: <>Pronto para impulsionar seu negócio com <span className="text-idOrange">estratégias inteligentes</span>?</>,
           heroDescription: 'Estratégias de marketing digital com foco em resultados e tecnologia de ponta com IA para acelerar o crescimento da sua empresa.',
           requestProposal: 'Quero Começar a Escalar Meu Negócio',
           ourServices: 'Conheça Nossos Serviços',

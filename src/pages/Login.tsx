@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -35,12 +36,25 @@ const Login = () => {
 
       // For regular clients, check localStorage for demo purposes
       const savedClients = localStorage.getItem('adminClients');
+      console.log('Checking clients in localStorage:', savedClients);
+      
       if (savedClients) {
         const clients = JSON.parse(savedClients);
-        const client = clients.find((c: any) => 
-          (c.email === email && c.password === password) ||
-          (c.name === email && c.password === password)
-        );
+        console.log('Parsed clients:', clients);
+        console.log('Looking for email/name:', email, 'password:', password);
+        
+        const client = clients.find((c: any) => {
+          const emailMatch = c.email?.toLowerCase() === email.toLowerCase();
+          const nameMatch = c.name?.toLowerCase() === email.toLowerCase();
+          const passwordMatch = c.password === password;
+          
+          console.log('Checking client:', c.name, c.email);
+          console.log('Email match:', emailMatch, 'Name match:', nameMatch, 'Password match:', passwordMatch);
+          
+          return (emailMatch || nameMatch) && passwordMatch;
+        });
+        
+        console.log('Found client:', client);
         
         if (client) {
           localStorage.setItem('currentClient', JSON.stringify(client));
@@ -76,8 +90,8 @@ const Login = () => {
         navigate('/cliente/dashboard');
       }
     } catch (error: any) {
-      setError('Erro ao fazer login. Tente novamente.');
       console.error('Login error:', error);
+      setError('Erro ao fazer login. Tente novamente.');
     } finally {
       setLoading(false);
     }

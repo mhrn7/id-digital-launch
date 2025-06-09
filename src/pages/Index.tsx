@@ -7,6 +7,7 @@ import Services from '@/components/Services';
 import Testimonials from '@/components/Testimonials';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
+import WhatsAppButton from '@/components/WhatsAppButton';
 import { LanguageProvider } from '@/components/LanguageProvider';
 import StructuredData from '@/components/StructuredData';
 import { Toaster } from '@/components/ui/toaster';
@@ -49,6 +50,7 @@ const Index = () => {
         <Testimonials />
         <Contact />
         <Footer />
+        <WhatsAppButton />
       </div>
     </LanguageProvider>
   );
