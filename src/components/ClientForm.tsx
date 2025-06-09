@@ -14,6 +14,8 @@ interface Client {
   phone: string;
   password: string;
   plan: string;
+  currency: string;
+  monthlyValue: number;
 }
 
 interface ClientFormProps {
@@ -29,7 +31,9 @@ const ClientForm: React.FC<ClientFormProps> = ({ open, onOpenChange, onSubmit, e
     email: '',
     phone: '',
     password: '',
-    plan: ''
+    plan: '',
+    currency: '',
+    monthlyValue: 0
   });
   const { language } = useLanguage();
 
@@ -43,9 +47,11 @@ const ClientForm: React.FC<ClientFormProps> = ({ open, onOpenChange, onSubmit, e
       password: 'Senha',
       plan: 'Plano',
       selectPlan: 'Selecione um plano',
-      basicPlan: 'Básico',
-      standardPlan: 'Padrão',
-      premiumPlan: 'Premium',
+      basicPlan: 'Start',
+      standardPlan: 'Pro',
+      currency: 'Moeda',
+      selectCurrency: 'Selecione a moeda',
+      monthlyValue: 'Valor Mensal',
       save: 'Salvar',
       cancel: 'Cancelar'
     },
@@ -58,9 +64,11 @@ const ClientForm: React.FC<ClientFormProps> = ({ open, onOpenChange, onSubmit, e
       password: 'Password',
       plan: 'Plan',
       selectPlan: 'Select a plan',
-      basicPlan: 'Basic',
-      standardPlan: 'Standard',
-      premiumPlan: 'Premium',
+      basicPlan: 'Start',
+      standardPlan: 'Pro',
+      currency: 'Currency',
+      selectCurrency: 'Select currency',
+      monthlyValue: 'Monthly Value',
       save: 'Save',
       cancel: 'Cancel'
     },
@@ -73,9 +81,11 @@ const ClientForm: React.FC<ClientFormProps> = ({ open, onOpenChange, onSubmit, e
       password: 'Contraseña',
       plan: 'Plan',
       selectPlan: 'Selecciona un plan',
-      basicPlan: 'Básico',
-      standardPlan: 'Estándar',
-      premiumPlan: 'Premium',
+      basicPlan: 'Start',
+      standardPlan: 'Pro',
+      currency: 'Moneda',
+      selectCurrency: 'Selecciona moneda',
+      monthlyValue: 'Valor Mensual',
       save: 'Guardar',
       cancel: 'Cancelar'
     }
@@ -90,7 +100,9 @@ const ClientForm: React.FC<ClientFormProps> = ({ open, onOpenChange, onSubmit, e
         email: editingClient.email || '',
         phone: editingClient.phone || '',
         password: editingClient.password || '',
-        plan: editingClient.plan || ''
+        plan: editingClient.plan || '',
+        currency: editingClient.currency || '',
+        monthlyValue: editingClient.monthlyValue || 0
       });
     } else {
       setFormData({
@@ -98,7 +110,9 @@ const ClientForm: React.FC<ClientFormProps> = ({ open, onOpenChange, onSubmit, e
         email: '',
         phone: '',
         password: '',
-        plan: ''
+        plan: '',
+        currency: '',
+        monthlyValue: 0
       });
     }
   }, [editingClient, open]);
@@ -114,7 +128,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ open, onOpenChange, onSubmit, e
     onSubmit(clientData, !!editingClient);
   };
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | number) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -123,7 +137,7 @@ const ClientForm: React.FC<ClientFormProps> = ({ open, onOpenChange, onSubmit, e
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-idDarkBlack border-gray-800 text-white">
+      <DialogContent className="bg-idDarkBlack border-gray-800 text-white max-w-md">
         <DialogHeader>
           <DialogTitle>{editingClient ? t.editClient : t.addClient}</DialogTitle>
           <DialogDescription className="text-gray-400">
@@ -185,11 +199,39 @@ const ClientForm: React.FC<ClientFormProps> = ({ open, onOpenChange, onSubmit, e
                 <SelectValue placeholder={t.selectPlan} />
               </SelectTrigger>
               <SelectContent className="bg-idDarkBlack border-gray-700">
-                <SelectItem value="básico">{t.basicPlan}</SelectItem>
-                <SelectItem value="padrão">{t.standardPlan}</SelectItem>
-                <SelectItem value="premium">{t.premiumPlan}</SelectItem>
+                <SelectItem value="Start">{t.basicPlan}</SelectItem>
+                <SelectItem value="Pro">{t.standardPlan}</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="currency" className="text-white">{t.currency}</Label>
+            <Select value={formData.currency} onValueChange={(value) => handleInputChange('currency', value)}>
+              <SelectTrigger className="bg-idBlack border-gray-700 text-white">
+                <SelectValue placeholder={t.selectCurrency} />
+              </SelectTrigger>
+              <SelectContent className="bg-idDarkBlack border-gray-700">
+                <SelectItem value="BRL">Real (BRL)</SelectItem>
+                <SelectItem value="USD">Dólar (USD)</SelectItem>
+                <SelectItem value="EUR">Euro (EUR)</SelectItem>
+                <SelectItem value="GBP">Libra (GBP)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="monthlyValue" className="text-white">{t.monthlyValue}</Label>
+            <Input
+              id="monthlyValue"
+              type="number"
+              value={formData.monthlyValue}
+              onChange={(e) => handleInputChange('monthlyValue', parseFloat(e.target.value) || 0)}
+              className="bg-idBlack border-gray-700 text-white"
+              required
+              min="0"
+              step="0.01"
+            />
           </div>
 
           <div className="flex gap-2">

@@ -16,6 +16,8 @@ interface Client {
   phone: string;
   password: string;
   plan: string;
+  currency: string;
+  monthlyValue: number;
 }
 
 interface Message {
@@ -73,6 +75,9 @@ const AdminDashboard = () => {
       clientName: 'Nome',
       clientEmail: 'Email',
       clientPhone: 'Telefone',
+      clientPlan: 'Plano',
+      clientCurrency: 'Moeda',
+      clientMonthlyValue: 'Valor Mensal',
       actions: 'Ações',
       messageName: 'Nome',
       messageEmail: 'Email',
@@ -105,6 +110,9 @@ const AdminDashboard = () => {
       clientName: 'Name',
       clientEmail: 'Email',
       clientPhone: 'Phone',
+      clientPlan: 'Plan',
+      clientCurrency: 'Currency',
+      clientMonthlyValue: 'Monthly Value',
       actions: 'Actions',
       messageName: 'Name',
       messageEmail: 'Email',
@@ -137,6 +145,9 @@ const AdminDashboard = () => {
       clientName: 'Nombre',
       clientEmail: 'Email',
       clientPhone: 'Teléfono',
+      clientPlan: 'Plan',
+      clientCurrency: 'Moneda',
+      clientMonthlyValue: 'Valor Mensual',
       actions: 'Acciones',
       messageName: 'Nombre',
       messageEmail: 'Email',
@@ -233,6 +244,21 @@ const AdminDashboard = () => {
     navigate('/admin/login');
   };
 
+  const formatCurrency = (value: number, currency: string) => {
+    switch (currency) {
+      case 'BRL':
+        return `R$ ${value.toLocaleString('pt-BR')}`;
+      case 'USD':
+        return `$ ${value.toLocaleString('en-US')}`;
+      case 'EUR':
+        return `€ ${value.toLocaleString('de-DE')}`;
+      case 'GBP':
+        return `£ ${value.toLocaleString('en-GB')}`;
+      default:
+        return `${currency} ${value.toLocaleString()}`;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-idBlack text-white">
       <div className="container mx-auto p-4">
@@ -263,6 +289,8 @@ const AdminDashboard = () => {
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.clientName}</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.clientEmail}</th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.clientPhone}</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.clientPlan}</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t.clientMonthlyValue}</th>
                           <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t.actions}</th>
                         </tr>
                       </thead>
@@ -272,6 +300,8 @@ const AdminDashboard = () => {
                             <td className="px-6 py-4 whitespace-nowrap">{client.name}</td>
                             <td className="px-6 py-4 whitespace-nowrap">{client.email}</td>
                             <td className="px-6 py-4 whitespace-nowrap">{client.phone}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{client.plan}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">{formatCurrency(client.monthlyValue, client.currency)}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-right">
                               <Button onClick={() => handleEditClient(client)} size="icon" variant="ghost" className="text-gray-400 hover:text-white">
                                 <Pencil className="h-4 w-4" />
