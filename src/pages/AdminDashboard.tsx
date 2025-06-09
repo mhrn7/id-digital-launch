@@ -14,7 +14,8 @@ interface Client {
   name: string;
   email: string;
   phone: string;
-  [key: string]: any;
+  password: string;
+  plan: string;
 }
 
 interface Message {
@@ -274,11 +275,11 @@ const AdminDashboard = () => {
                             <td className="px-6 py-4 whitespace-nowrap text-right">
                               <Button onClick={() => handleEditClient(client)} size="icon" variant="ghost" className="text-gray-400 hover:text-white">
                                 <Pencil className="h-4 w-4" />
-                                <span>{t.editClient}</span>
+                                <span className="sr-only">{t.editClient}</span>
                               </Button>
                               <Button onClick={() => handleDeleteClient(client)} size="icon" variant="ghost" className="text-gray-400 hover:text-white">
                                 <Trash className="h-4 w-4" />
-                                <span>{t.deleteClient}</span>
+                                <span className="sr-only">{t.deleteClient}</span>
                               </Button>
                             </td>
                           </tr>
@@ -312,7 +313,7 @@ const AdminDashboard = () => {
                             <td className="px-6 py-4 whitespace-nowrap text-right">
                               <Button onClick={() => handleViewMessage(message)} size="icon" variant="ghost" className="text-gray-400 hover:text-white">
                                 <Mail className="h-4 w-4" />
-                                <span>{t.viewMessage}</span>
+                                <span className="sr-only">{t.viewMessage}</span>
                               </Button>
                             </td>
                           </tr>
