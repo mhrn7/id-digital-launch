@@ -150,7 +150,7 @@ const Hero = () => {
               {/* Gradient Circle Background - reduced sizing */}
               <div className="w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] md:w-[400px] md:h-[400px] lg:w-[480px] lg:h-[480px] rounded-full bg-gradient-to-br from-idOrange/30 to-idOrange/10 p-1">
                 <div className="w-full h-full rounded-full bg-gradient-to-br from-idOrange/20 to-transparent p-2 sm:p-3 md:p-4">
-                  <img alt="CEO da Agência iD" src="/lovable-uploads/8d4d30ab-5727-457d-b2d3-7126e30162f6.png" className="w-full h-full rounded-full border-2 sm:border-3 md:border-4 border-idOrange/40 object-center object-cover" />
+                  <img alt="CEO da Agência iD" src="/lovable-uploads/8d4d30ab-5727-457d-b2d3-7126e30162f6.png" className="w-full h-full rounded-full border-2 sm:border-3 md:border-4 border-idOrange/40 object-center object-scale-down" />
                 </div>
               </div>
               
