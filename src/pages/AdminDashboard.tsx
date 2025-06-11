@@ -223,6 +223,7 @@ const AdminDashboard = () => {
   };
 
   const handleViewMessage = (message: Message) => {
+    console.log('Viewing message:', message);
     setSelectedMessage(message);
     setShowMessageModal(true);
   };
@@ -413,12 +414,14 @@ const AdminDashboard = () => {
         editingClient={editingClient}
       />
 
-      <MessageModal
-        open={showMessageModal}
-        onOpenChange={setShowMessageModal}
-        message={selectedMessage}
-        onClose={handleCloseMessageModal}
-      />
+      {selectedMessage && (
+        <MessageModal
+          open={showMessageModal}
+          onOpenChange={setShowMessageModal}
+          message={selectedMessage}
+          onClose={handleCloseMessageModal}
+        />
+      )}
     </div>
   );
 };

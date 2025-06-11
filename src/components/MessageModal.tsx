@@ -6,20 +6,24 @@ import { Mail, Phone, User } from 'lucide-react';
 import { useLanguage } from '@/components/LanguageProvider';
 
 interface Message {
-  id: string;
+  id: number;
   name: string;
   email: string;
-  phone: string;
+  phone?: string;
   message: string;
+  date: string;
+  status: 'Novo' | 'Respondido';
+  type?: 'contact' | 'password-recovery';
 }
 
 interface MessageModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  message: Message;
+  message: Message | null;
+  onClose?: () => void;
 }
 
-const MessageModal: React.FC<MessageModalProps> = ({ open, onOpenChange, message }) => {
+const MessageModal: React.FC<MessageModalProps> = ({ open, onOpenChange, message, onClose }) => {
   const { language } = useLanguage();
 
   const translations = {
@@ -50,6 +54,16 @@ const MessageModal: React.FC<MessageModalProps> = ({ open, onOpenChange, message
   };
 
   const t = translations[language];
+
+  // Don't render if message is null
+  if (!message) {
+    return null;
+  }
+
+  const handleClose = () => {
+    onOpenChange(false);
+    onClose?.();
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -82,7 +96,7 @@ const MessageModal: React.FC<MessageModalProps> = ({ open, onOpenChange, message
                 {t.phone}
               </Label>
               <div className="p-3 bg-idBlack rounded-md border border-gray-700">
-                <p className="text-white">{message.phone}</p>
+                <p className="text-white">{message.phone || 'Não informado'}</p>
               </div>
             </div>
           </div>
@@ -107,7 +121,7 @@ const MessageModal: React.FC<MessageModalProps> = ({ open, onOpenChange, message
 
         <div className="flex justify-end">
           <Button 
-            onClick={() => onOpenChange(false)}
+            onClick={handleClose}
             className="bg-idOrange hover:bg-idOrange/90 text-black"
           >
             {t.close}
