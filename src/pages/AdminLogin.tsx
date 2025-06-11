@@ -11,7 +11,7 @@ import { useLanguage } from '@/components/LanguageProvider';
 import LanguageSelector from '@/components/LanguageSelector';
 
 const AdminLogin = () => {
-  const [email, setEmail] = useState('');
+  const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -20,33 +20,33 @@ const AdminLogin = () => {
 
   const translations = {
     PT: {
-      adminAccess: 'Acesso Administrativo',
-      adminDescription: 'Faça login para acessar o painel administrativo',
-      email: 'Email',
+      adminAccess: 'Painel Administrativo',
+      adminDescription: 'Faça login para gerenciar as mensagens do site',
+      login: 'Login',
       password: 'Senha',
-      login: 'Entrar',
+      loginButton: 'Entrar',
       logging: 'Entrando...',
       invalidCredentials: 'Credenciais inválidas',
       tryAgain: 'Tente novamente',
       loginSuccess: 'Login realizado com sucesso!'
     },
     EN: {
-      adminAccess: 'Administrative Access',
-      adminDescription: 'Login to access the administrative panel',
-      email: 'Email',
-      password: 'Password',
+      adminAccess: 'Admin Panel',
+      adminDescription: 'Login to manage website messages',
       login: 'Login',
+      password: 'Password',
+      loginButton: 'Login',
       logging: 'Logging in...',
       invalidCredentials: 'Invalid credentials',
       tryAgain: 'Try again',
       loginSuccess: 'Login successful!'
     },
     ES: {
-      adminAccess: 'Acceso Administrativo',
-      adminDescription: 'Inicie sesión para acceder al panel administrativo',
-      email: 'Correo electrónico',
+      adminAccess: 'Panel de Administración',
+      adminDescription: 'Inicie sesión para gestionar los mensajes del sitio',
+      login: 'Login',
       password: 'Contraseña',
-      login: 'Iniciar sesión',
+      loginButton: 'Iniciar sesión',
       logging: 'Iniciando sesión...',
       invalidCredentials: 'Credenciales inválidas',
       tryAgain: 'Intentar de nuevo',
@@ -61,19 +61,15 @@ const AdminLogin = () => {
     setLoading(true);
 
     try {
-      console.log('Tentando fazer login com:', { email, password });
+      console.log('Tentando fazer login com:', { login, password });
       
-      // Check admin credentials - múltiplas opções válidas
-      const isValidAdmin = (
-        (email === 'admin@idanuncios.com' && password === 'admin123') ||
-        (email === 'admin' && password === 'mhrn#2025') ||
-        (email === 'admin@agenciaidmkt.site' && password === 'admin123')
-      );
+      // Check admin credentials
+      const isValidAdmin = (login === 'agenciaid' && password === '134265');
 
       if (isValidAdmin) {
         const adminUser = {
           id: 'admin',
-          email: email,
+          login: login,
           role: 'admin',
           loginTime: new Date().toISOString()
         };
@@ -92,7 +88,7 @@ const AdminLogin = () => {
         // Redirecionar para o dashboard
         navigate('/admin/dashboard');
       } else {
-        console.log('Credenciais inválidas:', { email, password });
+        console.log('Credenciais inválidas:', { login, password });
         toast({
           title: t.invalidCredentials,
           description: t.tryAgain,
@@ -130,14 +126,14 @@ const AdminLogin = () => {
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-white">{t.email}</Label>
+              <Label htmlFor="login" className="text-white">{t.login}</Label>
               <Input
-                id="email"
+                id="login"
                 type="text"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={login}
+                onChange={(e) => setLogin(e.target.value)}
                 className="bg-idBlack border-gray-700 text-white"
-                placeholder="admin@agenciaidmkt.site"
+                placeholder="agenciaid"
                 required
               />
             </div>
@@ -158,14 +154,13 @@ const AdminLogin = () => {
               className="w-full bg-idOrange hover:bg-idOrange/90 text-black font-semibold"
               disabled={loading}
             >
-              {loading ? t.logging : t.login}
+              {loading ? t.logging : t.loginButton}
             </Button>
           </form>
           
           <div className="mt-6 p-4 bg-gray-800/50 rounded-lg">
             <p className="text-xs text-gray-400 text-center">
-              Demo: admin@agenciaidmkt.site / admin123<br/>
-              ou admin / mhrn#2025
+              Demo: agenciaid / 134265
             </p>
           </div>
         </CardContent>

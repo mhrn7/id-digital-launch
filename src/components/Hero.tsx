@@ -1,11 +1,12 @@
+
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from './LanguageProvider';
+
 const Hero = () => {
-  const {
-    language
-  } = useLanguage();
+  const { language } = useLanguage();
   const [count, setCount] = useState(0);
+
   useEffect(() => {
     // Apply animation to elements
     const observer = new IntersectionObserver(entries => {
@@ -17,6 +18,7 @@ const Hero = () => {
     }, {
       threshold: 0.1
     });
+
     document.querySelectorAll('.animate-on-scroll').forEach(el => {
       observer.observe(el);
     });
@@ -26,6 +28,7 @@ const Hero = () => {
     const targetValue = 830000;
     const increment = targetValue / (duration / 50);
     let currentValue = 0;
+
     const timer = setInterval(() => {
       currentValue += increment;
       if (currentValue >= targetValue) {
@@ -34,16 +37,18 @@ const Hero = () => {
       }
       setCount(Math.floor(currentValue));
     }, 50);
+
     return () => {
       observer.disconnect();
       clearInterval(timer);
     };
   }, []);
+
   const getContent = () => {
     switch (language) {
       case 'EN':
         return {
-          heroTitle: <>Ready to boost your business with <span className="text-idOrange">smart strategies</span>?</>,
+          heroTitle: <>We are specialists in <span className="text-idOrange">boosting businesses</span> in the digital world.</>,
           heroDescription: 'Digital marketing strategies focused on results and cutting-edge AI technology to accelerate your company\'s growth.',
           requestProposal: 'I Want to Start Scaling My Business',
           ourServices: 'Our Services',
@@ -53,8 +58,8 @@ const Hero = () => {
         };
       case 'ES':
         return {
-          heroTitle: <>¿Listo para impulsar tu negocio con <span className="text-idOrange">estrategias inteligentes</span>?</>,
-          heroDescription: 'Estrategias de marketing digital enfocadas en resultados y tecnología de punta con IA para acelerar el crecimiento de tu empresa.',
+          heroTitle: <>Somos especialistas en <span className="text-idOrange">impulsar negocios</span> en el mundo digital.</>,
+          heroDescription: 'Estrategias de marketing digital enfocadas en resultados y tecnología con IA para acelerar el crecimiento de tu empresa.',
           requestProposal: 'Quiero Comenzar a Escalar Mi Negocio',
           ourServices: 'Nuestros Servicios',
           managedInAds: 'Gestionados en Anuncios',
@@ -64,8 +69,8 @@ const Hero = () => {
       default:
         // PT
         return {
-          heroTitle: <>Pronto para impulsionar seu negócio com <span className="text-idOrange">estratégias inteligentes</span>?</>,
-          heroDescription: 'Estratégias de marketing digital com foco em resultados e tecnologia de ponta com IA para acelerar o crescimento da sua empresa.',
+          heroTitle: <>Somos especialistas em <span className="text-idOrange">impulsionar negócios</span> no digital.</>,
+          heroDescription: 'Estratégias de marketing digital com foco em resultados e tecnologia com IA para acelerar o crescimento da sua empresa.',
           requestProposal: 'Quero Começar a Escalar Meu Negócio',
           ourServices: 'Conheça Nossos Serviços',
           managedInAds: 'Gerenciados em Anúncios',
@@ -74,7 +79,9 @@ const Hero = () => {
         };
     }
   };
+
   const content = getContent();
+
   const formatNumber = (num: number) => {
     if (num >= 1000000) {
       return (num / 1000000).toFixed(1) + 'M';
@@ -83,7 +90,9 @@ const Hero = () => {
     }
     return num.toString();
   };
-  return <section id="home" className="relative min-h-screen flex items-center pt-20 bg-idBlack overflow-hidden">
+
+  return (
+    <section id="home" className="relative min-h-screen flex items-center pt-20 bg-idBlack overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-1/4 -left-10 w-72 h-72 bg-idOrange/20 rounded-full blur-[100px]"></div>
@@ -144,24 +153,30 @@ const Hero = () => {
             </div>
           </div>
 
-          {/* Profile Image with Circle Background - Responsive sizing */}
+          {/* Profile Image with Circle Background - Amplified to 1.5x */}
           <div className="flex justify-center animate-on-scroll">
             <div className="relative">
-              {/* Gradient Circle Background - responsive sizing: smaller on mobile, larger on desktop */}
-              <div className="w-[280px] h-[280px] md:w-[480px] md:h-[480px] rounded-full bg-gradient-to-br from-idOrange/30 to-idOrange/10 p-1">
+              {/* Gradient Circle Background - amplified sizing: 1.5x larger */}
+              <div className="w-[420px] h-[420px] md:w-[720px] md:h-[720px] rounded-full bg-gradient-to-br from-idOrange/30 to-idOrange/10 p-1">
                 <div className="w-full h-full rounded-full bg-gradient-to-br from-idOrange/20 to-transparent p-4">
-                  <img alt="CEO da Agência iD" src="/lovable-uploads/b985cf50-2e80-4623-9196-34889d26a8ad.jpg" className="w-full h-full rounded-full border-4 border-idOrange/40 object-cover" />
+                  <img 
+                    alt="CEO da Agência iD" 
+                    src="/lovable-uploads/8d4d30ab-5727-457d-b2d3-7126e30162f6.png" 
+                    className="w-full h-full rounded-full border-4 border-idOrange/40 object-cover object-center" 
+                  />
                 </div>
               </div>
               
-              {/* Floating Animation Effects - adjusted positions for responsive sizing */}
-              <div className="absolute -top-3 -right-3 md:-top-6 md:-right-6 w-6 h-6 md:w-10 md:h-10 bg-idOrange/60 rounded-full animate-pulse"></div>
-              <div className="absolute -bottom-4 -left-4 md:-bottom-8 md:-left-8 w-8 h-8 md:w-16 md:h-16 bg-idOrange/40 rounded-full animate-pulse"></div>
-              <div className="absolute top-1/2 -right-5 md:-right-10 w-4 h-4 md:w-8 md:h-8 bg-idOrange/50 rounded-full animate-bounce"></div>
+              {/* Floating Animation Effects - adjusted positions for amplified sizing */}
+              <div className="absolute -top-4 -right-4 md:-top-8 md:-right-8 w-8 h-8 md:w-12 md:h-12 bg-idOrange/60 rounded-full animate-pulse"></div>
+              <div className="absolute -bottom-6 -left-6 md:-bottom-12 md:-left-12 w-10 h-10 md:w-20 md:h-20 bg-idOrange/40 rounded-full animate-pulse"></div>
+              <div className="absolute top-1/2 -right-7 md:-right-14 w-6 h-6 md:w-10 md:h-10 bg-idOrange/50 rounded-full animate-bounce"></div>
             </div>
           </div>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default Hero;
