@@ -1,14 +1,14 @@
+
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from '@/components/ui/button';
-import { Plus, Pencil, Trash, Mail, LogOut, Upload, FileText } from 'lucide-react';
+import { Plus, Pencil, Trash, Mail, LogOut } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/components/LanguageProvider';
 import ClientForm from '@/components/ClientForm';
 import MessageModal from '@/components/MessageModal';
-import ReportUploadForm from '@/components/ReportUploadForm';
 
 interface Client {
   id: string;
@@ -32,23 +32,11 @@ interface Message {
   type?: 'contact' | 'password-recovery';
 }
 
-interface Report {
-  id: string;
-  clientId: string;
-  clientName: string;
-  title: string;
-  date: string;
-  fileUrl: string;
-}
-
 const AdminDashboard = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [reports, setReports] = useState<Report[]>([]);
   const [showClientForm, setShowClientForm] = useState(false);
-  const [showReportForm, setShowReportForm] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [showMessageModal, setShowMessageModal] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const navigate = useNavigate();
@@ -104,16 +92,7 @@ const AdminDashboard = () => {
       clientAdded: 'Cliente adicionado com sucesso.',
       clients: 'Clientes',
       messages: 'Mensagens',
-      passwordRecovery: 'Recuperação de Senha',
-      addReport: 'Adicionar Relatório',
-      viewReport: 'Ver Relatório',
-      noReports: 'Nenhum relatório encontrado.',
-      confirmDeleteMessage: 'Tem certeza que deseja excluir esta mensagem?',
-      messageDeleted: 'Mensagem excluída com sucesso.',
-      reportAdded: 'Relatório adicionado com sucesso.',
-      confirmDeleteReport: 'Tem certeza que deseja excluir este relatório?',
-      reportDeleted: 'Relatório excluído com sucesso.',
-      reports: 'Relatórios'
+      passwordRecovery: 'Recuperação de Senha'
     },
     EN: {
       adminPanel: 'Admin Panel',
@@ -143,16 +122,7 @@ const AdminDashboard = () => {
       clientAdded: 'Client added successfully.',
       clients: 'Clients',
       messages: 'Messages',
-      passwordRecovery: 'Password Recovery',
-      addReport: 'Add Report',
-      viewReport: 'View Report',
-      noReports: 'No reports found.',
-      confirmDeleteMessage: 'Are you sure you want to delete this message?',
-      messageDeleted: 'Message deleted successfully.',
-      reportAdded: 'Report added successfully.',
-      confirmDeleteReport: 'Are you sure you want to delete this report?',
-      reportDeleted: 'Report deleted successfully.',
-      reports: 'Reports'
+      passwordRecovery: 'Password Recovery'
     },
     ES: {
       adminPanel: 'Panel Administrativo',
@@ -182,16 +152,7 @@ const AdminDashboard = () => {
       clientAdded: 'Cliente añadido con éxito.',
       clients: 'Clientes',
       messages: 'Mensajes',
-      passwordRecovery: 'Recuperación de Contraseña',
-      addReport: 'Añadir Relatorio',
-      viewReport: 'Ver Relatorio',
-      noReports: 'No se encontraron reportes.',
-      confirmDeleteMessage: '¿Está seguro de que desea eliminar este mensaje?',
-      messageDeleted: 'Mensaje eliminado con éxito.',
-      reportAdded: 'Reporte añadido con éxito.',
-      confirmDeleteReport: '¿Está seguro de que desea eliminar este reporte?',
-      reportDeleted: 'Reporte eliminado con éxito.',
-      reports: 'Reportes'
+      passwordRecovery: 'Recuperación de Contraseña'
     }
   };
 
@@ -202,7 +163,6 @@ const AdminDashboard = () => {
     const savedClients = localStorage.getItem('adminClients');
     const savedMessages = localStorage.getItem('contactMessages');
     const savedFormMessages = localStorage.getItem('formMessages');
-    const savedReports = localStorage.getItem('adminReports');
     
     if (savedClients) {
       setClients(JSON.parse(savedClients));
@@ -220,13 +180,6 @@ const AdminDashboard = () => {
     }
     
     setMessages(allMessages);
-
-    // Carregar relatórios
-    if (savedReports) {
-      setReports(JSON.parse(savedReports));
-    } else {
-      setReports([]);
-    }
   }, []);
 
   const handleAddClient = () => {
@@ -275,61 +228,9 @@ const AdminDashboard = () => {
     setShowMessageModal(true);
   };
 
-  const handleDeleteMessage = (messageId: number) => {
-    if (window.confirm(t.confirmDeleteMessage)) {
-      const updatedMessages = messages.filter(m => m.id !== messageId);
-      setMessages(updatedMessages);
-      
-      // Atualizar os dados no localStorage
-      const contactMessages = JSON.parse(localStorage.getItem('contactMessages') || '[]');
-      const formMessages = JSON.parse(localStorage.getItem('formMessages') || '[]');
-      
-      const updatedContactMessages = contactMessages.filter((m: Message) => m.id !== messageId);
-      const updatedFormMessages = formMessages.filter((m: Message) => m.id !== messageId);
-      
-      localStorage.setItem('contactMessages', JSON.stringify(updatedContactMessages));
-      localStorage.setItem('formMessages', JSON.stringify(updatedFormMessages));
-      
-      toast({
-        title: t.messageDeleted,
-      });
-    }
-  };
-
   const handleCloseMessageModal = () => {
     setShowMessageModal(false);
     setSelectedMessage(null);
-  };
-
-  const handleAddReport = () => {
-    setSelectedClient(null);
-    setShowReportForm(true);
-  };
-
-  const handleAddReportForClient = (client: Client) => {
-    setSelectedClient(client);
-    setShowReportForm(true);
-  };
-
-  const handleReportFormSubmit = (report: Report) => {
-    const updatedReports = [...reports, report];
-    setReports(updatedReports);
-    localStorage.setItem('adminReports', JSON.stringify(updatedReports));
-    setShowReportForm(false);
-    toast({
-      title: t.reportAdded,
-    });
-  };
-
-  const handleDeleteReport = (reportId: string) => {
-    if (window.confirm(t.confirmDeleteReport)) {
-      const updatedReports = reports.filter(r => r.id !== reportId);
-      setReports(updatedReports);
-      localStorage.setItem('adminReports', JSON.stringify(updatedReports));
-      toast({
-        title: t.reportDeleted,
-      });
-    }
   };
 
   const handleLogout = () => {
@@ -375,10 +276,9 @@ const AdminDashboard = () => {
 
       <div className="container mx-auto p-4">
         <Tabs defaultValue="clients" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="clients">{t.clients}</TabsTrigger>
             <TabsTrigger value="messages">{t.messages}</TabsTrigger>
-            <TabsTrigger value="reports">{t.reports}</TabsTrigger>
           </TabsList>
           
           <TabsContent value="clients" className="space-y-4">
@@ -433,14 +333,6 @@ const AdminDashboard = () => {
                                 >
                                   <Trash className="w-4 h-4" />
                                 </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleAddReportForClient(client)}
-                                  className="border-blue-700 text-blue-400 hover:bg-blue-900"
-                                >
-                                  <Upload className="w-4 h-4" />
-                                </Button>
                               </div>
                             </td>
                           </tr>
@@ -486,25 +378,15 @@ const AdminDashboard = () => {
                             </td>
                             <td className="p-4 text-gray-300">{message.date}</td>
                             <td className="p-4">
-                              <div className="flex space-x-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleViewMessage(message)}
-                                  className="border-gray-700"
-                                >
-                                  <Mail className="w-4 h-4 mr-2" />
-                                  {t.viewMessage}
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleDeleteMessage(message.id)}
-                                  className="border-red-700 text-red-400 hover:bg-red-900"
-                                >
-                                  <Trash className="w-4 h-4" />
-                                </Button>
-                              </div>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleViewMessage(message)}
+                                className="border-gray-700"
+                              >
+                                <Mail className="w-4 h-4 mr-2" />
+                                {t.viewMessage}
+                              </Button>
                             </td>
                           </tr>
                         ))
@@ -512,71 +394,6 @@ const AdminDashboard = () => {
                         <tr>
                           <td colSpan={5} className="p-8 text-center text-gray-400">
                             {t.noMessages}
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="reports" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold">Gerenciar Relatórios</h2>
-              <Button onClick={handleAddReport} className="bg-idOrange hover:bg-idOrange/90 text-black">
-                <Plus className="w-4 h-4 mr-2" />
-                {t.addReport}
-              </Button>
-            </div>
-            
-            <Card className="bg-idDarkBlack border-gray-800">
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-700">
-                        <th className="text-left p-4 text-white">Cliente</th>
-                        <th className="text-left p-4 text-white">Título</th>
-                        <th className="text-left p-4 text-white">Data</th>
-                        <th className="text-left p-4 text-white">{t.actions}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {reports.length > 0 ? (
-                        reports.map((report) => (
-                          <tr key={report.id} className="border-b border-gray-800">
-                            <td className="p-4 text-gray-300">{report.clientName}</td>
-                            <td className="p-4 text-gray-300">{report.title}</td>
-                            <td className="p-4 text-gray-300">{report.date}</td>
-                            <td className="p-4">
-                              <div className="flex space-x-2">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => window.open(report.fileUrl, '_blank')}
-                                  className="border-gray-700"
-                                >
-                                  <FileText className="w-4 h-4 mr-2" />
-                                  {t.viewReport}
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => handleDeleteReport(report.id)}
-                                  className="border-red-700 text-red-400 hover:bg-red-900"
-                                >
-                                  <Trash className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            </td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={4} className="p-8 text-center text-gray-400">
-                            {t.noReports}
                           </td>
                         </tr>
                       )}
@@ -605,14 +422,6 @@ const AdminDashboard = () => {
           onClose={handleCloseMessageModal}
         />
       )}
-
-      <ReportUploadForm
-        open={showReportForm}
-        onOpenChange={setShowReportForm}
-        onSubmit={handleReportFormSubmit}
-        clients={clients}
-        selectedClient={selectedClient}
-      />
     </div>
   );
 };
