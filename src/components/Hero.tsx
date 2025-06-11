@@ -1,12 +1,11 @@
-
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from './LanguageProvider';
-
 const Hero = () => {
-  const { language } = useLanguage();
+  const {
+    language
+  } = useLanguage();
   const [count, setCount] = useState(0);
-
   useEffect(() => {
     // Apply animation to elements
     const observer = new IntersectionObserver(entries => {
@@ -18,7 +17,6 @@ const Hero = () => {
     }, {
       threshold: 0.1
     });
-
     document.querySelectorAll('.animate-on-scroll').forEach(el => {
       observer.observe(el);
     });
@@ -28,7 +26,6 @@ const Hero = () => {
     const targetValue = 830000;
     const increment = targetValue / (duration / 50);
     let currentValue = 0;
-
     const timer = setInterval(() => {
       currentValue += increment;
       if (currentValue >= targetValue) {
@@ -37,13 +34,11 @@ const Hero = () => {
       }
       setCount(Math.floor(currentValue));
     }, 50);
-
     return () => {
       observer.disconnect();
       clearInterval(timer);
     };
   }, []);
-
   const getContent = () => {
     switch (language) {
       case 'EN':
@@ -79,9 +74,7 @@ const Hero = () => {
         };
     }
   };
-
   const content = getContent();
-
   const formatNumber = (num: number) => {
     if (num >= 1000000) {
       return (num / 1000000).toFixed(1) + 'M';
@@ -90,9 +83,7 @@ const Hero = () => {
     }
     return num.toString();
   };
-
-  return (
-    <section id="home" className="relative min-h-screen flex items-center pt-16 md:pt-20 bg-idBlack overflow-hidden">
+  return <section id="home" className="relative min-h-screen flex items-center pt-16 md:pt-20 bg-idBlack overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-1/4 -left-10 w-72 h-72 bg-idOrange/20 rounded-full blur-[100px]"></div>
@@ -159,11 +150,7 @@ const Hero = () => {
               {/* Gradient Circle Background - reduced sizing */}
               <div className="w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] md:w-[400px] md:h-[400px] lg:w-[480px] lg:h-[480px] rounded-full bg-gradient-to-br from-idOrange/30 to-idOrange/10 p-1">
                 <div className="w-full h-full rounded-full bg-gradient-to-br from-idOrange/20 to-transparent p-2 sm:p-3 md:p-4">
-                  <img 
-                    alt="CEO da Agência iD" 
-                    src="/lovable-uploads/8d4d30ab-5727-457d-b2d3-7126e30162f6.png" 
-                    className="w-full h-full rounded-full border-2 sm:border-3 md:border-4 border-idOrange/40 object-cover object-center" 
-                  />
+                  <img alt="CEO da Agência iD" src="/lovable-uploads/8d4d30ab-5727-457d-b2d3-7126e30162f6.png" className="w-full h-full rounded-full border-2 sm:border-3 md:border-4 border-idOrange/40 object-center object-cover" />
                 </div>
               </div>
               
@@ -175,8 +162,6 @@ const Hero = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default Hero;
