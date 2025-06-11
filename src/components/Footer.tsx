@@ -116,6 +116,7 @@ const Footer = () => {
 
   const whatsappMessage = getWhatsappMessage();
   const whatsappLink = `https://wa.me/5561999601534?text=${encodeURIComponent(whatsappMessage)}`;
+  const contactEmail = "idanunciosonline@gmail.com";
 
   return (
     <footer className="bg-black pt-16 relative">
@@ -184,7 +185,7 @@ const Footer = () => {
                 <svg className="w-5 h-5 text-idOrange mr-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                <span>idanunciosonline@gmail.com</span>
+                <span>{contactEmail}</span>
               </li>
               <li className="flex items-center text-gray-400">
                 <svg className="w-5 h-5 text-idOrange mr-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -223,7 +224,7 @@ const Footer = () => {
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 bg-idOrange text-white p-3 rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 z-50"
+          className="fixed bottom-6 right-6 bg-idOrange text-white p-3 rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 z-40"
           aria-label="Scroll to top"
         >
           <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">

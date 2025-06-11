@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { LogOut, FileText, CreditCard, TrendingUp } from 'lucide-react';
+import { LogOut, CreditCard, TrendingUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useLanguage } from '@/components/LanguageProvider';
 import LanguageSelector from '@/components/LanguageSelector';
@@ -158,7 +158,7 @@ const ClientDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [clientPlan, setClientPlan] = useState(null);
   const [reports, setReports] = useState([]);
-  const [activeTab, setActiveTab] = useState('contract');
+  const [activeTab, setActiveTab] = useState('plan'); // Changed default tab to 'plan'
   const navigate = useNavigate();
   const { toast } = useToast();
   const { language } = useLanguage();
@@ -298,16 +298,8 @@ const ClientDashboard = () => {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Navigation Tabs */}
+        {/* Navigation Tabs - Removed contract tab */}
         <div className="flex space-x-1 mb-8 bg-idDarkBlack p-1 rounded-lg">
-          <Button 
-            variant="ghost" 
-            className={`flex-1 ${activeTab === 'contract' ? 'bg-idOrange text-white' : 'text-gray-400 hover:text-white'}`}
-            onClick={() => setActiveTab('contract')}
-          >
-            <FileText className="w-4 h-4 mr-2" />
-            {t.contract}
-          </Button>
           <Button 
             variant="ghost" 
             className={`flex-1 ${activeTab === 'plan' ? 'bg-idOrange text-white' : 'text-gray-400 hover:text-white'}`}
@@ -327,33 +319,7 @@ const ClientDashboard = () => {
         </div>
 
         <div className="space-y-8">
-          {/* Contrato Section */}
-          {activeTab === 'contract' && (
-            <Card className="bg-idDarkBlack border-gray-800">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center">
-                  <FileText className="w-5 h-5 mr-2 text-idOrange" />
-                  {t.serviceContract}
-                </CardTitle>
-                <CardDescription className="text-gray-400">
-                  {t.contractDescription}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between p-4 border border-gray-700 rounded-lg">
-                  <div>
-                    <h4 className="text-white font-medium">{t.trafficManagement} - {clientPlan?.name}</h4>
-                    <p className="text-gray-400 text-sm">{t.signedOn} {client?.startDate ? new Date(client.startDate).toLocaleDateString('pt-BR') : '15/01/2024'}</p>
-                    <Badge className="mt-2 bg-green-600">{t.active}</Badge>
-                  </div>
-                  <Button variant="outline" className="border-gray-700">
-                    <FileText className="w-4 h-4 mr-2" />
-                    {t.downloadPdf}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          {/* Removed Contract Section */}
 
           {/* Plano Section */}
           {activeTab === 'plan' && clientPlan && (
@@ -450,3 +416,5 @@ const ClientDashboard = () => {
 };
 
 export default ClientDashboard;
+
+}

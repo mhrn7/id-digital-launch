@@ -64,12 +64,58 @@
     @apply px-4 mx-auto max-w-7xl;
   }
   
+  /* Enhanced Scroll Animations */
   .animate-on-scroll {
     @apply opacity-0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
   }
   
-  .animate-on-scroll.active {
-    @apply animate-fade-in;
+  .animate-visible {
+    @apply opacity-100;
+    transform: translateY(0);
+  }
+  
+  /* Animation variants */
+  .animate-fade-up {
+    transform: translateY(0);
+  }
+  
+  .animate-fade-left {
+    transform: translateX(0);
+  }
+  
+  .animate-fade-right {
+    transform: translateX(0);
+  }
+  
+  .animate-zoom-in {
+    transform: scale(1);
+  }
+  
+  .animate-flip {
+    transform: rotateX(0deg);
+  }
+  
+  /* Animation starting states */
+  [data-animation="fade-up"] {
+    transform: translateY(30px);
+  }
+  
+  [data-animation="fade-left"] {
+    transform: translateX(-30px);
+  }
+  
+  [data-animation="fade-right"] {
+    transform: translateX(30px);
+  }
+  
+  [data-animation="zoom-in"] {
+    transform: scale(0.9);
+  }
+  
+  [data-animation="flip"] {
+    transform: rotateX(-10deg);
   }
   
   .btn {
@@ -99,5 +145,26 @@
     50% {
       transform: translateY(-20px);
     }
+  }
+  
+  /* Staggered animation delays */
+  .animate-delay-100 {
+    transition-delay: 0.1s;
+  }
+  
+  .animate-delay-200 {
+    transition-delay: 0.2s;
+  }
+  
+  .animate-delay-300 {
+    transition-delay: 0.3s;
+  }
+  
+  .animate-delay-400 {
+    transition-delay: 0.4s;
+  }
+  
+  .animate-delay-500 {
+    transition-delay: 0.5s;
   }
 }
