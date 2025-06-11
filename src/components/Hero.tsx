@@ -158,9 +158,9 @@ const Hero = () => {
               <div className="w-[280px] h-[280px] md:w-[480px] md:h-[480px] rounded-full bg-gradient-to-br from-idOrange/30 to-idOrange/10 p-1">
                 <div className="w-full h-full rounded-full bg-gradient-to-br from-idOrange/20 to-transparent p-4">
                   <img 
-                    src="/lovable-uploads/e8edba01-542f-42bc-851a-f1cbbdf62975.png" 
+                    src="/lovable-uploads/8d4d30ab-5727-457d-b2d3-7126e30162f6.png" 
                     alt="CEO da Agência iD" 
-                    className="w-full h-full rounded-full border-4 border-idOrange/40 object-cover" 
+                    className="w-full h-full rounded-full border-4 border-idOrange/40 object-cover object-center" 
                   />
                 </div>
               </div>

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -250,10 +249,30 @@ const ClientDashboard = () => {
   };
 
   const downloadReport = (report) => {
-    toast({
-      title: "Download iniciado",
-      description: `Baixando ${report.title}...`
-    });
+    try {
+      // Create a temporary link element to trigger the download
+      const link = document.createElement('a');
+      link.href = report.fileUrl || report.file_url;
+      link.download = `${report.title}.pdf`;
+      link.target = '_blank';
+      
+      // Append to body, click, and remove
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast({
+        title: "Download iniciado",
+        description: `Baixando ${report.title}...`
+      });
+    } catch (error) {
+      console.error('Error downloading report:', error);
+      toast({
+        title: "Erro no download",
+        description: "Não foi possível baixar o relatório. Tente novamente.",
+        variant: "destructive"
+      });
+    }
   };
 
   const formatCurrency = (value, currency) => {
