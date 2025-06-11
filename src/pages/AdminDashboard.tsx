@@ -107,7 +107,13 @@ const AdminDashboard = () => {
       passwordRecovery: 'Recuperação de Senha',
       addReport: 'Adicionar Relatório',
       viewReport: 'Ver Relatório',
-      noReports: 'Nenhum relatório encontrado.'
+      noReports: 'Nenhum relatório encontrado.',
+      confirmDeleteMessage: 'Tem certeza que deseja excluir esta mensagem?',
+      messageDeleted: 'Mensagem excluída com sucesso.',
+      reportAdded: 'Relatório adicionado com sucesso.',
+      confirmDeleteReport: 'Tem certeza que deseja excluir este relatório?',
+      reportDeleted: 'Relatório excluído com sucesso.',
+      reports: 'Relatórios'
     },
     EN: {
       adminPanel: 'Admin Panel',
@@ -140,7 +146,13 @@ const AdminDashboard = () => {
       passwordRecovery: 'Password Recovery',
       addReport: 'Add Report',
       viewReport: 'View Report',
-      noReports: 'No reports found.'
+      noReports: 'No reports found.',
+      confirmDeleteMessage: 'Are you sure you want to delete this message?',
+      messageDeleted: 'Message deleted successfully.',
+      reportAdded: 'Report added successfully.',
+      confirmDeleteReport: 'Are you sure you want to delete this report?',
+      reportDeleted: 'Report deleted successfully.',
+      reports: 'Reports'
     },
     ES: {
       adminPanel: 'Panel Administrativo',
@@ -173,7 +185,13 @@ const AdminDashboard = () => {
       passwordRecovery: 'Recuperación de Contraseña',
       addReport: 'Añadir Relatorio',
       viewReport: 'Ver Relatorio',
-      noReports: 'No se encontraron reportes.'
+      noReports: 'No se encontraron reportes.',
+      confirmDeleteMessage: '¿Está seguro de que desea eliminar este mensaje?',
+      messageDeleted: 'Mensaje eliminado con éxito.',
+      reportAdded: 'Reporte añadido con éxito.',
+      confirmDeleteReport: '¿Está seguro de que desea eliminar este reporte?',
+      reportDeleted: 'Reporte eliminado con éxito.',
+      reports: 'Reportes'
     }
   };
 
