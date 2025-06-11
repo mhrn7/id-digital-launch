@@ -1,14 +1,11 @@
-
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from './LanguageProvider';
-
 const Hero = () => {
   const {
     language
   } = useLanguage();
   const [count, setCount] = useState(0);
-
   useEffect(() => {
     // Apply animation to elements
     const observer = new IntersectionObserver(entries => {
@@ -42,7 +39,6 @@ const Hero = () => {
       clearInterval(timer);
     };
   }, []);
-
   const getContent = () => {
     switch (language) {
       case 'EN':
@@ -78,7 +74,6 @@ const Hero = () => {
         };
     }
   };
-
   const content = getContent();
   const formatNumber = (num: number) => {
     if (num >= 1000000) {
@@ -88,9 +83,7 @@ const Hero = () => {
     }
     return num.toString();
   };
-
-  return (
-    <section id="home" className="relative min-h-screen flex items-center pt-20 bg-idBlack overflow-hidden">
+  return <section id="home" className="relative min-h-screen flex items-center pt-20 bg-idBlack overflow-hidden">
       {/* Background Effects */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-1/4 -left-10 w-72 h-72 bg-idOrange/20 rounded-full blur-[100px]"></div>
@@ -157,11 +150,7 @@ const Hero = () => {
               {/* Gradient Circle Background - responsive sizing: smaller on mobile, larger on desktop */}
               <div className="w-[280px] h-[280px] md:w-[480px] md:h-[480px] rounded-full bg-gradient-to-br from-idOrange/30 to-idOrange/10 p-1">
                 <div className="w-full h-full rounded-full bg-gradient-to-br from-idOrange/20 to-transparent p-4">
-                  <img 
-                    src="/lovable-uploads/e8edba01-542f-42bc-851a-f1cbbdf62975.png" 
-                    alt="CEO da Agência iD" 
-                    className="w-full h-full rounded-full border-4 border-idOrange/40 object-cover" 
-                  />
+                  <img alt="CEO da Agência iD" src="/lovable-uploads/b985cf50-2e80-4623-9196-34889d26a8ad.jpg" className="w-full h-full rounded-full border-4 border-idOrange/40 object-cover" />
                 </div>
               </div>
               
@@ -173,8 +162,6 @@ const Hero = () => {
           </div>
         </div>
       </div>
-    </section>
-  );
+    </section>;
 };
-
 export default Hero;
