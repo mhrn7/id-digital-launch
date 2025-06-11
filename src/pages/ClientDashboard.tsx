@@ -99,7 +99,9 @@ const translations = {
     download: 'Baixar',
     noReports: 'Nenhum relatório disponível ainda.',
     reportsWillAppear: 'Os relatórios aparecerão aqui conforme forem publicados.',
-    loading: 'Carregando...'
+    loading: 'Carregando...',
+    downloadSuccess: 'Download iniciado com sucesso!',
+    downloadError: 'Erro ao baixar o relatório. Tente novamente.'
   },
   EN: {
     clientArea: 'Client Area',
@@ -124,7 +126,9 @@ const translations = {
     download: 'Download',
     noReports: 'No reports available yet.',
     reportsWillAppear: 'Reports will appear here as they are published.',
-    loading: 'Loading...'
+    loading: 'Loading...',
+    downloadSuccess: 'Download started successfully!',
+    downloadError: 'Error downloading the report. Please try again.'
   },
   ES: {
     clientArea: 'Área del Cliente',
@@ -149,7 +153,9 @@ const translations = {
     download: 'Descargar',
     noReports: 'Aún no hay informes disponibles.',
     reportsWillAppear: 'Los informes aparecerán aquí cuando se publiquen.',
-    loading: 'Cargando...'
+    loading: 'Cargando...',
+    downloadSuccess: '¡Descarga iniciada con éxito!',
+    downloadError: 'Error al descargar el informe. Inténtelo de nuevo.'
   }
 };
 
@@ -248,28 +254,39 @@ const ClientDashboard = () => {
     });
   };
 
-  const downloadReport = (report) => {
+  const downloadReport = async (report) => {
     try {
-      // Create a temporary link element to trigger the download
-      const link = document.createElement('a');
-      link.href = report.fileUrl || report.file_url;
-      link.download = `${report.title}.pdf`;
-      link.target = '_blank';
+      console.log('Iniciando download do relatório:', report);
       
-      // Append to body, click, and remove
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      // Check if the file URL exists
+      const fileUrl = report.fileUrl || report.file_url;
+      if (!fileUrl) {
+        throw new Error('URL do arquivo não encontrada');
+      }
+
+      // Check if it's a blob URL or external URL
+      if (fileUrl.startsWith('blob:') || fileUrl.startsWith('data:')) {
+        // For blob URLs, create a temporary link
+        const link = document.createElement('a');
+        link.href = fileUrl;
+        link.download = `${report.title}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        // For external URLs, open in new tab
+        window.open(fileUrl, '_blank');
+      }
       
       toast({
-        title: "Download iniciado",
-        description: `Baixando ${report.title}...`
+        title: t.downloadSuccess,
+        description: `${report.title}`,
       });
     } catch (error) {
-      console.error('Error downloading report:', error);
+      console.error('Erro no download:', error);
       toast({
-        title: "Erro no download",
-        description: "Não foi possível baixar o relatório. Tente novamente.",
+        title: t.downloadError,
+        description: "Verifique se o arquivo ainda está disponível.",
         variant: "destructive"
       });
     }
@@ -300,16 +317,16 @@ const ClientDashboard = () => {
 
   return (
     <div className="min-h-screen bg-idBlack text-white">
-      {/* Header */}
+      {/* Header - Melhorado para mobile */}
       <div className="border-b border-gray-800 bg-idDarkBlack">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-idOrange">{t.clientArea}</h1>
-            <p className="text-gray-400">{t.welcome}, {client?.name || client?.email}</p>
+        <div className="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex-1">
+            <h1 className="text-xl sm:text-2xl font-bold text-idOrange">{t.clientArea}</h1>
+            <p className="text-gray-400 text-sm sm:text-base">{t.welcome}, {client?.name || client?.email}</p>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             <LanguageSelector />
-            <Button variant="outline" onClick={handleLogout} className="border-gray-700">
+            <Button variant="outline" onClick={handleLogout} className="border-gray-700 text-sm">
               <LogOut className="w-4 h-4 mr-2" />
               {t.logout}
             </Button>
@@ -317,64 +334,64 @@ const ClientDashboard = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-8">
-        {/* Navigation Tabs - Removed contract tab */}
-        <div className="flex space-x-1 mb-8 bg-idDarkBlack p-1 rounded-lg">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
+        {/* Navigation Tabs - Melhorado para mobile */}
+        <div className="flex space-x-1 mb-6 sm:mb-8 bg-idDarkBlack p-1 rounded-lg">
           <Button 
             variant="ghost" 
-            className={`flex-1 ${activeTab === 'plan' ? 'bg-idOrange text-white' : 'text-gray-400 hover:text-white'}`}
+            className={`flex-1 text-sm sm:text-base ${activeTab === 'plan' ? 'bg-idOrange text-white' : 'text-gray-400 hover:text-white'}`}
             onClick={() => setActiveTab('plan')}
           >
-            <CreditCard className="w-4 h-4 mr-2" />
-            {t.plan}
+            <CreditCard className="w-4 h-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">{t.plan}</span>
+            <span className="sm:hidden">Plano</span>
           </Button>
           <Button 
             variant="ghost" 
-            className={`flex-1 ${activeTab === 'reports' ? 'bg-idOrange text-white' : 'text-gray-400 hover:text-white'}`}
+            className={`flex-1 text-sm sm:text-base ${activeTab === 'reports' ? 'bg-idOrange text-white' : 'text-gray-400 hover:text-white'}`}
             onClick={() => setActiveTab('reports')}
           >
-            <TrendingUp className="w-4 h-4 mr-2" />
-            {t.reports}
+            <TrendingUp className="w-4 h-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">{t.reports}</span>
+            <span className="sm:hidden">Relatórios</span>
           </Button>
         </div>
 
-        <div className="space-y-8">
-          {/* Removed Contract Section */}
-
-          {/* Plano Section */}
+        <div className="space-y-6 sm:space-y-8">
+          {/* Plano Section - Melhorado para mobile */}
           {activeTab === 'plan' && clientPlan && (
             <Card className="bg-idDarkBlack border-gray-800">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-white flex items-center text-lg sm:text-xl">
                   <CreditCard className="w-5 h-5 mr-2 text-idOrange" />
                   {t.plan} {clientPlan.name}
                 </CardTitle>
-                <CardDescription className="text-gray-400">
+                <CardDescription className="text-gray-400 text-sm sm:text-base">
                   {t.planDetails}
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-6">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400">{t.monthlyValue}:</span>
-                    <span className="text-2xl font-bold text-idOrange">
+                <div className="space-y-4 sm:space-y-6">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                    <span className="text-gray-400 text-sm sm:text-base">{t.monthlyValue}:</span>
+                    <span className="text-xl sm:text-2xl font-bold text-idOrange">
                       {formatCurrency(clientPlan.price, clientPlan.currency)}
                     </span>
                   </div>
                   
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-400">{t.status}:</span>
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
+                    <span className="text-gray-400 text-sm sm:text-base">{t.status}:</span>
                     <Badge className={clientPlan.status === 'active' ? 'bg-green-600' : 'bg-red-600'}>
                       {clientPlan.status === 'active' ? t.active : 'Inativo'}
                     </Badge>
                   </div>
 
                   <div>
-                    <h4 className="text-white font-medium mb-4 text-lg">{t.includedServices}:</h4>
-                    <ul className="space-y-3">
+                    <h4 className="text-white font-medium mb-3 sm:mb-4 text-base sm:text-lg">{t.includedServices}:</h4>
+                    <ul className="space-y-2 sm:space-y-3">
                       {clientPlan.features.map((feature, index) => (
-                        <li key={index} className="flex items-start text-gray-300">
-                          <div className="w-2 h-2 bg-idOrange rounded-full mr-4 mt-2 flex-shrink-0"></div>
+                        <li key={index} className="flex items-start text-gray-300 text-sm sm:text-base">
+                          <div className="w-2 h-2 bg-idOrange rounded-full mr-3 sm:mr-4 mt-2 flex-shrink-0"></div>
                           <span className="leading-relaxed">{feature}</span>
                         </li>
                       ))}
@@ -385,32 +402,32 @@ const ClientDashboard = () => {
             </Card>
           )}
 
-          {/* Relatórios Section */}
+          {/* Relatórios Section - Melhorado para mobile */}
           {activeTab === 'reports' && (
             <Card className="bg-idDarkBlack border-gray-800">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-white flex items-center text-lg sm:text-xl">
                   <TrendingUp className="w-5 h-5 mr-2 text-idOrange" />
                   {t.performanceReports}
                 </CardTitle>
-                <CardDescription className="text-gray-400">
+                <CardDescription className="text-gray-400 text-sm sm:text-base">
                   {t.reportsDescription}
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-3 sm:space-y-4">
                   {reports.length > 0 ? (
                     reports.map((report) => (
-                      <div key={report.id} className="flex items-center justify-between p-4 border border-gray-700 rounded-lg">
-                        <div>
-                          <h4 className="text-white font-medium">{report.title}</h4>
-                          <p className="text-gray-400 text-sm">
+                      <div key={report.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 sm:p-4 border border-gray-700 rounded-lg gap-3">
+                        <div className="flex-1">
+                          <h4 className="text-white font-medium text-sm sm:text-base">{report.title}</h4>
+                          <p className="text-gray-400 text-xs sm:text-sm">
                             {t.date}: {new Date(report.date).toLocaleDateString('pt-BR')}
                           </p>
                         </div>
                         <Button 
                           variant="outline" 
-                          className="border-gray-700"
+                          className="border-gray-700 w-full sm:w-auto text-sm"
                           onClick={() => downloadReport(report)}
                         >
                           <FileText className="w-4 h-4 mr-2" />
@@ -419,10 +436,10 @@ const ClientDashboard = () => {
                       </div>
                     ))
                   ) : (
-                    <div className="text-center py-8">
-                      <TrendingUp className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-                      <p className="text-gray-400">{t.noReports}</p>
-                      <p className="text-gray-500 text-sm">{t.reportsWillAppear}</p>
+                    <div className="text-center py-6 sm:py-8">
+                      <TrendingUp className="w-10 h-10 sm:w-12 sm:h-12 text-gray-600 mx-auto mb-4" />
+                      <p className="text-gray-400 text-sm sm:text-base">{t.noReports}</p>
+                      <p className="text-gray-500 text-xs sm:text-sm">{t.reportsWillAppear}</p>
                     </div>
                   )}
                 </div>

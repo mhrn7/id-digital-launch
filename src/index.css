@@ -46,22 +46,32 @@
   
   html {
     @apply scroll-smooth;
+    /* Previne zoom horizontal em mobile */
+    overflow-x: hidden;
   }
   
   body {
     @apply bg-black text-foreground font-sans;
+    /* Previne zoom horizontal em mobile */
+    overflow-x: hidden;
+    /* Melhora performance em mobile */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading font-bold;
+    /* Melhora quebra de linha em mobile */
+    word-wrap: break-word;
+    hyphens: auto;
   }
   
   .section-padding {
-    @apply py-16 md:py-24;
+    @apply py-12 sm:py-16 md:py-24;
   }
   
   .container-custom {
-    @apply px-4 mx-auto max-w-7xl;
+    @apply px-4 sm:px-6 mx-auto max-w-7xl;
   }
   
   /* Enhanced Scroll Animations */
@@ -119,7 +129,9 @@
   }
   
   .btn {
-    @apply inline-flex items-center justify-center px-6 py-3 text-base font-medium transition-all duration-300 rounded-md;
+    @apply inline-flex items-center justify-center px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-medium transition-all duration-300 rounded-md;
+    /* Previne zoom em mobile */
+    touch-action: manipulation;
   }
   
   .btn-primary {
@@ -166,5 +178,50 @@
   
   .animate-delay-500 {
     transition-delay: 0.5s;
+  }
+
+  /* Melhorias específicas para mobile */
+  @media (max-width: 640px) {
+    .container-custom {
+      @apply px-4;
+    }
+    
+    /* Melhora legibilidade em mobile */
+    h1 {
+      line-height: 1.2;
+    }
+    
+    h2, h3 {
+      line-height: 1.3;
+    }
+    
+    p {
+      line-height: 1.6;
+    }
+    
+    /* Botões mais amigáveis ao toque */
+    button, .btn {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+  
+  /* Otimizações para performance */
+  img {
+    @apply max-w-full h-auto;
+    /* Melhora carregamento de imagens */
+    loading: lazy;
+  }
+  
+  /* Previne problemas de layout em mobile */
+  * {
+    box-sizing: border-box;
+  }
+  
+  /* Melhora área de toque em mobile */
+  @media (hover: none) and (pointer: coarse) {
+    button, a, [role="button"] {
+      @apply p-3;
+    }
   }
 }

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from './LanguageProvider';
@@ -116,41 +115,41 @@ const Footer = () => {
 
   const whatsappMessage = getWhatsappMessage();
   const whatsappLink = `https://wa.me/5561999601534?text=${encodeURIComponent(whatsappMessage)}`;
-  const contactEmail = "idanunciosonline@gmail.com";
+  const contactEmail = "contato@agenciaidmkt.site";
 
   return (
-    <footer className="bg-black pt-16 relative">
+    <footer className="bg-black pt-12 sm:pt-16 relative">
       {/* Background Effects */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <div className="absolute top-1/2 left-1/4 w-60 h-60 bg-idOrange/10 rounded-full blur-[100px]"></div>
       </div>
 
       <div className="container-custom relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          {/* Company Info */}
-          <div>
-            <a href="#home" className="text-2xl font-bold text-white mb-4 block">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-8 sm:mb-12">
+          {/* Company Info - Melhorado para mobile */}
+          <div className="text-center sm:text-left">
+            <a href="#home" className="text-xl sm:text-2xl font-bold text-white mb-3 sm:mb-4 block">
               <span className="text-idOrange">iD</span> Digital
             </a>
-            <p className="text-gray-400 mb-6">
+            <p className="text-gray-400 mb-4 sm:mb-6 text-sm sm:text-base px-2 sm:px-0">
               {content.companyDescription}
             </p>
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center justify-center sm:justify-start space-x-4">
               <LanguageSelector />
             </div>
           </div>
 
-          {/* Navigation */}
-          <div>
-            <h3 className="text-lg font-bold text-white mb-4">
+          {/* Navigation - Melhorado para mobile */}
+          <div className="text-center sm:text-left">
+            <h3 className="text-base sm:text-lg font-bold text-white mb-3 sm:mb-4">
               {content.navigation}
             </h3>
-            <ul className="space-y-2">
+            <ul className="space-y-1 sm:space-y-2">
               {content.navLinks.map((link, index) => (
                 <li key={index}>
                   <a 
                     href={link.href}
-                    className="text-gray-400 hover:text-idOrange transition-colors duration-300"
+                    className="text-gray-400 hover:text-idOrange transition-colors duration-300 text-sm sm:text-base"
                   >
                     {link.name}
                   </a>
@@ -159,15 +158,15 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Services */}
-          <div>
-            <h3 className="text-lg font-bold text-white mb-4">
+          {/* Services - Melhorado para mobile */}
+          <div className="text-center sm:text-left">
+            <h3 className="text-base sm:text-lg font-bold text-white mb-3 sm:mb-4">
               {content.services}
             </h3>
-            <ul className="space-y-2">
+            <ul className="space-y-1 sm:space-y-2">
               {content.serviceLinks.map((service, index) => (
                 <li key={index}>
-                  <a href={service.href} className="text-gray-400 hover:text-idOrange transition-colors duration-300 text-sm">
+                  <a href={service.href} className="text-gray-400 hover:text-idOrange transition-colors duration-300 text-xs sm:text-sm leading-relaxed block">
                     {service.name}
                   </a>
                 </li>
@@ -175,28 +174,28 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact */}
-          <div>
-            <h3 className="text-lg font-bold text-white mb-4">
+          {/* Contact - Melhorado para mobile */}
+          <div className="text-center sm:text-left">
+            <h3 className="text-base sm:text-lg font-bold text-white mb-3 sm:mb-4">
               {content.contact}
             </h3>
-            <ul className="space-y-2">
-              <li className="flex items-center text-gray-400">
-                <svg className="w-5 h-5 text-idOrange mr-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <ul className="space-y-2 sm:space-y-3">
+              <li className="flex items-center justify-center sm:justify-start text-gray-400">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-idOrange mr-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>
-                <span>{contactEmail}</span>
+                <span className="text-xs sm:text-sm break-all">{contactEmail}</span>
               </li>
-              <li className="flex items-center text-gray-400">
-                <svg className="w-5 h-5 text-idOrange mr-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <li className="flex items-center justify-center sm:justify-start text-gray-400">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 text-idOrange mr-2 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
-                <span>+55 (61) 99960-1534</span>
+                <span className="text-xs sm:text-sm">+55 (61) 99960-1534</span>
               </li>
             </ul>
-            <div className="mt-6">
+            <div className="mt-4 sm:mt-6">
               <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
-                <Button className="btn-primary">
+                <Button className="btn-primary text-sm sm:text-base w-full sm:w-auto">
                   {content.talkToSpecialist}
                 </Button>
               </a>
@@ -204,30 +203,30 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-gray-800 py-6 text-center md:flex md:justify-between md:text-left">
-          <p className="text-gray-400">
+        {/* Bottom Bar - Melhorado para mobile */}
+        <div className="border-t border-gray-800 py-4 sm:py-6 text-center md:flex md:justify-between md:text-left">
+          <p className="text-gray-400 text-xs sm:text-sm">
             © 2025 Agência iD. {content.allRightsReserved}
           </p>
-          <div className="mt-3 md:mt-0 flex justify-center md:justify-end space-x-6">
-            <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-idOrange transition-colors duration-300">
+          <div className="mt-2 md:mt-0 flex justify-center md:justify-end space-x-4 sm:space-x-6">
+            <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-idOrange transition-colors duration-300 text-xs sm:text-sm">
               {content.termsOfUse}
             </a>
-            <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-idOrange transition-colors duration-300">
+            <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-idOrange transition-colors duration-300 text-xs sm:text-sm">
               {content.privacyPolicy}
             </a>
           </div>
         </div>
       </div>
       
-      {/* Scroll to Top Button */}
+      {/* Scroll to Top Button - Melhorado para mobile */}
       {showScrollTop && (
         <button
           onClick={scrollToTop}
-          className="fixed bottom-6 right-6 bg-idOrange text-white p-3 rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 z-40"
+          className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 bg-idOrange text-white p-2 sm:p-3 rounded-full shadow-lg hover:bg-orange-600 transition-all duration-300 z-40"
           aria-label="Scroll to top"
         >
-          <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="w-4 h-4 sm:w-5 sm:h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
           </svg>
         </button>
