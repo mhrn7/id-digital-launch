@@ -101,7 +101,7 @@ const Hero = () => {
               {content.heroDescription}
             </p>
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
-              <a href="#contact">
+              <a href="https://wa.me/5511999999999?text=Olá! Quero começar a escalar meu negócio" target="_blank" rel="noopener noreferrer">
                 <Button className="btn-primary text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 w-full sm:w-auto">
                   {content.requestProposal}
                 </Button>
@@ -150,7 +150,7 @@ const Hero = () => {
               {/* Gradient Circle Background - reduced sizing */}
               <div className="w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] md:w-[400px] md:h-[400px] lg:w-[480px] lg:h-[480px] rounded-full bg-gradient-to-br from-idOrange/30 to-idOrange/10 p-1">
                 <div className="w-full h-full rounded-full bg-gradient-to-br from-idOrange/20 to-transparent p-2 sm:p-3 md:p-4">
-                  <img alt="CEO da Agência iD" src="/lovable-uploads/7fe0977e-6587-42d1-82d8-bf6328bcb70b.jpg" className="w-full h-full rounded-full border-2 sm:border-3 md:border-4 border-idOrange/40 object-center object-cover" />
+                  <img alt="CEO da Agência iD" src="/lovable-uploads/12fbe7c9-2a8d-415f-8f1d-e1918e2c46de.png" className="w-full h-full rounded-full border-2 sm:border-3 md:border-4 border-idOrange/40 object-center object-cover" />
                 </div>
               </div>
               

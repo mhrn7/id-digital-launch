@@ -1,7 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from './LanguageProvider';
-import { Star } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface TestimonialProps {
   quote: string;
@@ -43,23 +43,7 @@ const TestimonialCard = ({ quote, author, company, image }: TestimonialProps) =>
 
 const Testimonials = () => {
   const { language } = useLanguage();
-
-  useEffect(() => {
-    // Apply animation to elements
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('active');
-        }
-      });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.animate-on-scroll').forEach(el => {
-      observer.observe(el);
-    });
-
-    return () => observer.disconnect();
-  }, []);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const getContent = () => {
     switch (language) {
@@ -158,6 +142,41 @@ const Testimonials = () => {
 
   const content = getContent();
 
+  useEffect(() => {
+    // Apply animation to elements
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.animate-on-scroll').forEach(el => {
+      observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+  
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prevIndex) => 
+        prevIndex === content.testimonials.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 4000);
+
+    return () => clearInterval(timer);
+  }, [content.testimonials.length]);
+
+  const nextTestimonial = () => {
+    setCurrentIndex(currentIndex === content.testimonials.length - 1 ? 0 : currentIndex + 1);
+  };
+
+  const prevTestimonial = () => {
+    setCurrentIndex(currentIndex === 0 ? content.testimonials.length - 1 : currentIndex - 1);
+  };
+
   return (
     <section id="testimonials" className="section-padding bg-gradient-to-b from-idDarkBlack to-black">
       <div className="container-custom">
@@ -171,15 +190,51 @@ const Testimonials = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {content.testimonials.map((testimonial, index) => (
-            <TestimonialCard
-              key={index}
-              quote={testimonial.quote}
-              author={testimonial.author}
-              company={testimonial.company}
-            />
-          ))}
+        {/* Carrossel de Depoimentos */}
+        <div className="relative max-w-4xl mx-auto">
+          <div className="overflow-hidden rounded-lg">
+            <div 
+              className="flex transition-transform duration-500 ease-in-out"
+              style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+            >
+              {content.testimonials.map((testimonial, index) => (
+                <div key={index} className="w-full flex-shrink-0 px-4">
+                  <TestimonialCard
+                    quote={testimonial.quote}
+                    author={testimonial.author}
+                    company={testimonial.company}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          {/* Controles do Carrossel */}
+          <button 
+            onClick={prevTestimonial}
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 bg-idOrange/20 hover:bg-idOrange/40 text-white p-2 rounded-full transition-colors duration-200"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
+          <button 
+            onClick={nextTestimonial}
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 bg-idOrange/20 hover:bg-idOrange/40 text-white p-2 rounded-full transition-colors duration-200"
+          >
+            <ChevronRight className="w-6 h-6" />
+          </button>
+          
+          {/* Indicadores */}
+          <div className="flex justify-center space-x-2 mt-8">
+            {content.testimonials.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`w-3 h-3 rounded-full transition-colors duration-200 ${
+                  index === currentIndex ? 'bg-idOrange' : 'bg-gray-600'
+                }`}
+              />
+            ))}
+          </div>
         </div>
         
         <div className="mt-16 text-center">
@@ -190,7 +245,7 @@ const Testimonials = () => {
             <p className="text-gray-300 mb-6">
               {content.readyDescription}
             </p>
-            <a href="#contact">
+            <a href="https://wa.me/5511999999999?text=Olá! Quero impulsionar meu negócio" target="_blank" rel="noopener noreferrer">
               <Button className="btn-primary">
                 {content.requestConsultation}
               </Button>
