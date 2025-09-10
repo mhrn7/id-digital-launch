@@ -245,7 +245,7 @@ const Testimonials = () => {
             <p className="text-gray-300 mb-6">
               {content.readyDescription}
             </p>
-            <a href="https://wa.me/5511999999999?text=Olá! Quero impulsionar meu negócio" target="_blank" rel="noopener noreferrer">
+            <a href="https://wa.me/5561999601534?text=Olá! Quero impulsionar meu negócio" target="_blank" rel="noopener noreferrer">
               <Button className="btn-primary">
                 {content.requestConsultation}
               </Button>

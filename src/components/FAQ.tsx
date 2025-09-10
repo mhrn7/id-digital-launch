@@ -165,7 +165,7 @@ const FAQ = () => {
         
         <div className="text-center mt-12">
           <p className="text-gray-400 mb-6">Ainda tem dúvidas? Entre em contato conosco!</p>
-          <a href="https://wa.me/5511999999999?text=Olá! Tenho algumas dúvidas sobre os serviços" target="_blank" rel="noopener noreferrer">
+          <a href="https://wa.me/5561999601534?text=Olá! Tenho algumas dúvidas sobre os serviços" target="_blank" rel="noopener noreferrer">
             <button className="btn-primary">
               Fale Conosco
             </button>

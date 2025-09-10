@@ -114,11 +114,36 @@
   /* Melhorias para mobile */
   @media (max-width: 768px) {
     .section-padding {
-      @apply py-8;
+      @apply py-12;
     }
     
     .container-custom {
       @apply px-4;
+    }
+    
+    /* Hero optimizations */
+    #home .grid {
+      @apply gap-6;
+    }
+    
+    /* Form improvements */
+    .btn-primary {
+      @apply py-4 text-base font-semibold min-h-[48px];
+    }
+    
+    /* Contact form mobile */
+    input, textarea {
+      @apply py-4 px-4 text-base min-h-[48px];
+    }
+    
+    /* Mobile carousel improvements */
+    .carousel-item {
+      @apply px-2;
+    }
+    
+    /* FAQ mobile spacing */
+    .accordion-content {
+      @apply text-sm leading-relaxed;
     }
   }
 
@@ -127,5 +152,42 @@
     .container-custom {
       @apply px-3;
     }
+    
+    .section-padding {
+      @apply py-10;
+    }
+    
+    /* Ensure touch targets are at least 44px */
+    button, .btn-primary {
+      @apply min-h-[44px] px-6;
+    }
+  }
+  
+  /* Premium animations and micro-interactions */
+  .btn-primary {
+    @apply relative overflow-hidden transition-all duration-300;
+  }
+
+  .btn-primary::before {
+    content: '';
+    @apply absolute top-0 left-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent transform -translate-x-full transition-transform duration-700;
+  }
+
+  .btn-primary:hover::before {
+    @apply translate-x-full;
+  }
+
+  /* Improved focus states for accessibility */
+  input:focus, textarea:focus, button:focus {
+    @apply ring-2 ring-idOrange/50 ring-offset-2 ring-offset-black outline-none;
+  }
+
+  /* Premium card hover effects */
+  .premium-card {
+    @apply transition-all duration-300 hover:shadow-2xl hover:shadow-idOrange/10;
+  }
+
+  .premium-card:hover {
+    transform: translateY(-2px);
   }
 }

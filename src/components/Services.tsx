@@ -52,7 +52,7 @@ const ServiceItem = ({ title, description, icon, details, value, ctaText }: Serv
       <AccordionContent className="bg-gradient-to-br from-idDarkBlack to-black px-6 pb-6">
         <ServiceDetails details={details} />
         <div className="mt-6 pt-4 border-t border-gray-800">
-          <a href="#contact">
+          <a href="https://wa.me/5561999601534?text=Olá! Quero saber mais sobre os serviços" target="_blank" rel="noopener noreferrer">
             <Button className="btn-primary w-full">
               {ctaText}
             </Button>
@@ -348,7 +348,7 @@ const Services = () => {
         </div>
 
         <div className="mt-12 md:mt-16 text-center animate-on-scroll">
-          <a href="#contact">
+          <a href="https://wa.me/5561999601534?text=Olá! Quero começar minha consultoria gratuita" target="_blank" rel="noopener noreferrer">
             <Button className="btn-primary text-base md:text-lg px-6 md:px-8 py-4 md:py-6">
               {content.requestAnalysis}
             </Button>

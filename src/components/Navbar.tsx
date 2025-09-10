@@ -145,7 +145,7 @@ const Navbar = () => {
             >
               <Settings className="w-4 h-4" />
             </Button>
-            <a href="#contact">
+            <a href="https://wa.me/5561999601534?text=Olá! Quero falar sobre marketing digital" target="_blank" rel="noopener noreferrer">
               <Button className="btn-primary">
                 {ctaText.desktop}
               </Button>
@@ -192,7 +192,7 @@ const Navbar = () => {
                   <Settings className="w-4 h-4 mr-2" />
                   Admin
                 </Button>
-                <a href="#contact">
+                <a href="https://wa.me/5561999601534?text=Olá! Quero falar sobre marketing digital" target="_blank" rel="noopener noreferrer">
                   <Button className="btn-primary w-full">
                     {ctaText.mobile}
                   </Button>
