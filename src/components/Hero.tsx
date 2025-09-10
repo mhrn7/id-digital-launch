@@ -101,7 +101,7 @@ const Hero = () => {
               {content.heroDescription}
             </p>
             <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
-              <a href="https://wa.me/5561999601534?text=Olá! Quero começar a escalar meu negócio" target="_blank" rel="noopener noreferrer">
+              <a href="https://wa.me/5511999999999?text=Olá! Quero começar a escalar meu negócio" target="_blank" rel="noopener noreferrer">
                 <Button className="btn-primary text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 w-full sm:w-auto">
                   {content.requestProposal}
                 </Button>

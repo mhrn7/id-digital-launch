@@ -4,17 +4,18 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useLanguage } from './LanguageProvider';
+import { useFormMessages } from '@/hooks/useFormMessages';
 import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
 
 const Contact = () => {
   const { language } = useLanguage();
+  const { addMessage } = useFormMessages();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
+    email: '',
     phone: '',
-    company: '',
     message: ''
   });
 
@@ -25,42 +26,45 @@ const Contact = () => {
           title: 'Ready to scale your business?',
           subtitle: 'Contact us and discover how we can help accelerate your company\'s growth.',
           namePlaceholder: 'Your full name',
-          companyPlaceholder: 'Your company',
+          emailPlaceholder: 'Your email',
           phonePlaceholder: 'Your phone',
           messagePlaceholder: 'Tell us about your business and goals...',
-          sendButton: 'Contact on WhatsApp',
+          sendButton: 'Send Message',
           sending: 'Sending...',
           successMessage: 'Message sent successfully! We will contact you soon.',
           errorMessage: 'Error sending message. Please try again.',
-          contactInfo: 'Contact Information'
+          contactInfo: 'Contact Information',
+          socialMedia: 'Follow Us'
         };
       case 'ES':
         return {
           title: '¿Listo para escalar tu negocio?',
           subtitle: 'Contáctanos y descubre cómo podemos ayudar a acelerar el crecimiento de tu empresa.',
           namePlaceholder: 'Tu nombre completo',
-          companyPlaceholder: 'Tu empresa',
+          emailPlaceholder: 'Tu email',
           phonePlaceholder: 'Tu teléfono',
           messagePlaceholder: 'Cuéntanos sobre tu negocio y objetivos...',
-          sendButton: 'Contactar en WhatsApp',
+          sendButton: 'Enviar Mensaje',
           sending: 'Enviando...',
           successMessage: '¡Mensaje enviado con éxito! Te contactaremos pronto.',
           errorMessage: 'Error al enviar mensaje. Por favor, inténtalo de nuevo.',
-          contactInfo: 'Información de Contacto'
+          contactInfo: 'Información de Contacto',
+          socialMedia: 'Síguenos'
         };
       default: // PT
         return {
           title: 'Pronto para escalar seu negócio?',
           subtitle: 'Entre em contato conosco e descubra como podemos ajudar a acelerar o crescimento da sua empresa.',
           namePlaceholder: 'Seu nome completo',
-          companyPlaceholder: 'Sua empresa',
+          emailPlaceholder: 'Seu email',
           phonePlaceholder: 'Seu telefone',
           messagePlaceholder: 'Conte-nos sobre seu negócio e objetivos...',
-          sendButton: 'Contatar no WhatsApp',
+          sendButton: 'Enviar Mensagem',
           sending: 'Enviando...',
           successMessage: 'Mensagem enviada com sucesso! Entraremos em contato em breve.',
           errorMessage: 'Erro ao enviar mensagem. Tente novamente.',
-          contactInfo: 'Informações de Contato'
+          contactInfo: 'Informações de Contato',
+          socialMedia: 'Nos Siga'
         };
     }
   };
@@ -70,7 +74,7 @@ const Contact = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.name || !formData.phone || !formData.message) {
+    if (!formData.name || !formData.email || !formData.message) {
       toast({
         title: "Erro",
         description: "Por favor, preencha todos os campos obrigatórios.",
@@ -82,30 +86,21 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      // Save to Supabase
-      const { error } = await supabase
-        .from('form_submissions')
-        .insert([
-          {
-            name: formData.name,
-            phone: formData.phone,
-            company: formData.company,
-            message: formData.message
-          }
-        ]);
+      // Adicionar mensagem ao sistema
+      const newMessage = addMessage({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        message: formData.message
+      });
 
-      if (error) throw error;
+      console.log('Mensagem adicionada ao painel admin:', newMessage);
 
-      // Redirect to WhatsApp with form data
-      const phoneNumber = "5561999601534";
-      const whatsappMessage = `Olá! Meu nome é ${formData.name}${formData.company ? ` da empresa ${formData.company}` : ''}. ${formData.message}`;
-      const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(whatsappMessage)}`;
-      
-      // Clear form
+      // Limpar formulário
       setFormData({
         name: '',
+        email: '',
         phone: '',
-        company: '',
         message: ''
       });
 
@@ -113,9 +108,6 @@ const Contact = () => {
         title: "Sucesso!",
         description: content.successMessage,
       });
-
-      // Open WhatsApp
-      window.open(whatsappURL, '_blank');
 
     } catch (error) {
       console.error('Erro ao enviar mensagem:', error);
@@ -152,94 +144,110 @@ const Contact = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <div>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
                   <Input
                     type="text"
                     placeholder={content.namePlaceholder}
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
-                    className="bg-idDarkBlack border-gray-700 text-white placeholder:text-gray-400 focus:border-idOrange transition-colors"
+                    className="bg-idDarkBlack border-gray-700 text-white"
                     required
                   />
+                </div>
+                <div>
+                  <Input
+                    type="email"
+                    placeholder={content.emailPlaceholder}
+                    value={formData.email}
+                    onChange={(e) => handleInputChange('email', e.target.value)}
+                    className="bg-idDarkBlack border-gray-700 text-white"
+                    required
+                  />
+                </div>
+                <div>
                   <Input
                     type="tel"
                     placeholder={content.phonePlaceholder}
                     value={formData.phone}
                     onChange={(e) => handleInputChange('phone', e.target.value)}
-                    className="bg-idDarkBlack border-gray-700 text-white placeholder:text-gray-400 focus:border-idOrange transition-colors"
+                    className="bg-idDarkBlack border-gray-700 text-white"
+                  />
+                </div>
+                <div>
+                  <Textarea
+                    placeholder={content.messagePlaceholder}
+                    value={formData.message}
+                    onChange={(e) => handleInputChange('message', e.target.value)}
+                    className="bg-idDarkBlack border-gray-700 text-white min-h-[120px]"
                     required
                   />
                 </div>
-                <Input
-                  type="text"
-                  placeholder={content.companyPlaceholder}
-                  value={formData.company}
-                  onChange={(e) => handleInputChange('company', e.target.value)}
-                  className="bg-idDarkBlack border-gray-700 text-white placeholder:text-gray-400 focus:border-idOrange transition-colors"
-                />
-                <Textarea
-                  placeholder={content.messagePlaceholder}
-                  value={formData.message}
-                  onChange={(e) => handleInputChange('message', e.target.value)}
-                  className="bg-idDarkBlack border-gray-700 text-white placeholder:text-gray-400 focus:border-idOrange transition-colors min-h-[120px] resize-none"
-                  required
-                />
                 <Button
                   type="submit"
-                  className="btn-primary w-full h-12 text-lg font-semibold hover:scale-105 transition-all duration-200"
+                  className="btn-primary w-full"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"></div>
-                      {content.sending}
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/>
-                      </svg>
-                      {content.sendButton}
-                    </div>
-                  )}
+                  {isSubmitting ? content.sending : content.sendButton}
                 </Button>
               </form>
             </div>
 
             <div className="space-y-8">
               <div>
-                <h3 className="text-xl font-bold mb-6 text-center lg:text-left">{content.contactInfo}</h3>
-                <div className="space-y-6">
-                  <a 
-                    href="https://wa.me/5561999601534?text=Olá! Gostaria de saber mais sobre os serviços da Agência iD." 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center p-4 bg-green-500/10 border border-green-500/20 rounded-xl hover:bg-green-500/20 transition-all duration-200 group"
-                  >
-                    <div className="w-14 h-14 bg-green-500 rounded-xl flex items-center justify-center mr-4 group-hover:scale-110 transition-transform">
-                      <svg className="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347"/>
+                <h3 className="text-xl font-bold mb-4">{content.contactInfo}</h3>
+                <div className="space-y-4">
+                  <div className="flex items-center">
+                    <div className="w-12 h-12 bg-idOrange/20 rounded-lg flex items-center justify-center mr-4">
+                      <svg className="w-6 h-6 text-idOrange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                       </svg>
                     </div>
                     <div>
-                      <p className="text-green-400 font-medium">WhatsApp</p>
-                      <p className="text-white font-semibold text-lg">+55 (61) 99960-1534</p>
-                      <p className="text-gray-400 text-sm">Clique para conversar conosco</p>
+                      <p className="text-gray-300">Email</p>
+                      <p className="text-white font-semibold">contato@agenciaidmkt.site</p>
                     </div>
-                  </a>
+                  </div>
+                  
+                  <div className="flex items-center">
+                    <div className="w-12 h-12 bg-idOrange/20 rounded-lg flex items-center justify-center mr-4">
+                      <svg className="w-6 h-6 text-idOrange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-gray-300">Telefone</p>
+                      <p className="text-white font-semibold">+55 (61) 99960-1534</p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="bg-gradient-to-br from-idOrange/10 to-yellow-500/10 border border-idOrange/20 rounded-xl p-6">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-idOrange/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg className="w-8 h-8 text-idOrange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              {/* Social Media Section */}
+              <div>
+                <h3 className="text-xl font-bold mb-4">{content.socialMedia}</h3>
+                <div className="flex space-x-4">
+                  <a 
+                    href="https://instagram.com/eumatheusnevs" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center hover:scale-110 transition-transform"
+                  >
+                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                     </svg>
-                  </div>
-                  <h4 className="text-lg font-bold text-white mb-2">Resposta Rápida</h4>
-                  <p className="text-gray-300 text-sm">Respondemos em até 30 minutos durante horário comercial</p>
+                  </a>
+                  
+                  <a 
+                    href="https://www.facebook.com/matheus.neves.992581/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center hover:scale-110 transition-transform"
+                  >
+                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                  </a>
                 </div>
               </div>
             </div>
